@@ -15,3 +15,10 @@ https://doc.qt.io/qtforpython-6/tutorials/basictutorial/uifiles.html#option-a-ge
 
 # load ui files directory
 https://doc.qt.io/qtforpython-6/tutorials/basictutorial/uifiles.html#option-b-loading-it-directly
+
+# API
+https://doc.qt.io/qtforpython-6/api.html
+
+# QTableView
+https://doc.qt.io/qtforpython-6/PySide6/QtWidgets/QTableView.html#PySide6.QtWidgets.QTableView
+
