@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "pyfemtet-opt-gui"
+version = "0.1.0"
+description = "GUI to build and run a script for pyfemtet.opt"
+authors = ["Your Name <you@example.com>"]
+license = "BSD-3"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.11, <3.13"
+pyside6 = "^6.7.1"
+nuitka = "==2.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

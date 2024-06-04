@@ -1,0 +1,17 @@
+# installation
+https://doc.qt.io/qtforpython-6/quickstart.html
+
+# examples
+https://doc.qt.io/qtforpython-6/examples/index.html
+
+# distribution
+https://doc.qt.io/qtforpython-6/faq/distribution.html
+
+# distribution (with FREEZE)
+https://doc.qt.io/qtforpython-6/deployment/index.html
+
+# compile ui files
+https://doc.qt.io/qtforpython-6/tutorials/basictutorial/uifiles.html#option-a-generating-a-python-class
+
+# load ui files directory
+https://doc.qt.io/qtforpython-6/tutorials/basictutorial/uifiles.html#option-b-loading-it-directly
