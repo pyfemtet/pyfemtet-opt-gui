@@ -10,7 +10,7 @@ readme = "README.md"
 python = ">=3.11, <3.13"
 pyside6 = "^6.7.1"
 nuitka = "==2.1"
-pyfemtet = "^0.4.4"
+pyfemtet = ">=0.4.5"
 
 [build-system]
 requires = ["poetry-core"]
