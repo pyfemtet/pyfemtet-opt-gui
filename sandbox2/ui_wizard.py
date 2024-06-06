@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'wizardTNlFuj.ui'
+## Form generated from reading UI file 'wizardRpoHOP.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.7.1
 ##
@@ -89,7 +89,7 @@ class Ui_Wizard(object):
         self.wizardPage9_verify.setObjectName(u"wizardPage9_verify")
         self.textEdit_4 = QTextEdit(self.wizardPage9_verify)
         self.textEdit_4.setObjectName(u"textEdit_4")
-        self.textEdit_4.setGeometry(QRect(150, 270, 421, 51))
+        self.textEdit_4.setGeometry(QRect(150, 290, 421, 51))
         self.textEdit_4.setReadOnly(True)
         Wizard.addPage(self.wizardPage9_verify)
 #if QT_CONFIG(shortcut)
@@ -112,8 +112,10 @@ class Ui_Wizard(object):
         self.pushButton_load.setText(QCoreApplication.translate("Wizard", u"Load", None))
         self.label_project.setText(QCoreApplication.translate("Wizard", u".femprj", None))
         self.label_model.setText(QCoreApplication.translate("Wizard", u"model", None))
-        self.plainTextEdit_prj.setPlainText(QCoreApplication.translate("Wizard", u"<.femprj path>", None))
-        self.plainTextEdit_model.setPlainText(QCoreApplication.translate("Wizard", u"<analysis model name>", None))
+        self.plainTextEdit_prj.setPlainText("")
+        self.plainTextEdit_prj.setPlaceholderText(QCoreApplication.translate("Wizard", u"<.femprj path>", None))
+        self.plainTextEdit_model.setPlainText("")
+        self.plainTextEdit_model.setPlaceholderText(QCoreApplication.translate("Wizard", u"<analysis model name>", None))
         self.textEdit.setMarkdown(QCoreApplication.translate("Wizard", u".femprj \u30d5\u30a1\u30a4\u30eb\u3092\u958b\u3044\u3066\u304f\u3060\u3055\u3044\u3002\n"
 "\n"
 "\u76ee\u7684\u306e\u89e3\u6790\u30e2\u30c7\u30eb\u3092\u958b\u304d\u3001Load \u3092\u62bc\u3057\u3066\u304f\u3060\u3055\u3044\u3002\n"

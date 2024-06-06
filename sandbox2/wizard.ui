@@ -96,6 +96,9 @@
      <bool>true</bool>
     </property>
     <property name="plainText">
+     <string/>
+    </property>
+    <property name="placeholderText">
      <string>&lt;.femprj path&gt;</string>
     </property>
    </widget>
@@ -109,6 +112,9 @@
      </rect>
     </property>
     <property name="plainText">
+     <string/>
+    </property>
+    <property name="placeholderText">
      <string>&lt;analysis model name&gt;</string>
     </property>
    </widget>
@@ -253,7 +259,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
     <property name="geometry">
      <rect>
       <x>150</x>
-      <y>270</y>
+      <y>290</y>
       <width>421</width>
       <height>51</height>
      </rect>

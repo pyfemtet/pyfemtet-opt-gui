@@ -21,21 +21,26 @@ class MainWizard(QWizard):
         self._ui = ui
 
     def load_prm(self):
-        prm_table_model = PrmTableModel()  # モデルの作成
-        self._ui.tableView_prm.setModel(prm_table_model)  # モデルをビューに設定
+        if self._ui.plainTextEdit_prj.toPlainText():
+            prm_table_model = PrmTableModel()  # モデルの作成
+            self._ui.tableView_prm.setModel(prm_table_model)  # モデルをビューに設定
 
     def load_obj(self):
-        obj_table_model = ObjTableModel()  # モデルの作成
-        self._ui.tableView_obj.setModel(obj_table_model)  # モデルをビューに設定
-        delegate = ComboBoxDelegate(obj_table_model)  # デリゲートの作成
-        ui_wizard.tableView_obj.setItemDelegate(delegate)  # デリゲートをビューに設定
+        if self._ui.plainTextEdit_prj.toPlainText():
+            obj_table_model = ObjTableModel()  # モデルの作成
+            self._ui.tableView_obj.setModel(obj_table_model)  # モデルをビューに設定
+            delegate = ComboBoxDelegate(obj_table_model)  # デリゲートの作成
+            ui_wizard.tableView_obj.setItemDelegate(delegate)  # デリゲートをビューに設定
 
     def load_model(self):
         if _p.check_femtet_alive():
             prj = _p.Femtet.Project
             model = _p.Femtet.AnalysisModelName
-            self._ui.plainTextEdit_prj.setPlainText(prj)
-            self._ui.plainTextEdit_model.setPlainText(model)
+            if prj:
+                self._ui.plainTextEdit_prj.setPlainText(prj)
+                self._ui.plainTextEdit_model.setPlainText(model)
+            else:
+                _p.logger.warning('Femtet で解析プロジェクトが開かれていません。')
         else:
             _p.logger.warning('Femtet との接続が確立していません。')
 
@@ -49,12 +54,11 @@ class MainWizard(QWizard):
         else:
             _p.logger.warning('Connection failed.')
 
-        self.check_femtet_alive.emit()
-
     def update_model_via_ui(self):
-        self.load_prm()
-        self.load_obj()
-        self.load_model()
+        if self._ui.plainTextEdit_prj.toPlainText():
+            self.load_prm()
+            self.load_obj()
+            self.load_model()
 
 
 if __name__ == '__main__':

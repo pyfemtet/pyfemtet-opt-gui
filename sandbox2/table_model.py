@@ -110,14 +110,14 @@ class PrmTableModel(BasicTableModel):
             return False
 
         # load prm
-        from logging import DEBUG
-        _p.logger.setLevel(DEBUG)
         names = _p.Femtet.GetVariableNames_py()
-        _p.logger.debug(f'names is ({names})')
 
-        # if no prm, show dialog
+        # TODO: if no prm, show dialog
+        if names is None:
+            _p.logger.warning('Femtet で変数を設定してください。')
+            return False
+
         if len(names) == 0:
-            # TODO: show dialog
             _p.logger.warning('Femtet で変数を設定してください。')
             return False
 
@@ -180,8 +180,17 @@ class ObjTableModel(BasicTableModel):
             return False
 
         # load obj
-        data = []
         names = _p.get_parametric_output_names()
+
+        if names is None:
+            _p.logger.warning('Femtet のパラメトリック解析ダイアログの出力設定タブで設定を行ってください。')
+            return False
+
+        if len(names) == 0:
+            _p.logger.warning('Femtet のパラメトリック解析ダイアログの出力設定タブで設定を行ってください。')
+            return False
+
+        data = []
         for name in names:
             row_data = [True, name, 'Maximize', None]  # TODO: implement delegate
             data.append(row_data)
