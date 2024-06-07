@@ -121,6 +121,13 @@ class PrmModel(MyStandardItemAsTableModel):
         # note: must be (lb < expression < ub).
         # implemented in setData
 
+        # use / name is uneditable
+        if col_name in ['use', 'name']:
+            flags = Qt.ItemIsEnabled | Qt.ItemIsSelectable
+            if col_name == 'use':
+                flags = flags | Qt.ItemIsUserCheckable
+            return flags
+
         return super().flags(index)
 
     def setData(self, index, value, role=Qt.EditRole) -> bool:
