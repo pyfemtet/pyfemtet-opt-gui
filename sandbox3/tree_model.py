@@ -16,6 +16,7 @@ def _isnumeric(exp):
 class MyStandardItemAsTableModel(QAbstractTableModel):
     def __init__(self, table_item: QStandardItem, parent=None):
         self._item: QStandardItem = table_item  # QStandardItem what has table structure children.
+        self._header: list[str] = []
         super().__init__(parent)
 
     def rowCount(self, parent=None): return self._item.rowCount()
@@ -38,6 +39,19 @@ class MyStandardItemAsTableModel(QAbstractTableModel):
         self.dataChanged.emit(self.createIndex(row, col), self.createIndex(row, col))
         return True
 
+    def headerData(self, section: int, orientation: Qt.Orientation, role: int = ...):
+        if orientation == Qt.Horizontal and role == Qt.DisplayRole:
+            return self.get_header(section)
+        return None
+
+    def set_header(self, header: list[str]) -> None:
+        self._header = header
+
+    def get_col_name(self, col: int) -> str:
+        return self._header[col]
+
+    def get_col_from_name(self, header_string: str) -> int:
+        return self._header.index(header_string)
 
 
 class ProblemItemModel(QStandardItemModel):
@@ -109,9 +123,19 @@ class ProblemItemModel(QStandardItemModel):
         # set data to table
         table.setRowCount(len(names))
 
+        self.prm_model.set_header([
+            'use',
+            'name',
+            'expression',
+            'lb',
+            'ub',
+            'test',
+        ])
+
         for row, name in enumerate(names):
             # use
             item = QStandardItem()
+            item.setCheckable(True)
             table.setChild(row, 0, item)
 
             # name
@@ -140,6 +164,7 @@ class ProblemItemModel(QStandardItemModel):
 
         # notify to end editing to the abstract model
         self.prm_model.endResetModel()
+
 
 
 
