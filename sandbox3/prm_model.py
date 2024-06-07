@@ -109,7 +109,7 @@ class PrmModel(MyStandardItemAsTableModel):
             return ~Qt.ItemIsEnabled
 
         # note: expression, lb, ub, test must be a float.
-        # TODO: IMPLEMENT ABOVE (via setData?)
+        # implemented in setData
 
         # note: if checkbox is false, disable the row (excluding use column).
         use_col = self.get_col_from_name('use')
@@ -119,6 +119,43 @@ class PrmModel(MyStandardItemAsTableModel):
                 return ~Qt.ItemIsEnabled
 
         # note: must be (lb < expression < ub).
-        # TODO: IMPLEMENT ABOVE (via setData?)
+        # implemented in setData
 
         return super().flags(index)
+
+    def setData(self, index, value, role=Qt.EditRole) -> bool:
+        if not index.isValid(): return super().setData(index, value, role)
+
+        col, row = index.column(), index.row()
+        col_name = self.get_col_name(col)
+
+        # note: expression, lb, ub, test must be a float.
+        if col_name in ['expression', 'lb', 'ub']:
+            if not _isnumeric(value):
+                _p.logger.warning('数値を入力してください。')
+                return False
+
+        # note: must be (lb < expression < ub).
+        if col_name in ['expression', 'lb', 'ub']:
+            exp_index = self.createIndex(row, self.get_col_from_name('expression'))
+            exp_float = float(value) if col_name == 'expression' else float(self.data(exp_index))
+
+            lb_index = self.createIndex(row, self.get_col_from_name('lb'))
+            lb_float = float(value) if col_name == 'lb' else float(self.data(lb_index))
+
+            ub_index = self.createIndex(row, self.get_col_from_name('ub'))
+            ub_float = float(value) if col_name == 'ub' else float(self.data(ub_index))
+
+            if not (lb_float <= exp_float):
+                _p.logger.warning('初期値が下限を下回っています。')
+                return False
+
+            if not (exp_float <= ub_float):
+                _p.logger.warning('初期値が上限を上回っています。')
+                return False
+
+            if lb_float == ub_float:
+                _p.logger.warning('上限と下限が一致しています。変数の値を変更したくない場合は、use 列のチェックを外してください。')
+                return False
+
+        return super().setData(index, value, role)
