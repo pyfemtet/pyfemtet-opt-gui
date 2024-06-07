@@ -38,6 +38,10 @@ class MyStandardItemAsTableModel(QAbstractTableModel):
         row, col = index.row(), index.column()
         self._item.child(row, col).setData(value, role)  # -> None
         self.dataChanged.emit(self.createIndex(row, col), self.createIndex(row, col))
+
+        if role == Qt.CheckStateRole:
+            self.layoutChanged.emit()  # これがないとチェックボックスの変更による enable / disable 切り替えが即時にならない
+
         return True
 
     # header relative implementation
@@ -55,3 +59,6 @@ class MyStandardItemAsTableModel(QAbstractTableModel):
     def get_col_from_name(self, header_string: str) -> int:
         return self._header.index(header_string)
 
+    # get item directory
+    def get_item(self, row, col) -> QStandardItem:
+        return self._item.child(row, col)

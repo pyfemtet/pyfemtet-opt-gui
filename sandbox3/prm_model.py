@@ -1,3 +1,4 @@
+from PySide6.QtCore import Qt
 from PySide6.QtGui import QStandardItem
 
 import _p
@@ -6,22 +7,21 @@ from item_as_model import MyStandardItemAsTableModel, _isnumeric
 
 
 class PrmModel(MyStandardItemAsTableModel):
+    """A table for determining whether to use Femtet variables in optimization.
+
+    use        | name       | expression   | lb             | ub             | test
+    -------------------------------------------------------------------------
+    checkbox   | str        | float or str | float or empty | float or empty | float
+    uneditable | uneditable |              |
+
+    note: if expression is not numeric, disable the row (including use column).
+    note: expression, lb, ub, test must be a float.
+    note: if checkbox is false, disable the row (excluding use column).
+    note: must be (lb < expression < ub).
+
+    """
 
     def load(self):
-        """A table for determining whether to use Femtet variables in optimization.
-
-        use        | name       | expression   | lb             | ub             | test
-        -------------------------------------------------------------------------
-        checkbox   | str        | float or str | float or empty | float or empty | float
-        uneditable | uneditable |              |
-
-        note: if expression is not numeric, disable the row (including use column).
-        note: expression, lb, ub, test must be a float.
-        note: if checkbox is false, disable the row (excluding use column).
-        note: must be (lb < expression < ub).
-
-        """
-
         # initialize table
         table: QStandardItem = self._item
         table.clearData()
@@ -95,3 +95,30 @@ class PrmModel(MyStandardItemAsTableModel):
 
         # notify to end editing to the abstract model
         self.endResetModel()
+
+    def flags(self, index):
+        if not index.isValid(): return super().flags(index)
+
+        col, row = index.column(), index.row()
+        col_name = self.get_col_name(col)
+
+        # note: if expression is not numeric, disable the row (including use column).
+        exp_col = self.get_col_from_name('expression')
+        exp_index = self.createIndex(row, exp_col)
+        if not _isnumeric(self.data(exp_index)):
+            return ~Qt.ItemIsEnabled
+
+        # note: expression, lb, ub, test must be a float.
+        # TODO: IMPLEMENT ABOVE (via setData?)
+
+        # note: if checkbox is false, disable the row (excluding use column).
+        use_col = self.get_col_from_name('use')
+        use_item = self.get_item(row, use_col)
+        if use_item.checkState() == Qt.CheckState.Unchecked:
+            if col_name != 'use':
+                return ~Qt.ItemIsEnabled
+
+        # note: must be (lb < expression < ub).
+        # TODO: IMPLEMENT ABOVE (via setData?)
+
+        return super().flags(index)
