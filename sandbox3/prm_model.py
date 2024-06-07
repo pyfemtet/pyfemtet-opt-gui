@@ -139,7 +139,7 @@ class PrmModel(MyStandardItemAsTableModel):
         # note: expression, lb, ub, test must be a float.
         if col_name in ['expression', 'lb', 'ub']:
             if not _isnumeric(value):
-                _p.logger.warning('数値を入力してください。')
+                _p.logger.error('数値を入力してください。')
                 return False
 
         # note: must be (lb < expression < ub).
@@ -154,15 +154,15 @@ class PrmModel(MyStandardItemAsTableModel):
             ub_float = float(value) if col_name == 'ub' else float(self.data(ub_index))
 
             if not (lb_float <= exp_float):
-                _p.logger.warning('初期値が下限を下回っています。')
+                _p.logger.error('初期値が下限を下回っています。')
                 return False
 
             if not (exp_float <= ub_float):
-                _p.logger.warning('初期値が上限を上回っています。')
+                _p.logger.error('初期値が上限を上回っています。')
                 return False
 
             if lb_float == ub_float:
-                _p.logger.warning('上限と下限が一致しています。変数の値を変更したくない場合は、use 列のチェックを外してください。')
+                _p.logger.error('上限と下限が一致しています。変数の値を変更したくない場合は、use 列のチェックを外してください。')
                 return False
 
         return super().setData(index, value, role)

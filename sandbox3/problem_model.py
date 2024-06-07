@@ -1,6 +1,7 @@
 from PySide6.QtGui import QStandardItemModel, QStandardItem
 
 from prm_model import PrmModel
+from obj_model import ObjModel
 
 
 
@@ -15,7 +16,7 @@ class ProblemItemModel(QStandardItemModel):
         self.run_item: QStandardItem = self.append_table_item('run')
 
         self.prm_model: PrmModel = PrmModel(self.prm_item, self.root)
-        # self.obj_model: QAbstractTableModel = MyStandardItemAsTableModel(self.obj_item)
+        self.obj_model: ObjModel = ObjModel(self.obj_item, self.root)
         # self.cns_model: QAbstractTableModel = MyStandardItemAsTableModel(self.cns_item)
         # self.run_model: QAbstractTableModel = MyStandardItemAsTableModel(self.run_item)
 

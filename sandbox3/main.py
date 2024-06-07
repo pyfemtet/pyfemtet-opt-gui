@@ -30,7 +30,12 @@ class MainWizard(QWizard):
             self._ui.tableView_prm.setModel(model)
 
     def load_obj(self):
-        pass
+        if self._ui.plainTextEdit_prj.toPlainText():
+            # モデルの再読み込み
+            self._problem.obj_model.load()
+            # モデルをビューに再設定
+            model = self._problem.obj_model
+            self._ui.tableView_obj.setModel(model)
 
     def load_model(self):
         if _p.check_femtet_alive():
