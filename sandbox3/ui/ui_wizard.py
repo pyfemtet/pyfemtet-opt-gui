@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'wizardjwCfBA.ui'
+## Form generated from reading UI file 'wizardCeKTSK.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.7.1
 ##
@@ -107,6 +107,7 @@ class Ui_Wizard(object):
         self.treeView = QTreeView(self.wizardPage9_verify)
         self.treeView.setObjectName(u"treeView")
         self.treeView.setGeometry(QRect(130, 20, 421, 251))
+        self.treeView.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         Wizard.addPage(self.wizardPage9_verify)
 #if QT_CONFIG(shortcut)
         self.label_project.setBuddy(self.plainTextEdit_prj)

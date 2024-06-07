@@ -314,6 +314,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
       <height>251</height>
      </rect>
     </property>
+    <property name="editTriggers">
+     <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+    </property>
    </widget>
   </widget>
  </widget>
