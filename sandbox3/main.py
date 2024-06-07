@@ -1,7 +1,7 @@
 import sys
 
 from PySide6.QtWidgets import (QApplication, QWizard)
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QSortFilterProxyModel
 
 from sandbox3.ui.ui_wizard import Ui_Wizard
 from sandbox3.problem_model import ProblemItemModel
@@ -65,6 +65,15 @@ class MainWizard(QWizard):
             self.load_obj()
 
 
+class CustomProxyModel(QSortFilterProxyModel):
+    def filterAcceptsRow(self, source_row, source_parent):
+        index = self.sourceModel().index(source_row, 0, source_parent)
+        data = index.data(Qt.DisplayRole)
+        if data == "True":
+            return True
+        return False
+
+
 if __name__ == '__main__':
 
     app = QApplication(sys.argv)
@@ -75,9 +84,12 @@ if __name__ == '__main__':
 
     ui_wizard = Ui_Wizard()
     ui_wizard.setupUi(wizard)
-    ui_wizard.treeView.setModel(g_problem)
-    # ui_wizard.tableView_prm.setModel(g_problem.prm_model)  # ここで設定していると何故かメソッドのほうが反映されない
 
+    # show use only test
+    g_proxy_model = CustomProxyModel(g_problem)
+    g_proxy_model.setSourceModel(g_problem)
+
+    ui_wizard.treeView.setModel(g_proxy_model)
 
     wizard.set_ui(ui_wizard)  # ui を登録
     wizard.update_model_via_ui()  # ui へのモデルの登録
