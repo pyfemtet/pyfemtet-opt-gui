@@ -4,7 +4,7 @@ from PySide6.QtWidgets import (QApplication, QWizard)
 from PySide6.QtCore import Qt
 
 from sandbox3.ui.ui_wizard import Ui_Wizard
-from sandbox3.tree_model import ProblemItemModel
+from sandbox3.problem_model import ProblemItemModel
 
 
 import _p  # must be same folder and cannot import via `from` keyword.
@@ -24,7 +24,7 @@ class MainWizard(QWizard):
     def load_prm(self):
         if self._ui.plainTextEdit_prj.toPlainText():
             # モデルの再読み込み
-            self._problem.load_prm()
+            self._problem.prm_model.load()
             # モデルをビューに再設定
             model = self._problem.prm_model
             self._ui.tableView_prm.setModel(model)
