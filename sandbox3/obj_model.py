@@ -1,9 +1,46 @@
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QStandardItem
+from PySide6.QtWidgets import QStyledItemDelegate, QComboBox
 
 import _p
 
 from item_as_model import MyStandardItemAsTableModel, _isnumeric
+
+
+class ObjTableDelegate(QStyledItemDelegate):
+
+    def __init__(self, model: MyStandardItemAsTableModel):
+        super().__init__()
+        self._model: MyStandardItemAsTableModel = model
+
+    def createEditor(self, parent, option, index):
+        col, row = index.column(), index.row()
+        col_name = self._model.get_col_name(col)
+        if col_name == 'direction':
+            # コンボボックスエディタを作成
+            comboBox = QComboBox(parent)
+            comboBox.addItems(['Maximize', 'Minimize', 'Set to...'])
+            return comboBox
+        return super().createEditor(parent, option, index)
+
+    def setEditorData(self, editor, index):
+        col, row = index.column(), index.row()
+        col_name = self._model.get_col_name(col)
+        if col_name == 'direction':
+            # コンボボックスにデータを設定
+            value = index.model().data(index, Qt.EditRole)
+            editor.setCurrentText(value)
+        else:
+            super().setEditorData(editor, index)
+
+    def setModelData(self, editor, model, index):
+        col, row = index.column(), index.row()
+        col_name = self._model.get_col_name(col)
+        if col_name == 'direction':
+            # コンボボックスのデータをモデルに設定
+            model.setData(index, editor.currentText(), Qt.EditRole)
+        else:
+            super().setModelData(editor, model, index)
 
 
 class ObjModel(MyStandardItemAsTableModel):

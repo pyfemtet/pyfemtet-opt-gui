@@ -176,9 +176,27 @@ li.checked::marker { content: &quot;\2612&quot;; }
       <height>291</height>
      </rect>
     </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
     <property name="sizeAdjustPolicy">
      <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustIgnored</enum>
     </property>
+    <property name="editTriggers">
+     <set>QAbstractItemView::EditTrigger::AllEditTriggers</set>
+    </property>
+    <property name="verticalScrollMode">
+     <enum>QAbstractItemView::ScrollMode::ScrollPerItem</enum>
+    </property>
+    <property name="horizontalScrollMode">
+     <enum>QAbstractItemView::ScrollMode::ScrollPerPixel</enum>
+    </property>
+    <attribute name="verticalHeaderVisible">
+     <bool>true</bool>
+    </attribute>
    </widget>
    <widget class="QTextEdit" name="textEdit_2">
     <property name="geometry">
@@ -235,6 +253,15 @@ li.checked::marker { content: &quot;\2612&quot;; }
       <width>585</width>
       <height>291</height>
      </rect>
+    </property>
+    <property name="editTriggers">
+     <set>QAbstractItemView::EditTrigger::AllEditTriggers</set>
+    </property>
+    <property name="verticalScrollMode">
+     <enum>QAbstractItemView::ScrollMode::ScrollPerItem</enum>
+    </property>
+    <property name="horizontalScrollMode">
+     <enum>QAbstractItemView::ScrollMode::ScrollPerPixel</enum>
     </property>
    </widget>
    <widget class="QPushButton" name="pushButton_load_obj">

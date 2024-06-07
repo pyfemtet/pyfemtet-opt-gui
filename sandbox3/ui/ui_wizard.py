@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'wizardAAMxWr.ui'
+## Form generated from reading UI file 'wizardjwCfBA.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.7.1
 ##
@@ -15,10 +15,10 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QAbstractScrollArea, QApplication, QHeaderView, QLabel,
-    QPlainTextEdit, QPushButton, QSizePolicy, QTableView,
-    QTextEdit, QTreeView, QWidget, QWizard,
-    QWizardPage)
+from PySide6.QtWidgets import (QAbstractItemView, QAbstractScrollArea, QApplication, QHeaderView,
+    QLabel, QPlainTextEdit, QPushButton, QSizePolicy,
+    QTableView, QTextEdit, QTreeView, QWidget,
+    QWizard, QWizardPage)
 
 class Ui_Wizard(object):
     def setupUi(self, Wizard):
@@ -67,7 +67,16 @@ class Ui_Wizard(object):
         self.tableView_prm = QTableView(self.wizardPage3_param)
         self.tableView_prm.setObjectName(u"tableView_prm")
         self.tableView_prm.setGeometry(QRect(90, 9, 585, 291))
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.tableView_prm.sizePolicy().hasHeightForWidth())
+        self.tableView_prm.setSizePolicy(sizePolicy)
         self.tableView_prm.setSizeAdjustPolicy(QAbstractScrollArea.SizeAdjustPolicy.AdjustIgnored)
+        self.tableView_prm.setEditTriggers(QAbstractItemView.EditTrigger.AllEditTriggers)
+        self.tableView_prm.setVerticalScrollMode(QAbstractItemView.ScrollMode.ScrollPerItem)
+        self.tableView_prm.setHorizontalScrollMode(QAbstractItemView.ScrollMode.ScrollPerPixel)
+        self.tableView_prm.verticalHeader().setVisible(True)
         self.textEdit_2 = QTextEdit(self.wizardPage3_param)
         self.textEdit_2.setObjectName(u"textEdit_2")
         self.textEdit_2.setGeometry(QRect(154, 328, 331, 41))
@@ -81,6 +90,9 @@ class Ui_Wizard(object):
         self.tableView_obj = QTableView(self.wizardPage4_obj)
         self.tableView_obj.setObjectName(u"tableView_obj")
         self.tableView_obj.setGeometry(QRect(81, 0, 585, 291))
+        self.tableView_obj.setEditTriggers(QAbstractItemView.EditTrigger.AllEditTriggers)
+        self.tableView_obj.setVerticalScrollMode(QAbstractItemView.ScrollMode.ScrollPerItem)
+        self.tableView_obj.setHorizontalScrollMode(QAbstractItemView.ScrollMode.ScrollPerPixel)
         self.pushButton_load_obj = QPushButton(self.wizardPage4_obj)
         self.pushButton_load_obj.setObjectName(u"pushButton_load_obj")
         self.pushButton_load_obj.setGeometry(QRect(0, 76, 75, 24))
