@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>684</width>
-    <height>422</height>
+    <width>632</width>
+    <height>474</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,7 +23,7 @@
    <widget class="QPushButton" name="pushButton_launch">
     <property name="geometry">
      <rect>
-      <x>290</x>
+      <x>230</x>
       <y>170</y>
       <width>75</width>
       <height>24</height>
@@ -35,110 +35,127 @@
    </widget>
   </widget>
   <widget class="QWizardPage" name="wizardPage2_model">
-   <widget class="QPushButton" name="pushButton_load">
-    <property name="geometry">
-     <rect>
-      <x>100</x>
-      <y>180</y>
-      <width>75</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Load</string>
-    </property>
-    <property name="icon">
-     <iconset theme="QIcon::ThemeIcon::GoDown"/>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_project">
-    <property name="geometry">
-     <rect>
-      <x>210</x>
-      <y>150</y>
-      <width>49</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>.femprj</string>
-    </property>
-    <property name="buddy">
-     <cstring>plainTextEdit_prj</cstring>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_model">
-    <property name="geometry">
-     <rect>
-      <x>210</x>
-      <y>220</y>
-      <width>49</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>model</string>
-    </property>
-    <property name="buddy">
-     <cstring>plainTextEdit_model</cstring>
-    </property>
-   </widget>
-   <widget class="QPlainTextEdit" name="plainTextEdit_prj">
-    <property name="geometry">
-     <rect>
-      <x>260</x>
-      <y>130</y>
-      <width>311</width>
-      <height>51</height>
-     </rect>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-    <property name="plainText">
-     <string/>
-    </property>
-    <property name="placeholderText">
-     <string>&lt;.femprj path&gt;</string>
-    </property>
-   </widget>
-   <widget class="QPlainTextEdit" name="plainTextEdit_model">
-    <property name="geometry">
-     <rect>
-      <x>260</x>
-      <y>210</y>
-      <width>311</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="plainText">
-     <string/>
-    </property>
-    <property name="placeholderText">
-     <string>&lt;analysis model name&gt;</string>
-    </property>
-   </widget>
-   <widget class="QTextEdit" name="textEdit">
-    <property name="geometry">
-     <rect>
-      <x>110</x>
-      <y>280</y>
-      <width>451</width>
-      <height>81</height>
-     </rect>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-    <property name="markdown">
-     <string>.femprj ファイルを開いてください。
+   <property name="subTitle">
+    <string>&lt;table class=MsoTableGrid border=0 cellspacing=0 cellpadding=0 width=&quot;100%&quot;  style='width:100.0%;border-collapse:collapse;border:none'&gt;  &lt;tr&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:16.66%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;b&gt;&lt;i&gt;&lt;span style='color:#0987D5'&gt;モデル指定&lt;/span&gt;&lt;/i&gt;&lt;/b&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:16.66%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#8A8A8A'&gt;変数指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:16.68%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#8A8A8A'&gt;目的指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:16.68%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#8A8A8A'&gt;拘束指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:16.68%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#8A8A8A'&gt;実行設定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:16.68%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#8A8A8A'&gt;確認&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;  &lt;/tr&gt; &lt;/table&gt;</string>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="sizeConstraint">
+       <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
+      </property>
+      <item>
+       <widget class="QPushButton" name="pushButton_load">
+        <property name="text">
+         <string>Load</string>
+        </property>
+        <property name="icon">
+         <iconset theme="QIcon::ThemeIcon::GoDown"/>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <layout class="QFormLayout" name="formLayout">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_project">
+          <property name="text">
+           <string>.femprj</string>
+          </property>
+          <property name="buddy">
+           <cstring>plainTextEdit_prj</cstring>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_model">
+          <property name="text">
+           <string>model</string>
+          </property>
+          <property name="buddy">
+           <cstring>plainTextEdit_model</cstring>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QPlainTextEdit" name="plainTextEdit_prj">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="lineWrapMode">
+           <enum>QPlainTextEdit::LineWrapMode::WidgetWidth</enum>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+          <property name="plainText">
+           <string/>
+          </property>
+          <property name="placeholderText">
+           <string>&lt;.femprj path&gt;</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QPlainTextEdit" name="plainTextEdit_model">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="inputMethodHints">
+           <set>Qt::InputMethodHint::ImhNone</set>
+          </property>
+          <property name="horizontalScrollBarPolicy">
+           <enum>Qt::ScrollBarPolicy::ScrollBarAsNeeded</enum>
+          </property>
+          <property name="sizeAdjustPolicy">
+           <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents</enum>
+          </property>
+          <property name="lineWrapMode">
+           <enum>QPlainTextEdit::LineWrapMode::WidgetWidth</enum>
+          </property>
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+          <property name="plainText">
+           <string/>
+          </property>
+          <property name="placeholderText">
+           <string>&lt;analysis model name&gt;</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QTextEdit" name="textEdit">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="sizeAdjustPolicy">
+       <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents</enum>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+      <property name="markdown">
+       <string>.femprj ファイルを開いてください。
 
 目的の解析モデルを開き、Load を押してください。
 
 </string>
-    </property>
-    <property name="html">
-     <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+      </property>
+      <property name="html">
+       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;meta charset=&quot;utf-8&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 hr { height: 1px; border-width: 0; }
@@ -147,94 +164,145 @@ li.checked::marker { content: &quot;\2612&quot;; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Yu Gothic UI'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:6px; margin-bottom:6px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;.femprj ファイルを開いてください。&lt;/p&gt;
 &lt;p style=&quot; margin-top:6px; margin-bottom:6px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;目的の解析モデルを開き、Load を押してください。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-    </property>
-   </widget>
+      </property>
+     </widget>
+    </item>
+   </layout>
   </widget>
   <widget class="QWizardPage" name="wizardPage3_param">
-   <widget class="QPushButton" name="pushButton_load_prm">
-    <property name="geometry">
-     <rect>
-      <x>9</x>
-      <y>85</y>
-      <width>75</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Load</string>
-    </property>
-    <property name="icon">
-     <iconset theme="QIcon::ThemeIcon::GoDown"/>
-    </property>
-   </widget>
-   <widget class="QTableView" name="tableView_prm">
-    <property name="geometry">
-     <rect>
-      <x>90</x>
-      <y>9</y>
-      <width>585</width>
-      <height>291</height>
-     </rect>
-    </property>
-    <property name="sizePolicy">
-     <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-      <horstretch>0</horstretch>
-      <verstretch>0</verstretch>
-     </sizepolicy>
-    </property>
-    <property name="sizeAdjustPolicy">
-     <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustIgnored</enum>
-    </property>
-    <property name="editTriggers">
-     <set>QAbstractItemView::EditTrigger::AllEditTriggers</set>
-    </property>
-    <property name="verticalScrollMode">
-     <enum>QAbstractItemView::ScrollMode::ScrollPerItem</enum>
-    </property>
-    <property name="horizontalScrollMode">
-     <enum>QAbstractItemView::ScrollMode::ScrollPerPixel</enum>
-    </property>
-    <attribute name="verticalHeaderVisible">
-     <bool>true</bool>
-    </attribute>
-   </widget>
-   <widget class="QTextEdit" name="textEdit_2">
-    <property name="geometry">
-     <rect>
-      <x>154</x>
-      <y>328</y>
-      <width>331</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <property name="html">
-     <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+   <property name="subTitle">
+    <string>&lt;table class=MsoTableGrid border=0 cellspacing=0 cellpadding=0 width=&quot;100%&quot;  style='width:100.0%;border-collapse:collapse;border:none'&gt;  &lt;tr&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:16.66%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#0987D5'&gt;モデル指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:16.66%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;b&gt;&lt;i&gt;&lt;span style='color:#0987D5'&gt;変数指定&lt;/span&gt;&lt;/i&gt;&lt;/b&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:16.68%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#8A8A8A'&gt;目的指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:16.68%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#8A8A8A'&gt;拘束指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:16.68%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#8A8A8A'&gt;実行設定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:16.68%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#8A8A8A'&gt;確認&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;  &lt;/tr&gt; &lt;/table&gt;</string>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout_2">
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QPushButton" name="pushButton_load_prm">
+        <property name="text">
+         <string>Load</string>
+        </property>
+        <property name="icon">
+         <iconset theme="QIcon::ThemeIcon::GoDown"/>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QTableView" name="tableView_prm">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="sizeAdjustPolicy">
+         <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustIgnored</enum>
+        </property>
+        <property name="editTriggers">
+         <set>QAbstractItemView::EditTrigger::AllEditTriggers</set>
+        </property>
+        <property name="verticalScrollMode">
+         <enum>QAbstractItemView::ScrollMode::ScrollPerItem</enum>
+        </property>
+        <property name="horizontalScrollMode">
+         <enum>QAbstractItemView::ScrollMode::ScrollPerPixel</enum>
+        </property>
+        <attribute name="horizontalHeaderCascadingSectionResizes">
+         <bool>true</bool>
+        </attribute>
+        <attribute name="horizontalHeaderStretchLastSection">
+         <bool>true</bool>
+        </attribute>
+        <attribute name="verticalHeaderVisible">
+         <bool>true</bool>
+        </attribute>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QTextEdit" name="textEdit_5">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="sizeAdjustPolicy">
+       <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents</enum>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+      <property name="markdown">
+       <string>最適化の際に調整するパラメータを選択してください。
+
+初期値、下限、上限を設定・確認してください。
+
+</string>
+      </property>
+      <property name="html">
+       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;meta charset=&quot;utf-8&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 hr { height: 1px; border-width: 0; }
 li.unchecked::marker { content: &quot;\2610&quot;; }
 li.checked::marker { content: &quot;\2612&quot;; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Yu Gothic UI'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;最適化する変数を選んでください。&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;初期値、上限、下限を指定してください。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-    </property>
-   </widget>
+&lt;p style=&quot; margin-top:6px; margin-bottom:6px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;最適化の際に調整するパラメータを選択してください。&lt;/p&gt;
+&lt;p style=&quot; margin-top:6px; margin-bottom:6px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;初期値、下限、上限を設定・確認してください。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
   </widget>
   <widget class="QWizardPage" name="wizardPage4_obj">
-   <widget class="QTextEdit" name="textEdit_3">
-    <property name="geometry">
-     <rect>
-      <x>145</x>
-      <y>309</y>
-      <width>421</width>
-      <height>51</height>
-     </rect>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-    <property name="html">
-     <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+   <property name="subTitle">
+    <string>&lt;table class=MsoTableGrid border=0 cellspacing=0 cellpadding=0 width=&quot;100%&quot;  style='width:100.0%;border-collapse:collapse;border:none'&gt;  &lt;tr&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:16.66%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#0987D5'&gt;モデル指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:16.66%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#0987D5'&gt;変数指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:16.68%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;b&gt;&lt;i&gt;&lt;span style='color:#0987D5'&gt;目的指定&lt;/span&gt;&lt;/i&gt;&lt;/b&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:16.68%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#8A8A8A'&gt;拘束指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:16.68%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#8A8A8A'&gt;実行設定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:16.68%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#8A8A8A'&gt;確認&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;  &lt;/tr&gt; &lt;/table&gt;</string>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout_3">
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <item>
+       <widget class="QPushButton" name="pushButton_load_obj">
+        <property name="text">
+         <string>Load</string>
+        </property>
+        <property name="icon">
+         <iconset theme="QIcon::ThemeIcon::GoDown"/>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QTableView" name="tableView_obj">
+        <property name="editTriggers">
+         <set>QAbstractItemView::EditTrigger::AllEditTriggers</set>
+        </property>
+        <property name="verticalScrollMode">
+         <enum>QAbstractItemView::ScrollMode::ScrollPerItem</enum>
+        </property>
+        <property name="horizontalScrollMode">
+         <enum>QAbstractItemView::ScrollMode::ScrollPerPixel</enum>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QTextEdit" name="textEdit_3">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="sizeAdjustPolicy">
+       <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents</enum>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+      <property name="html">
+       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;meta charset=&quot;utf-8&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 hr { height: 1px; border-width: 0; }
@@ -243,59 +311,111 @@ li.checked::marker { content: &quot;\2612&quot;; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Yu Gothic UI'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;最適化する目的関数を選んでください。&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;※ Femtet のパラメトリック解析ダイアログで目的関数を定義してください。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-    </property>
-   </widget>
-   <widget class="QTableView" name="tableView_obj">
-    <property name="geometry">
-     <rect>
-      <x>81</x>
-      <y>0</y>
-      <width>585</width>
-      <height>291</height>
-     </rect>
-    </property>
-    <property name="editTriggers">
-     <set>QAbstractItemView::EditTrigger::AllEditTriggers</set>
-    </property>
-    <property name="verticalScrollMode">
-     <enum>QAbstractItemView::ScrollMode::ScrollPerItem</enum>
-    </property>
-    <property name="horizontalScrollMode">
-     <enum>QAbstractItemView::ScrollMode::ScrollPerPixel</enum>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="pushButton_load_obj">
-    <property name="geometry">
-     <rect>
-      <x>0</x>
-      <y>76</y>
-      <width>75</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Load</string>
-    </property>
-    <property name="icon">
-     <iconset theme="QIcon::ThemeIcon::GoDown"/>
-    </property>
-   </widget>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWizardPage" name="wizardPage5_run">
+   <property name="subTitle">
+    <string>&lt;table class=MsoTableGrid border=0 cellspacing=0 cellpadding=0 width=&quot;100%&quot;  style='width:100.0%;border-collapse:collapse;border:none'&gt;  &lt;tr&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:16.66%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#0987D5'&gt;モデル指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:16.66%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#0987D5'&gt;変数指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:16.68%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#0987D5'&gt;目的指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:16.68%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#0987D5'&gt;拘束指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:16.68%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;b&gt;&lt;i&gt;&lt;span style='color:#0987D5'&gt;実行設定&lt;/span&gt;&lt;/i&gt;&lt;/b&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:16.68%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#8A8A8A'&gt;確認&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;  &lt;/tr&gt; &lt;/table&gt; </string>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout_5">
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_4">
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QTableView" name="tableView_run"/>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QTextEdit" name="textEdit_6">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="verticalScrollBarPolicy">
+       <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
+      </property>
+      <property name="horizontalScrollBarPolicy">
+       <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOff</enum>
+      </property>
+      <property name="sizeAdjustPolicy">
+       <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents</enum>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+      <property name="html">
+       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;meta charset=&quot;utf-8&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+hr { height: 1px; border-width: 0; }
+li.unchecked::marker { content: &quot;\2610&quot;; }
+li.checked::marker { content: &quot;\2612&quot;; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Yu Gothic UI'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;実行時の設定を行ってください。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
   </widget>
   <widget class="QWizardPage" name="wizardPage9_verify">
-   <widget class="QTextEdit" name="textEdit_4">
-    <property name="geometry">
-     <rect>
-      <x>150</x>
-      <y>290</y>
-      <width>421</width>
-      <height>51</height>
-     </rect>
-    </property>
-    <property name="readOnly">
-     <bool>true</bool>
-    </property>
-    <property name="html">
-     <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+   <property name="subTitle">
+    <string>&lt;table class=MsoTableGrid border=0 cellspacing=0 cellpadding=0 width=&quot;100%&quot;  style='width:100.0%;border-collapse:collapse;border:none'&gt;  &lt;tr&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:16.66%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#0987D5'&gt;モデル指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:16.66%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#0987D5'&gt;変数指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:16.68%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#0987D5'&gt;目的指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:16.68%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#0987D5'&gt;拘束指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:16.68%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#0987D5'&gt;実行設定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:16.68%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;b&gt;&lt;i&gt;&lt;span style='color:#0987D5'&gt;確認&lt;/span&gt;&lt;/i&gt;&lt;/b&gt;&lt;/p&gt;   &lt;/td&gt;  &lt;/tr&gt; &lt;/table&gt; </string>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout_4">
+    <item>
+     <widget class="QTreeView" name="treeView">
+      <property name="editTriggers">
+       <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QTextEdit" name="textEdit_4">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="sizeAdjustPolicy">
+       <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents</enum>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+      <property name="html">
+       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;meta charset=&quot;utf-8&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 hr { height: 1px; border-width: 0; }
@@ -303,21 +423,10 @@ li.unchecked::marker { content: &quot;\2610&quot;; }
 li.checked::marker { content: &quot;\2612&quot;; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Yu Gothic UI'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;よろしいですか？&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-    </property>
-   </widget>
-   <widget class="QTreeView" name="treeView">
-    <property name="geometry">
-     <rect>
-      <x>130</x>
-      <y>20</y>
-      <width>421</width>
-      <height>251</height>
-     </rect>
-    </property>
-    <property name="editTriggers">
-     <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
-    </property>
-   </widget>
+      </property>
+     </widget>
+    </item>
+   </layout>
   </widget>
  </widget>
  <resources/>

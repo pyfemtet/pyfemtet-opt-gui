@@ -5,7 +5,6 @@ from prm_model import PrmModel
 from obj_model import ObjModel
 
 
-
 class ProblemItemModel(QStandardItemModel):
     def __init__(self, parent=None):
         super().__init__(parent)
