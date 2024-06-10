@@ -20,6 +20,9 @@ class MyStandardItemAsTableModel(QAbstractTableModel):
         self._root: QStandardItem = root
         super().__init__(parent)
 
+    def load(self):
+        pass
+
     def rowCount(self, parent=None): return self._item.rowCount()
     def columnCount(self, parent=None): return self._item.columnCount()
 

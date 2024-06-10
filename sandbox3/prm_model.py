@@ -64,9 +64,14 @@ class PrmModel(MyStandardItemAsTableModel):
         ])
 
         for row, name in enumerate(names):
+
+            exp = str(_p.Femtet.GetVariableExpression(name))
+
             # use
             item = QStandardItem()
-            item.setCheckable(True)
+            if _isnumeric(exp):
+                item.setCheckable(True)
+                item.setCheckState(Qt.CheckState.Checked)
             table.setChild(row, 0, item)
 
             # name
@@ -74,7 +79,6 @@ class PrmModel(MyStandardItemAsTableModel):
             table.setChild(row, 1, item)
 
             # expression
-            exp = str(_p.Femtet.GetVariableExpression(name))
             item = QStandardItem(exp)
             table.setChild(row, 2, item)
 

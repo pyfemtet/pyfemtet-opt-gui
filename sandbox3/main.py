@@ -20,6 +20,10 @@ class MainWizard(QWizard):
         # noinspection PyAttributeOutsideInit
         self._ui = ui
 
+        # set optimization settings
+        model = self._problem.run_model
+        self._ui.tableView_run.setModel(model)
+
     def load_prm(self):
         if self._ui.plainTextEdit_prj.toPlainText():
             # モデルの再読み込み
