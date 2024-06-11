@@ -3,10 +3,10 @@ import sys
 
 from PySide6.QtWidgets import (QApplication, QWizard, QFileDialog)
 
-from sandbox3.ui.ui_wizard import Ui_Wizard
-from sandbox3.problem_model import ProblemItemModel, CustomProxyModel
-from sandbox3.obj_model import ObjTableDelegate
-from sandbox3.script_builder import build_script
+from ui_wizard import Ui_Wizard
+from problem_model import ProblemItemModel, CustomProxyModel
+from obj_model import ObjTableDelegate
+from script_builder import build_script
 
 
 import _p  # must be same folder and cannot import via `from` keyword.
