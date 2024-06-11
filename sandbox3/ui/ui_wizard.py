@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'wizardMgxGUt.ui'
+## Form generated from reading UI file 'wizardjVBFHS.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.7.1
 ##
@@ -234,6 +234,11 @@ class Ui_Wizard(object):
 
         self.verticalLayout_4.addWidget(self.textEdit_4)
 
+        self.pushButton = QPushButton(self.wizardPage9_verify)
+        self.pushButton.setObjectName(u"pushButton")
+
+        self.verticalLayout_4.addWidget(self.pushButton)
+
         Wizard.addPage(self.wizardPage9_verify)
 #if QT_CONFIG(shortcut)
         self.label_project.setBuddy(self.plainTextEdit_prj)
@@ -245,6 +250,7 @@ class Ui_Wizard(object):
         self.pushButton_load.clicked.connect(Wizard.load_model)
         self.pushButton_load_prm.clicked.connect(Wizard.load_prm)
         self.pushButton_load_obj.clicked.connect(Wizard.load_obj)
+        self.pushButton.clicked.connect(Wizard.build_script)
 
         QMetaObject.connectSlotsByName(Wizard)
     # setupUi
@@ -326,5 +332,6 @@ class Ui_Wizard(object):
 "li.checked::marker { content: \"\\2612\"; }\n"
 "</style></head><body style=\" font-family:'Yu Gothic UI'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">\u3088\u308d\u3057\u3044\u3067\u3059\u304b\uff1f</p></body></html>", None))
+        self.pushButton.setText(QCoreApplication.translate("Wizard", u"\u30b9\u30af\u30ea\u30d7\u30c8\u3092\u4f5c\u6210\u3059\u308b", None))
     # retranslateUi
 

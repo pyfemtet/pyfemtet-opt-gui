@@ -5,6 +5,8 @@ from PySide6.QtWidgets import (QApplication, QWizard)
 from sandbox3.ui.ui_wizard import Ui_Wizard
 from sandbox3.problem_model import ProblemItemModel, CustomProxyModel
 from sandbox3.obj_model import ObjTableDelegate
+from sandbox3.script_builder import build_script
+
 
 import _p  # must be same folder and cannot import via `from` keyword.
 
@@ -49,6 +51,10 @@ class MainWizard(QWizard):
             if prj:
                 self._ui.plainTextEdit_prj.setPlainText(prj)
                 self._ui.plainTextEdit_model.setPlainText(model)
+
+                # モデルの再読み込み
+                self._problem.femprj_model.load()
+
             else:
                 _p.logger.warning('Femtet で解析プロジェクトが開かれていません。')
         else:
@@ -66,6 +72,9 @@ class MainWizard(QWizard):
         if self._ui.plainTextEdit_prj.toPlainText():
             self.load_prm()
             self.load_obj()
+
+    def build_script(self):
+        build_script(self._problem)
 
 
 if __name__ == '__main__':

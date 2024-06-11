@@ -426,6 +426,13 @@ li.checked::marker { content: &quot;\2612&quot;; }
       </property>
      </widget>
     </item>
+    <item>
+     <widget class="QPushButton" name="pushButton">
+      <property name="text">
+       <string>スクリプトを作成する</string>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
  </widget>
@@ -438,8 +445,8 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <slot>connect_process()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>320</x>
-     <y>179</y>
+     <x>304</x>
+     <y>241</y>
     </hint>
     <hint type="destinationlabel">
      <x>339</x>
@@ -454,8 +461,8 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <slot>load_model()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>227</x>
-     <y>187</y>
+     <x>93</x>
+     <y>218</y>
     </hint>
     <hint type="destinationlabel">
      <x>190</x>
@@ -470,8 +477,8 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <slot>load_prm()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>58</x>
-     <y>94</y>
+     <x>77</x>
+     <y>218</y>
     </hint>
     <hint type="destinationlabel">
      <x>84</x>
@@ -486,12 +493,28 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <slot>load_obj()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>50</x>
-     <y>83</y>
+     <x>69</x>
+     <y>218</y>
     </hint>
     <hint type="destinationlabel">
      <x>64</x>
      <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>Wizard</receiver>
+   <slot>build_script()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>159</x>
+     <y>408</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>165</x>
+     <y>448</y>
     </hint>
    </hints>
   </connection>
@@ -504,5 +527,6 @@ li.checked::marker { content: &quot;\2612&quot;; }
   <slot>load_prm()</slot>
   <slot>load_obj()</slot>
   <slot>enable_next_button()</slot>
+  <slot>build_script()</slot>
  </slots>
 </ui>

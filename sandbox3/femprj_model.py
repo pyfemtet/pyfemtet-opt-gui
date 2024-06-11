@@ -7,112 +7,75 @@ import _p
 from item_as_model import MyStandardItemAsTableModel, _isnumeric
 
 
-class ObjTableDelegate(QStyledItemDelegate):
-
-    def __init__(self, model: MyStandardItemAsTableModel):
-        super().__init__()
-        self._model: MyStandardItemAsTableModel = model
-
-    def createEditor(self, parent, option, index):
-        col, row = index.column(), index.row()
-        col_name = self._model.get_col_name(col)
-        if col_name == 'direction':
-            # コンボボックスエディタを作成
-            comboBox = QComboBox(parent)
-            comboBox.addItems(['maximize', 'minimize', 'Set to...'])
-            return comboBox
-        return super().createEditor(parent, option, index)
-
-    def setEditorData(self, editor, index):
-        col, row = index.column(), index.row()
-        col_name = self._model.get_col_name(col)
-        if col_name == 'direction':
-            # コンボボックスにデータを設定
-            value = index.model().data(index, Qt.EditRole)
-            editor.setCurrentText(value)
-        else:
-            super().setEditorData(editor, index)
-
-    def setModelData(self, editor, model, index):
-        col, row = index.column(), index.row()
-        col_name = self._model.get_col_name(col)
-        if col_name == 'direction':
-            # コンボボックスのデータをモデルに設定
-            model.setData(index, editor.currentText(), Qt.EditRole)
-        else:
-            super().setModelData(editor, model, index)
-
-
-class ObjModel(MyStandardItemAsTableModel):
+class FEMPrjModel(MyStandardItemAsTableModel):
     """A table for determining whether to use Femtet variables in optimization.
 
-    use        | name       | direction   | set to
-    ----------------------------------------------
-    checkbox   | str        | combobox    | float or empty
-    uneditable | uneditable
+    use  | item   | value
+    ----------------------
+    None | femprj | str
+    None | model  | str
 
-    # if checkbox is false, disable the row (excluding use column).
-    # if direction is "Maximize" or "Minimize", (set to)+=(ignored) and disable
-    # elif direction is "Set to...", (set to).replace((ignored), '') and float only
-    # use / name is uneditable
+    # uneditable
 
     """
-    CATEGORY = 'objective'
-    HEADER = ['use', 'name', 'direction', 'set to']
+    CATEGORY = 'model'
+    HEADER = ['use', 'item', 'value']
+    ROW_COUNT = 2
 
     def load(self):
         # initialize table
         table: QStandardItem = self._item
         table.clearData()
         table.setText(self.CATEGORY)
-        table.setRowCount(0)
-        table.setColumnCount(len(self.HEADER))
+        table.setRowCount(self.ROW_COUNT)
+        table.setColumnCount(3)
 
         self._root.setColumnCount(max(self._root.columnCount(), table.columnCount()))
-        # table.parent().setColumnCount(max(table.parent().columnCount(), table.columnCount()))
 
         # if Femtet is not alive, do nothing
         if not _p.check_femtet_alive():
             _p.logger.warning('Femtet との接続ができていません。')
             return False
 
-        # load prm
-        names = _p.get_parametric_output_names()
+        # load value
+        prj = _p.Femtet.Project
+        model = _p.Femtet.AnalysisModelName
 
         # TODO: if no prm, show warning dialog
-        if names is None:
-            _p.logger.warning('Femtet のパラメトリック解析 / 結果出力タブで結果を設定してください。')
+        if prj is None:
+            _p.logger.warning('Femtet でプロジェクトが開かれていません。')
             return False
-        elif len(names) == 0:
-            _p.logger.warning('Femtet のパラメトリック解析 / 結果出力タブで結果を設定してください。')
+        elif prj == '':
+            _p.logger.warning('Femtet でプロジェクトが開かれていません。')
             return False
 
         # notify to start editing to the abstract model
         self.beginResetModel()
 
         # set data to table
-        table.setRowCount(len(names))
-
         self.set_header(self.HEADER)
 
-        for row, name in enumerate(names):
-            # use
-            item = QStandardItem()
-            item.setCheckable(True)
-            item.setCheckState(Qt.CheckState.Checked)
-            table.setChild(row, 0, item)
+        # ===== femprj =====
+        # use
+        item = QStandardItem()
+        table.setChild(0, 0, item)
+        # item
+        item = QStandardItem('femprj')
+        table.setChild(0, 1, item)
+        # value
+        item = QStandardItem(prj)
+        table.setChild(0, 2, item)
 
-            # name
-            item = QStandardItem(name)
-            table.setChild(row, 1, item)
-
-            # direction
-            item = QStandardItem('maximize')  # TODO: load if previous setting exists
-            table.setChild(row, 2, item)
-
-            # set to
-            item = QStandardItem('(ignore) 0')
-            table.setChild(row, 3, item)
+        # ===== model =====
+        # use
+        item = QStandardItem()
+        table.setChild(1, 0, item)
+        # item
+        item = QStandardItem('model')
+        table.setChild(1, 1, item)
+        # value
+        item = QStandardItem(model)
+        table.setChild(1, 2, item)
 
         # notify to end editing to the abstract model
         self.endResetModel()

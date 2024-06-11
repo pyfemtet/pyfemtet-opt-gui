@@ -7,42 +7,6 @@ from item_as_model import MyStandardItemAsTableModel, _isnumeric
 import _p  # for logger
 
 
-class RunTableDelegate(QStyledItemDelegate):
-
-    def __init__(self, model: MyStandardItemAsTableModel):
-        super().__init__()
-        self._model: MyStandardItemAsTableModel = model
-
-    def createEditor(self, parent, option, index):
-        # col, row = index.column(), index.row()
-        # col_name = self._model.get_col_name(col)
-        # if col_name == 'direction':
-        #     # コンボボックスエディタを作成
-        #     comboBox = QComboBox(parent)
-        #     comboBox.addItems(['Maximize', 'Minimize', 'Set to...'])
-        #     return comboBox
-        return super().createEditor(parent, option, index)
-
-    def setEditorData(self, editor, index):
-        # col, row = index.column(), index.row()
-        # col_name = self._model.get_col_name(col)
-        # if col_name == 'direction':
-        #     # コンボボックスにデータを設定
-        #     value = index.model().data(index, Qt.EditRole)
-        #     editor.setCurrentText(value)
-        # else:
-            super().setEditorData(editor, index)
-
-    def setModelData(self, editor, model, index):
-        # col, row = index.column(), index.row()
-        # col_name = self._model.get_col_name(col)
-        # if col_name == 'direction':
-        #     # コンボボックスのデータをモデルに設定
-        #     model.setData(index, editor.currentText(), Qt.EditRole)
-        # else:
-            super().setModelData(editor, model, index)
-
-
 class RunModel(MyStandardItemAsTableModel):
     """A table to set arguments for FEMOpt.optimize().
 
@@ -88,7 +52,7 @@ class RunModel(MyStandardItemAsTableModel):
         item.setCheckState(Qt.CheckState.Unchecked)
         table.setChild(0, 0, item)
         # item
-        item = QStandardItem('solve number')
+        item = QStandardItem('n_trials')
         table.setChild(0, 1, item)
         # value
         item = QStandardItem('10')
@@ -101,7 +65,7 @@ class RunModel(MyStandardItemAsTableModel):
         item.setCheckState(Qt.CheckState.Unchecked)
         table.setChild(1, 0, item)
         # item
-        item = QStandardItem('timeout(min)')
+        item = QStandardItem('timeout')
         table.setChild(1, 1, item)
         # value
         item = QStandardItem('3')
@@ -112,7 +76,7 @@ class RunModel(MyStandardItemAsTableModel):
         item = QStandardItem()
         table.setChild(2, 0, item)
         # item
-        item = QStandardItem('use license number')
+        item = QStandardItem('n_parallel')
         table.setChild(2, 1, item)
         # value
         item = QStandardItem('1')
@@ -137,7 +101,7 @@ class RunModel(MyStandardItemAsTableModel):
 
         # if checkbox is false, disable the row (excluding use column).
         item_name = self.get_item_name(row)
-        if item_name in ['solve number', 'timeout(min)']:
+        if item_name in ['n_trials', 'timeout']:
             use_col = self.get_col_from_name('use')
             use_item = self.get_item(row, use_col)
             if use_item.checkState() == Qt.CheckState.Unchecked:
@@ -163,7 +127,7 @@ class RunModel(MyStandardItemAsTableModel):
             name_index = self.createIndex(row, name_col)
             name_value = self.data(name_index)
 
-            if name_value == 'solve number':
+            if name_value == 'n_trials':
                 raise_alert = False
 
                 if not _isnumeric(value):
@@ -179,7 +143,7 @@ class RunModel(MyStandardItemAsTableModel):
                     _p.logger.error('自然数を入力してください。')
                     return False
 
-            if name_value == 'use license number':
+            if name_value == 'n_parallel':
                 raise_alert = False
 
                 if not _isnumeric(value):
@@ -195,7 +159,7 @@ class RunModel(MyStandardItemAsTableModel):
                     _p.logger.error('自然数を入力してください。')
                     return False
 
-            if name_value == 'timeout(min)':
+            if name_value == 'timeout':
                 raise_alert = False
 
                 if not _isnumeric(value):

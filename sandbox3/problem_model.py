@@ -4,6 +4,7 @@ from PySide6.QtCore import Qt, QSortFilterProxyModel
 from prm_model import PrmModel
 from obj_model import ObjModel
 from run_model import RunModel
+from femprj_model import FEMPrjModel
 
 
 class ProblemItemModel(QStandardItemModel):
@@ -11,11 +12,13 @@ class ProblemItemModel(QStandardItemModel):
         super().__init__(parent)
         self.root: QStandardItem = self.invisibleRootItem()
 
+        self.femprj_item: QStandardItem = self.append_table_item('model')
         self.prm_item: QStandardItem = self.append_table_item('prm')
-        self.obj_item: QStandardItem = self.append_table_item('obj')
+        self.obj_item: QStandardItem = self.append_table_item('objective')
         self.cns_item: QStandardItem = self.append_table_item('cns')
         self.run_item: QStandardItem = self.append_table_item('run')
 
+        self.femprj_model: FEMPrjModel = FEMPrjModel(self.femprj_item, self.root)
         self.prm_model: PrmModel = PrmModel(self.prm_item, self.root)
         self.obj_model: ObjModel = ObjModel(self.obj_item, self.root)
         # self.cns_model: QAbstractTableModel = MyStandardItemAsTableModel(self.cns_item)
