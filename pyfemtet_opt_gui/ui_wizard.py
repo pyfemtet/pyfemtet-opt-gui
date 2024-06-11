@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'wizardHtAvpn.ui'
+## Form generated from reading UI file 'wizardWrgOVa.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.7.1
 ##
@@ -259,10 +259,10 @@ class Ui_Wizard(object):
 
         self.retranslateUi(Wizard)
         self.pushButton_launch.clicked.connect(Wizard.connect_process)
-        self.pushButton_load_femprj.clicked.connect(Wizard.load_femprj)
-        self.pushButton_load_prm.clicked.connect(Wizard.load_prm)
-        self.pushButton_load_obj.clicked.connect(Wizard.load_obj)
+        self.pushButton_load_prm.clicked.connect(Wizard.update_problem)
+        self.pushButton_load_obj.clicked.connect(Wizard.update_problem)
         self.pushButton.clicked.connect(Wizard.build_script)
+        self.pushButton_load_femprj.clicked.connect(Wizard.update_problem)
 
         QMetaObject.connectSlotsByName(Wizard)
     # setupUi

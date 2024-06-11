@@ -467,8 +467,8 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <slot>connect_process()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>304</x>
-     <y>241</y>
+     <x>313</x>
+     <y>213</y>
     </hint>
     <hint type="destinationlabel">
      <x>339</x>
@@ -477,30 +477,14 @@ li.checked::marker { content: &quot;\2612&quot;; }
    </hints>
   </connection>
   <connection>
-   <sender>pushButton_load_femprj</sender>
-   <signal>clicked()</signal>
-   <receiver>Wizard</receiver>
-   <slot>load_femprj()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>93</x>
-     <y>218</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>190</x>
-     <y>-20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>pushButton_load_prm</sender>
    <signal>clicked()</signal>
    <receiver>Wizard</receiver>
-   <slot>load_prm()</slot>
+   <slot>update_problem()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>77</x>
-     <y>218</y>
+     <y>29</y>
     </hint>
     <hint type="destinationlabel">
      <x>84</x>
@@ -512,11 +496,11 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <sender>pushButton_load_obj</sender>
    <signal>clicked()</signal>
    <receiver>Wizard</receiver>
-   <slot>load_obj()</slot>
+   <slot>update_problem()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>69</x>
-     <y>218</y>
+     <y>29</y>
     </hint>
     <hint type="destinationlabel">
      <x>64</x>
@@ -531,12 +515,28 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <slot>build_script()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>159</x>
-     <y>408</y>
+     <x>99</x>
+     <y>29</y>
     </hint>
     <hint type="destinationlabel">
      <x>165</x>
      <y>448</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_load_femprj</sender>
+   <signal>clicked()</signal>
+   <receiver>Wizard</receiver>
+   <slot>update_problem()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>63</x>
+     <y>132</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>44</x>
+     <y>44</y>
     </hint>
    </hints>
   </connection>
@@ -545,10 +545,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
   <signal>process_loaded()</signal>
   <signal>check_femtet_alive()</signal>
   <slot>connect_process()</slot>
-  <slot>load_femprj()</slot>
-  <slot>load_prm()</slot>
-  <slot>load_obj()</slot>
-  <slot>enable_next_button()</slot>
   <slot>build_script()</slot>
+  <slot>update_problem()</slot>
  </slots>
 </ui>
