@@ -9,7 +9,7 @@ def get_header():
 from pyfemtet.opt import FemtetInterface, OptunaOptimizer, FEMOpt
 
 
-if __name__ == '__main__':
+def main():
 '''
     return code
 
@@ -97,17 +97,33 @@ def get_optimize(run_model: MyStandardItemAsTableModel):
     return code
 
 
-def build_script(model: ProblemItemModel):
+def get_entry_point():
+    code = f'''
+if __name__ == '__main__':
+    main()
+'''
+    return code
+
+
+def build_script(model: ProblemItemModel, path: str):
     code = ''
 
     code += get_header()
     code += get_femopt(model.femprj_model, model.obj_model)
     code += get_add_parameter(model.prm_model)
     code += get_optimize(model.run_model)
+    code += get_entry_point()
 
     print(code)
+    with open(path, 'w', encoding='utf-8') as f:
+        f.write(code)
 
-
+    import os
+    import sys
+    there, it = os.path.split(path)
+    module_name = os.path.splitext(it)[0]
+    sys.path.append(there)
+    exec(f'import {module_name}; {module_name}.main()')
 
 
 

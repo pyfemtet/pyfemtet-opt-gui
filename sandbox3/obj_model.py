@@ -127,7 +127,7 @@ class ObjModel(MyStandardItemAsTableModel):
             # if direction is "Maximize" or "Minimize", (set to)+=(ignored) and disable
             dir_col = self.get_col_from_name('direction')
             dir_index = self.createIndex(row, dir_col)
-            if self.data(dir_index) in ['Minimize', 'Maximize']:
+            if self.data(dir_index) in ['minimize', 'maximize']:
                 return ~Qt.ItemIsEnabled
 
             # elif direction is "Set to...", (set to).replace((ignored), '') and float only

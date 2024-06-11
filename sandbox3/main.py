@@ -1,6 +1,7 @@
+import os
 import sys
 
-from PySide6.QtWidgets import (QApplication, QWizard)
+from PySide6.QtWidgets import (QApplication, QWizard, QFileDialog)
 
 from sandbox3.ui.ui_wizard import Ui_Wizard
 from sandbox3.problem_model import ProblemItemModel, CustomProxyModel
@@ -74,7 +75,18 @@ class MainWizard(QWizard):
             self.load_obj()
 
     def build_script(self):
-        build_script(self._problem)
+
+        dialog = QFileDialog(self)
+        dialog.setFileMode(QFileDialog.FileMode.AnyFile)
+        dialog.setNameFilter("Python files (*.py)")
+
+        if dialog.exec():
+            path = dialog.selectedFiles()[0]
+            dir_path = os.path.dirname(path)
+            if os.path.isdir(dir_path):
+                build_script(self._problem, path)
+            else:
+                _p.logger.error('存在しないフォルダのファイルが指定されました。')
 
 
 if __name__ == '__main__':

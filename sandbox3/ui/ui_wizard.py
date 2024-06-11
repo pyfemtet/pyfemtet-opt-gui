@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'wizardjVBFHS.ui'
+## Form generated from reading UI file 'wizardKIGQRM.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.7.1
 ##
@@ -25,14 +25,26 @@ class Ui_Wizard(object):
     def setupUi(self, Wizard):
         if not Wizard.objectName():
             Wizard.setObjectName(u"Wizard")
-        Wizard.resize(632, 474)
+        Wizard.resize(697, 448)
         Wizard.setWizardStyle(QWizard.WizardStyle.ModernStyle)
         Wizard.setOptions(QWizard.WizardOption.HelpButtonOnRight)
         self.wizardPage1_launch = QWizardPage()
         self.wizardPage1_launch.setObjectName(u"wizardPage1_launch")
+        self.verticalLayout_6 = QVBoxLayout(self.wizardPage1_launch)
+        self.verticalLayout_6.setObjectName(u"verticalLayout_6")
+        self.verticalSpacer = QSpacerItem(20, 172, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.verticalLayout_6.addItem(self.verticalSpacer)
+
         self.pushButton_launch = QPushButton(self.wizardPage1_launch)
         self.pushButton_launch.setObjectName(u"pushButton_launch")
-        self.pushButton_launch.setGeometry(QRect(230, 170, 75, 24))
+
+        self.verticalLayout_6.addWidget(self.pushButton_launch)
+
+        self.verticalSpacer_2 = QSpacerItem(20, 172, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.verticalLayout_6.addItem(self.verticalSpacer_2)
+
         Wizard.addPage(self.wizardPage1_launch)
         self.wizardPage2_model = QWizardPage()
         self.wizardPage2_model.setObjectName(u"wizardPage2_model")
@@ -257,7 +269,7 @@ class Ui_Wizard(object):
 
     def retranslateUi(self, Wizard):
         Wizard.setWindowTitle(QCoreApplication.translate("Wizard", u"Wizard", None))
-        self.pushButton_launch.setText(QCoreApplication.translate("Wizard", u"Connect", None))
+        self.pushButton_launch.setText(QCoreApplication.translate("Wizard", u"Connect to Femtet", None))
         self.wizardPage2_model.setSubTitle(QCoreApplication.translate("Wizard", u"<table class=MsoTableGrid border=0 cellspacing=0 cellpadding=0 width=\"100%\"  style='width:100.0%;border-collapse:collapse;border:none'>  <tr>   <td width=\"16%\" valign=top style='width:16.66%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><b><i><span style='color:#0987D5'>\u30e2\u30c7\u30eb\u6307\u5b9a</span></i></b></p>   </td>   <td width=\"16%\" valign=top style='width:16.66%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><span style='color:#8A8A8A'>\u5909\u6570\u6307\u5b9a</span></p>   </td>   <td width=\"16%\" valign=top style='width:16.68%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><span style='color:#8A8A8A'>\u76ee\u7684\u6307\u5b9a</span></p>   </td>   <td width=\"16%\" valign=top style='width:16.68%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><span style='color:#8A8A8A'>\u62d8\u675f\u6307\u5b9a</span></p>   </td>   <td width=\"16%\" valign=top style='width:16.68%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><span style='color:#8A8A8A'>\u5b9f\u884c\u8a2d\u5b9a</span></p>"
                         "   </td>   <td width=\"16%\" valign=top style='width:16.68%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><span style='color:#8A8A8A'>\u78ba\u8a8d</span></p>   </td>  </tr> </table>", None))
         self.pushButton_load.setText(QCoreApplication.translate("Wizard", u"Load", None))
@@ -332,6 +344,6 @@ class Ui_Wizard(object):
 "li.checked::marker { content: \"\\2612\"; }\n"
 "</style></head><body style=\" font-family:'Yu Gothic UI'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">\u3088\u308d\u3057\u3044\u3067\u3059\u304b\uff1f</p></body></html>", None))
-        self.pushButton.setText(QCoreApplication.translate("Wizard", u"\u30b9\u30af\u30ea\u30d7\u30c8\u3092\u4f5c\u6210\u3059\u308b", None))
+        self.pushButton.setText(QCoreApplication.translate("Wizard", u"\u30b9\u30af\u30ea\u30d7\u30c8\u3092\u4fdd\u5b58\u3057\u3066\u5b9f\u884c\u3059\u308b", None))
     # retranslateUi
 
