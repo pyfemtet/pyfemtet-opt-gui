@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'wizardRMZyZr.ui'
+## Form generated from reading UI file 'wizardHtAvpn.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.7.1
 ##
@@ -53,12 +53,12 @@ class Ui_Wizard(object):
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.horizontalLayout.setSizeConstraint(QLayout.SizeConstraint.SetDefaultConstraint)
-        self.pushButton_load = QPushButton(self.wizardPage2_model)
-        self.pushButton_load.setObjectName(u"pushButton_load")
+        self.pushButton_load_femprj = QPushButton(self.wizardPage2_model)
+        self.pushButton_load_femprj.setObjectName(u"pushButton_load_femprj")
         icon = QIcon(QIcon.fromTheme(QIcon.ThemeIcon.GoDown))
-        self.pushButton_load.setIcon(icon)
+        self.pushButton_load_femprj.setIcon(icon)
 
-        self.horizontalLayout.addWidget(self.pushButton_load)
+        self.horizontalLayout.addWidget(self.pushButton_load_femprj)
 
         self.formLayout = QFormLayout()
         self.formLayout.setObjectName(u"formLayout")
@@ -259,7 +259,7 @@ class Ui_Wizard(object):
 
         self.retranslateUi(Wizard)
         self.pushButton_launch.clicked.connect(Wizard.connect_process)
-        self.pushButton_load.clicked.connect(Wizard.load_model)
+        self.pushButton_load_femprj.clicked.connect(Wizard.load_femprj)
         self.pushButton_load_prm.clicked.connect(Wizard.load_prm)
         self.pushButton_load_obj.clicked.connect(Wizard.load_obj)
         self.pushButton.clicked.connect(Wizard.build_script)
@@ -271,7 +271,7 @@ class Ui_Wizard(object):
         Wizard.setWindowTitle(QCoreApplication.translate("Wizard", u"Wizard", None))
         self.pushButton_launch.setText(QCoreApplication.translate("Wizard", u"Connect to Femtet", None))
         self.wizardPage2_model.setSubTitle(QCoreApplication.translate("Wizard", u"<table class=MsoNormalTable border=0 cellspacing=0 cellpadding=0 width=\"83%\"  style='width:83.32%;border-collapse:collapse'>  <tr>   <td width=\"19%\" valign=top style='width:19.98%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><b><i><span style='color:#0987D5'>\u30e2\u30c7\u30eb\u6307\u5b9a</span></i></b></p>   </td>   <td width=\"20%\" valign=top style='width:20.0%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><span style='color:#7F7F7F'>\u5909\u6570\u6307\u5b9a</span></p>   </td>   <td width=\"20%\" valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><span style='color:#7F7F7F'>\u76ee\u7684\u6307\u5b9a</span></p>   </td>   <td width=\"20%\" valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><span style='color:#7F7F7F'>\u5b9f\u884c\u8a2d\u5b9a</span></p>   </td>   <td width=\"19%\" valign=top style='width:19.96%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><span style='color:#7F7F7F'>\u78ba\u8a8d</span></p>   </td>  </tr> </table>", None))
-        self.pushButton_load.setText(QCoreApplication.translate("Wizard", u"Load", None))
+        self.pushButton_load_femprj.setText(QCoreApplication.translate("Wizard", u"Load", None))
         self.label_project.setText(QCoreApplication.translate("Wizard", u".femprj", None))
         self.label_model.setText(QCoreApplication.translate("Wizard", u"model", None))
         self.plainTextEdit_prj.setPlainText("")

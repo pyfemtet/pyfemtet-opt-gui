@@ -27,6 +27,28 @@ class MainWizard(QWizard):
         model = self._problem.run_model
         self._ui.tableView_run.setModel(model)
 
+    def update_problem(self):
+        self.load_femprj()
+        if self._ui.plainTextEdit_prj.toPlainText():
+            self.load_prm()
+            self.load_obj()
+
+    def load_femprj(self):
+        if _p.check_femtet_alive():
+            prj = _p.Femtet.Project
+            model = _p.Femtet.AnalysisModelName
+            if prj:
+                self._ui.plainTextEdit_prj.setPlainText(prj)
+                self._ui.plainTextEdit_model.setPlainText(model)
+
+                # モデルの再読み込み
+                self._problem.femprj_model.load()
+
+            else:
+                _p.logger.warning('Femtet で解析プロジェクトが開かれていません。')
+        else:
+            _p.logger.warning('Femtet との接続ができていません。')
+
     def load_prm(self):
         if self._ui.plainTextEdit_prj.toPlainText():
             # モデルの再読み込み
@@ -45,34 +67,12 @@ class MainWizard(QWizard):
             delegate = ObjTableDelegate(model)
             self._ui.tableView_obj.setItemDelegate(delegate)
 
-    def load_model(self):
-        if _p.check_femtet_alive():
-            prj = _p.Femtet.Project
-            model = _p.Femtet.AnalysisModelName
-            if prj:
-                self._ui.plainTextEdit_prj.setPlainText(prj)
-                self._ui.plainTextEdit_model.setPlainText(model)
-
-                # モデルの再読み込み
-                self._problem.femprj_model.load()
-
-            else:
-                _p.logger.warning('Femtet で解析プロジェクトが開かれていません。')
-        else:
-            _p.logger.warning('Femtet との接続ができていません。')
-
     def connect_process(self):
         if _p.connect_femtet():
             _p.logger.info(f'Connected! (pid: {_p.pid})')  # TODO: show dialog
 
             # update model
-            self.update_model_via_ui()
-
-    def update_model_via_ui(self):
-        self.load_model()
-        if self._ui.plainTextEdit_prj.toPlainText():
-            self.load_prm()
-            self.load_obj()
+            self.update_problem()
 
     def build_script(self):
 
@@ -105,7 +105,7 @@ if __name__ == '__main__':
     ui_wizard.treeView.setModel(proxy_model)
 
     wizard.set_ui(ui_wizard)  # ui を登録
-    wizard.update_model_via_ui()  # ui へのモデルの登録
+    wizard.update_problem()  # ui へのモデルの登録
 
     wizard.show()  # ビューの表示
     sys.exit(app.exec())  # アプリケーションの実行

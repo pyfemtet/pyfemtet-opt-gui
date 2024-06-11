@@ -67,7 +67,7 @@
        <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
       </property>
       <item>
-       <widget class="QPushButton" name="pushButton_load">
+       <widget class="QPushButton" name="pushButton_load_femprj">
         <property name="text">
          <string>Load</string>
         </property>
@@ -477,10 +477,10 @@ li.checked::marker { content: &quot;\2612&quot;; }
    </hints>
   </connection>
   <connection>
-   <sender>pushButton_load</sender>
+   <sender>pushButton_load_femprj</sender>
    <signal>clicked()</signal>
    <receiver>Wizard</receiver>
-   <slot>load_model()</slot>
+   <slot>load_femprj()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>93</x>
@@ -545,7 +545,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
   <signal>process_loaded()</signal>
   <signal>check_femtet_alive()</signal>
   <slot>connect_process()</slot>
-  <slot>load_model()</slot>
+  <slot>load_femprj()</slot>
   <slot>load_prm()</slot>
   <slot>load_obj()</slot>
   <slot>enable_next_button()</slot>

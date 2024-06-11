@@ -22,15 +22,18 @@ class FEMPrjModel(MyStandardItemAsTableModel):
     HEADER = ['use', 'item', 'value']
     ROW_COUNT = 2
 
-    def load(self):
-        # initialize table
-        table: QStandardItem = self._item
-        table.clearData()
-        table.setText(self.CATEGORY)
-        table.setRowCount(self.ROW_COUNT)
-        table.setColumnCount(3)
+    def __init__(self, table_item: QStandardItem, root: QStandardItem, parent=None):
+        super().__init__(table_item, root, parent)
 
-        self._root.setColumnCount(max(self._root.columnCount(), table.columnCount()))
+        # initialize table
+        self._item.clearData()
+        self._item.setText(self.CATEGORY)
+        self._item.setRowCount(self.ROW_COUNT)
+        self._item.setColumnCount(3)
+        self._root.setColumnCount(max(self._root.columnCount(), self._item.columnCount()))
+
+
+    def load(self):
 
         # if Femtet is not alive, do nothing
         if not _p.check_femtet_alive():
@@ -58,24 +61,32 @@ class FEMPrjModel(MyStandardItemAsTableModel):
         # ===== femprj =====
         # use
         item = QStandardItem()
-        table.setChild(0, 0, item)
+        self._item.setChild(0, 0, item)
         # item
         item = QStandardItem('femprj')
-        table.setChild(0, 1, item)
+        self._item.setChild(0, 1, item)
         # value
         item = QStandardItem(prj)
-        table.setChild(0, 2, item)
+        self._item.setChild(0, 2, item)
 
         # ===== model =====
         # use
         item = QStandardItem()
-        table.setChild(1, 0, item)
+        self._item.setChild(1, 0, item)
         # item
         item = QStandardItem('model')
-        table.setChild(1, 1, item)
+        self._item.setChild(1, 1, item)
         # value
         item = QStandardItem(model)
-        table.setChild(1, 2, item)
+        self._item.setChild(1, 2, item)
 
         # notify to end editing to the abstract model
         self.endResetModel()
+
+    def get_femprj(self):
+        femprj_item = self.get_item(0, 2)
+        model_item = self.get_item(1, 2)
+        if femprj_item is None or model_item is None:
+            return '', ''
+        else:
+            return femprj_item.text(), model_item.text()
