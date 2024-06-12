@@ -27,10 +27,13 @@ def get_femopt(femprj_model: MyStandardItemAsTableModel, obj_model: MyStandardIt
         model_name=model_name,
         parametric_output_indexes_use_as_objective={{'''
 
-    for row in range(obj_model.rowCount()):
-        checked = obj_model.get_item(row, 0).data(Qt.ItemDataRole.CheckStateRole)
-        if checked == Qt.CheckState.Checked.value:
-            idx = row
+    for row in range(1, obj_model.rowCount()):  # exclude header row
+
+        idx = row - 1  # because of the header row existing, objective index = row - 1.
+
+        use_col = obj_model.get_col_from_name('use')
+        checked = obj_model.get_item(row, use_col).checkState()
+        if checked == Qt.CheckState.Checked:
             d_col = obj_model.get_col_from_name('direction')
             direction = obj_model.get_item(row, d_col).text()
             if direction == 'Set to...':
@@ -40,7 +43,7 @@ def get_femopt(femprj_model: MyStandardItemAsTableModel, obj_model: MyStandardIt
                 direction = f'"{direction}"'
 
             code += f'''
-            {row}: {direction},'''
+            {idx}: {direction},'''  # dict[[int], str or float]
 
     code += f'''
         }},
@@ -55,7 +58,9 @@ def get_add_parameter(prm_model: MyStandardItemAsTableModel):
     code = ''
 
     for row in range(prm_model.rowCount()):
-        if prm_model.get_item(row, 0).data(Qt.ItemDataRole.CheckStateRole) == Qt.CheckState.Checked.value:
+        use_col = prm_model.get_col_from_name('use')
+        use = prm_model.get_item(row, use_col).checkState()
+        if use == Qt.CheckState.Checked:  # uncheckable row (i.e. header) must be False
             name_col = prm_model.get_col_from_name('name')
             init_col = prm_model.get_col_from_name('expression')
             lb_col = prm_model.get_col_from_name('lb')
@@ -75,16 +80,20 @@ def get_optimize(run_model: MyStandardItemAsTableModel):
     code = '''
     femopt.optimize('''
 
-    for row in range(run_model.rowCount()):
-        item = run_model.get_item(row, 0)
-        if item.isCheckable():
-            if item.checkState() == Qt.CheckState.Checked:
+    for row in range(1, run_model.rowCount()):  # exclude header row
+
+        use_col = run_model.get_col_from_name('use')
+        use_item = run_model.get_item(row, use_col)
+
+        if use_item.isCheckable():
+            if use_item.checkState() == Qt.CheckState.Checked:
                 arg_name = run_model.get_item(row, 1).text()
                 arg_value = run_model.get_item(row, 2).text()
                 if arg_name == 'timeout':
                     arg_value = str(float(arg_value) * 60)
                 code += f'''
         {arg_name}={arg_value},'''
+
         else:
             arg_name = run_model.get_item(row, 1).text()
             arg_value = run_model.get_item(row, 2).text()
@@ -123,7 +132,7 @@ def build_script(model: ProblemItemModel, path: str):
     there, it = os.path.split(path)
     module_name = os.path.splitext(it)[0]
     sys.path.append(there)
-    exec(f'import {module_name}; {module_name}.main()')
+    # exec(f'import {module_name}; {module_name}.main()')
 
 
 
