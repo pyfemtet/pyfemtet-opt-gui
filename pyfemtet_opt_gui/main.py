@@ -3,7 +3,8 @@ import sys
 
 from PySide6.QtWidgets import (QApplication, QWizard, QFileDialog)
 
-from ui.ui_wizard import Ui_Wizard
+
+from ui.ui_detailed_wizard import Ui_DetailedWizard
 from problem_model import ProblemItemModel, CustomProxyModel
 from obj_model import ObjTableDelegate
 from script_builder import build_script
@@ -108,7 +109,7 @@ if __name__ == '__main__':
 
     wizard = MainWizard(g_problem)
 
-    ui_wizard = Ui_Wizard()
+    ui_wizard = Ui_DetailedWizard()
     ui_wizard.setupUi(wizard)
 
     proxy_model = CustomProxyModel(g_problem)
