@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'wizardWrgOVa.ui'
+## Form generated from reading UI file 'wizardArCWPD.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.7.1
 ##
@@ -16,16 +16,16 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QAbstractItemView, QAbstractScrollArea, QApplication, QFormLayout,
-    QHBoxLayout, QHeaderView, QLabel, QLayout,
-    QPlainTextEdit, QPushButton, QSizePolicy, QSpacerItem,
-    QTableView, QTextEdit, QTreeView, QVBoxLayout,
-    QWidget, QWizard, QWizardPage)
+    QHBoxLayout, QHeaderView, QLabel, QPlainTextEdit,
+    QPushButton, QSizePolicy, QSpacerItem, QTableView,
+    QTextEdit, QTreeView, QVBoxLayout, QWidget,
+    QWizard, QWizardPage)
 
 class Ui_Wizard(object):
     def setupUi(self, Wizard):
         if not Wizard.objectName():
             Wizard.setObjectName(u"Wizard")
-        Wizard.resize(697, 448)
+        Wizard.resize(701, 402)
         Wizard.setWizardStyle(QWizard.WizardStyle.ModernStyle)
         Wizard.setOptions(QWizard.WizardOption.HelpButtonOnRight)
         self.wizardPage1_launch = QWizardPage()
@@ -52,7 +52,6 @@ class Ui_Wizard(object):
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.horizontalLayout.setSizeConstraint(QLayout.SizeConstraint.SetDefaultConstraint)
         self.pushButton_load_femprj = QPushButton(self.wizardPage2_model)
         self.pushButton_load_femprj.setObjectName(u"pushButton_load_femprj")
         icon = QIcon(QIcon.fromTheme(QIcon.ThemeIcon.GoDown))
@@ -74,7 +73,7 @@ class Ui_Wizard(object):
 
         self.plainTextEdit_prj = QPlainTextEdit(self.wizardPage2_model)
         self.plainTextEdit_prj.setObjectName(u"plainTextEdit_prj")
-        sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Maximum)
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.plainTextEdit_prj.sizePolicy().hasHeightForWidth())
@@ -86,7 +85,7 @@ class Ui_Wizard(object):
 
         self.plainTextEdit_model = QPlainTextEdit(self.wizardPage2_model)
         self.plainTextEdit_model.setObjectName(u"plainTextEdit_model")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
         sizePolicy1.setHorizontalStretch(0)
         sizePolicy1.setVerticalStretch(0)
         sizePolicy1.setHeightForWidth(self.plainTextEdit_model.sizePolicy().hasHeightForWidth())
@@ -107,11 +106,8 @@ class Ui_Wizard(object):
 
         self.textEdit = QTextEdit(self.wizardPage2_model)
         self.textEdit.setObjectName(u"textEdit")
-        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-        sizePolicy2.setHorizontalStretch(0)
-        sizePolicy2.setVerticalStretch(0)
-        sizePolicy2.setHeightForWidth(self.textEdit.sizePolicy().hasHeightForWidth())
-        self.textEdit.setSizePolicy(sizePolicy2)
+        sizePolicy1.setHeightForWidth(self.textEdit.sizePolicy().hasHeightForWidth())
+        self.textEdit.setSizePolicy(sizePolicy1)
         self.textEdit.setSizeAdjustPolicy(QAbstractScrollArea.SizeAdjustPolicy.AdjustToContents)
         self.textEdit.setReadOnly(True)
 
@@ -132,11 +128,8 @@ class Ui_Wizard(object):
 
         self.tableView_prm = QTableView(self.wizardPage3_param)
         self.tableView_prm.setObjectName(u"tableView_prm")
-        sizePolicy3 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-        sizePolicy3.setHorizontalStretch(0)
-        sizePolicy3.setVerticalStretch(0)
-        sizePolicy3.setHeightForWidth(self.tableView_prm.sizePolicy().hasHeightForWidth())
-        self.tableView_prm.setSizePolicy(sizePolicy3)
+        sizePolicy.setHeightForWidth(self.tableView_prm.sizePolicy().hasHeightForWidth())
+        self.tableView_prm.setSizePolicy(sizePolicy)
         self.tableView_prm.setSizeAdjustPolicy(QAbstractScrollArea.SizeAdjustPolicy.AdjustIgnored)
         self.tableView_prm.setEditTriggers(QAbstractItemView.EditTrigger.AllEditTriggers)
         self.tableView_prm.setVerticalScrollMode(QAbstractItemView.ScrollMode.ScrollPerItem)
@@ -152,8 +145,8 @@ class Ui_Wizard(object):
 
         self.textEdit_5 = QTextEdit(self.wizardPage3_param)
         self.textEdit_5.setObjectName(u"textEdit_5")
-        sizePolicy2.setHeightForWidth(self.textEdit_5.sizePolicy().hasHeightForWidth())
-        self.textEdit_5.setSizePolicy(sizePolicy2)
+        sizePolicy1.setHeightForWidth(self.textEdit_5.sizePolicy().hasHeightForWidth())
+        self.textEdit_5.setSizePolicy(sizePolicy1)
         self.textEdit_5.setSizeAdjustPolicy(QAbstractScrollArea.SizeAdjustPolicy.AdjustToContents)
         self.textEdit_5.setReadOnly(True)
 
@@ -177,6 +170,8 @@ class Ui_Wizard(object):
         self.tableView_obj.setEditTriggers(QAbstractItemView.EditTrigger.AllEditTriggers)
         self.tableView_obj.setVerticalScrollMode(QAbstractItemView.ScrollMode.ScrollPerItem)
         self.tableView_obj.setHorizontalScrollMode(QAbstractItemView.ScrollMode.ScrollPerPixel)
+        self.tableView_obj.horizontalHeader().setCascadingSectionResizes(True)
+        self.tableView_obj.horizontalHeader().setStretchLastSection(True)
 
         self.horizontalLayout_3.addWidget(self.tableView_obj)
 
@@ -185,8 +180,8 @@ class Ui_Wizard(object):
 
         self.textEdit_3 = QTextEdit(self.wizardPage4_obj)
         self.textEdit_3.setObjectName(u"textEdit_3")
-        sizePolicy2.setHeightForWidth(self.textEdit_3.sizePolicy().hasHeightForWidth())
-        self.textEdit_3.setSizePolicy(sizePolicy2)
+        sizePolicy1.setHeightForWidth(self.textEdit_3.sizePolicy().hasHeightForWidth())
+        self.textEdit_3.setSizePolicy(sizePolicy1)
         self.textEdit_3.setSizeAdjustPolicy(QAbstractScrollArea.SizeAdjustPolicy.AdjustToContents)
         self.textEdit_3.setReadOnly(True)
 
@@ -205,6 +200,8 @@ class Ui_Wizard(object):
 
         self.tableView_run = QTableView(self.wizardPage6_run)
         self.tableView_run.setObjectName(u"tableView_run")
+        self.tableView_run.horizontalHeader().setCascadingSectionResizes(True)
+        self.tableView_run.horizontalHeader().setStretchLastSection(True)
 
         self.horizontalLayout_4.addWidget(self.tableView_run)
 
@@ -217,8 +214,8 @@ class Ui_Wizard(object):
 
         self.textEdit_6 = QTextEdit(self.wizardPage6_run)
         self.textEdit_6.setObjectName(u"textEdit_6")
-        sizePolicy2.setHeightForWidth(self.textEdit_6.sizePolicy().hasHeightForWidth())
-        self.textEdit_6.setSizePolicy(sizePolicy2)
+        sizePolicy1.setHeightForWidth(self.textEdit_6.sizePolicy().hasHeightForWidth())
+        self.textEdit_6.setSizePolicy(sizePolicy1)
         self.textEdit_6.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.textEdit_6.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         self.textEdit_6.setSizeAdjustPolicy(QAbstractScrollArea.SizeAdjustPolicy.AdjustToContents)
@@ -234,13 +231,14 @@ class Ui_Wizard(object):
         self.treeView = QTreeView(self.wizardPage9_verify)
         self.treeView.setObjectName(u"treeView")
         self.treeView.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.treeView.setHeaderHidden(True)
 
         self.verticalLayout_4.addWidget(self.treeView)
 
         self.textEdit_4 = QTextEdit(self.wizardPage9_verify)
         self.textEdit_4.setObjectName(u"textEdit_4")
-        sizePolicy2.setHeightForWidth(self.textEdit_4.sizePolicy().hasHeightForWidth())
-        self.textEdit_4.setSizePolicy(sizePolicy2)
+        sizePolicy1.setHeightForWidth(self.textEdit_4.sizePolicy().hasHeightForWidth())
+        self.textEdit_4.setSizePolicy(sizePolicy1)
         self.textEdit_4.setSizeAdjustPolicy(QAbstractScrollArea.SizeAdjustPolicy.AdjustToContents)
         self.textEdit_4.setReadOnly(True)
 
@@ -263,6 +261,7 @@ class Ui_Wizard(object):
         self.pushButton_load_obj.clicked.connect(Wizard.update_problem)
         self.pushButton.clicked.connect(Wizard.build_script)
         self.pushButton_load_femprj.clicked.connect(Wizard.update_problem)
+        Wizard.currentIdChanged.connect(self.treeView.expandAll)
 
         QMetaObject.connectSlotsByName(Wizard)
     # setupUi
