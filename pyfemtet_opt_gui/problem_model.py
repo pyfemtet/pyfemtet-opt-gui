@@ -46,6 +46,11 @@ class CustomProxyModel(QSortFilterProxyModel):
         if not source_parent.isValid():
             return True
 
+        # if header row, show anyway (note: femprj_model have no header row but the first row should be shown)
+        else:
+            if source_row == 0:
+                return True
+
         sourceModel: ProblemItemModel = self.sourceModel()
 
         # if prm or obj, invisible if non-checkable
@@ -73,10 +78,16 @@ class CustomProxyModel(QSortFilterProxyModel):
         sourceIndex = self.mapToSource(proxyIndex)
         sourceModel: ProblemItemModel = self.sourceModel()
         item = sourceModel.itemFromIndex(sourceIndex)
+
+        # invisible checkbox
         if item.isCheckable():
             return None
+
+        # invisible header item 'use'
+        if item.text() == 'use':
+            return None
+
+        # invisible item its header is 'test'
+        ...
+
         return super().data(proxyIndex, role)
-
-
-
-

@@ -86,26 +86,26 @@ class ObjModel(MyStandardItemAsTableModel):
         self.beginResetModel()
 
         # set data to table
-        self._item.setRowCount(len(names))
+        self._item.setRowCount(len(names)+1)  # including header row (hidden by WithoutHeader proxy).
 
         for row, name in enumerate(names):
             # use
             item = QStandardItem()
             item.setCheckable(True)
             item.setCheckState(Qt.CheckState.Checked)
-            self._item.setChild(row, 0, item)
+            self._item.setChild(row+1, 0, item)
 
             # name
             item = QStandardItem(name)
-            self._item.setChild(row, 1, item)
+            self._item.setChild(row+1, 1, item)
 
             # direction
             item = QStandardItem('maximize')  # TODO: load if previous setting exists
-            self._item.setChild(row, 2, item)
+            self._item.setChild(row+1, 2, item)
 
             # set to
             item = QStandardItem('(ignore) 0')
-            self._item.setChild(row, 3, item)
+            self._item.setChild(row+1, 3, item)
 
         # notify to end editing to the abstract model
         self.endResetModel()

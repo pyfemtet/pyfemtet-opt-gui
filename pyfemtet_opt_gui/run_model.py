@@ -24,7 +24,7 @@ class RunModel(MyStandardItemAsTableModel):
 
     """
     HEADER = ['use', 'item', 'value']
-    ROW_COUNT = 3
+    ROW_COUNT = 4  # including header row
 
     def initialize_table(self):
         # initialize table
@@ -35,7 +35,6 @@ class RunModel(MyStandardItemAsTableModel):
         table.setColumnCount(3)
         self.set_header(self.HEADER)
         self._root.setColumnCount(max(self._root.columnCount(), self._item.columnCount()))
-
 
     def __init__(self, table_item: QStandardItem, root: QStandardItem, parent=None):
         super().__init__(table_item=table_item, root=root, parent=parent)
@@ -53,37 +52,37 @@ class RunModel(MyStandardItemAsTableModel):
         item = QStandardItem()
         item.setCheckable(True)
         item.setCheckState(Qt.CheckState.Unchecked)
-        self._item.setChild(0, 0, item)
+        self._item.setChild(1, 0, item)
         # item
         item = QStandardItem('n_trials')
-        self._item.setChild(0, 1, item)
+        self._item.setChild(1, 1, item)
         # value
         item = QStandardItem('10')
-        self._item.setChild(0, 2, item)
+        self._item.setChild(1, 2, item)
 
         # ===== timeout =====
         # use
         item = QStandardItem()
         item.setCheckable(True)
         item.setCheckState(Qt.CheckState.Unchecked)
-        self._item.setChild(1, 0, item)
+        self._item.setChild(2, 0, item)
         # item
         item = QStandardItem('timeout')
-        self._item.setChild(1, 1, item)
+        self._item.setChild(2, 1, item)
         # value
         item = QStandardItem('3')
-        self._item.setChild(1, 2, item)
+        self._item.setChild(2, 2, item)
 
         # ===== n_parallel =====
         # use
         item = QStandardItem()
-        self._item.setChild(2, 0, item)
+        self._item.setChild(3, 0, item)
         # item
         item = QStandardItem('n_parallel')
-        self._item.setChild(2, 1, item)
+        self._item.setChild(3, 1, item)
         # value
         item = QStandardItem('1')
-        self._item.setChild(2, 2, item)
+        self._item.setChild(3, 2, item)
 
         # notify to end editing to the abstract model
         self.endResetModel()

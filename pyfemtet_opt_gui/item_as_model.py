@@ -1,5 +1,5 @@
 from PySide6.QtGui import QStandardItem
-from PySide6.QtCore import Qt, QAbstractTableModel
+from PySide6.QtCore import Qt, QAbstractTableModel, QSortFilterProxyModel
 
 from pyfemtet_opt_gui.ui.return_code import ReturnCode
 
@@ -22,6 +22,7 @@ class MyStandardItemAsTableModel(QAbstractTableModel):
         super().__init__(parent)
 
     def load(self) -> ReturnCode:
+        """setChild must be starts with row=1."""
         return ReturnCode.INFO.SUCCEED
 
     def rowCount(self, parent=None): return self._item.rowCount()
@@ -56,6 +57,9 @@ class MyStandardItemAsTableModel(QAbstractTableModel):
 
     def set_header(self, header: list[str]) -> None:
         self._header = header
+        for col, h in enumerate(header):
+            item = QStandardItem(h)
+            self._item.setChild(0, col, item)
 
     def get_col_name(self, col: int) -> str:
         return self._header[col]
@@ -66,3 +70,10 @@ class MyStandardItemAsTableModel(QAbstractTableModel):
     # get item directory
     def get_item(self, row, col) -> QStandardItem:
         return self._item.child(row, col)
+
+
+class MyStandardItemAsTableModelWithoutHeader(QSortFilterProxyModel):
+    def filterAcceptsRow(self, source_row, source_parent) -> bool:
+        if source_row == 0:
+            return False
+        return True

@@ -62,11 +62,13 @@ class PrmModel(MyStandardItemAsTableModel):
         self.beginResetModel()
 
         # set data to table
-        table.setRowCount(len(names))
+        table.setRowCount(len(names)+1)  # including header row (hidden by WithoutHeader proxy).
 
         for row, name in enumerate(names):
 
             exp = str(_p.Femtet.GetVariableExpression(name))
+
+            row = row + 1  # avoid header row
 
             # use
             item = QStandardItem()

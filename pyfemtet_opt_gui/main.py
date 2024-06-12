@@ -10,6 +10,7 @@ from obj_model import ObjTableDelegate
 from script_builder import build_script
 
 from pyfemtet_opt_gui.ui.return_code import ReturnCode
+from pyfemtet_opt_gui.item_as_model import MyStandardItemAsTableModelWithoutHeader
 
 import _p  # must be same folder and cannot import via `from` keyword.
 
@@ -39,7 +40,9 @@ class MainWizard(QWizard):
 
         # set optimization settings
         model = self._problem.run_model
-        self._ui.tableView_run.setModel(model)
+        proxy_model = MyStandardItemAsTableModelWithoutHeader(model)
+        proxy_model.setSourceModel(model)
+        self._ui.tableView_run.setModel(proxy_model)
 
     def update_problem(self):
         return_codes = []
@@ -65,7 +68,9 @@ class MainWizard(QWizard):
         ret_code = self._problem.prm_model.load()
         # モデルをビューに再設定
         model = self._problem.prm_model
-        self._ui.tableView_prm.setModel(model)
+        proxy_model = MyStandardItemAsTableModelWithoutHeader(model)
+        proxy_model.setSourceModel(model)
+        self._ui.tableView_prm.setModel(proxy_model)
         return ret_code
 
     def load_obj(self) -> ReturnCode:
@@ -73,8 +78,10 @@ class MainWizard(QWizard):
         ret_code = self._problem.obj_model.load()
         # モデルをビューに再設定
         model = self._problem.obj_model
-        self._ui.tableView_obj.setModel(model)
-        delegate = ObjTableDelegate(model)
+        proxy_model = MyStandardItemAsTableModelWithoutHeader(model)
+        proxy_model.setSourceModel(model)
+        self._ui.tableView_obj.setModel(proxy_model)
+        delegate = ObjTableDelegate(proxy_model)
         self._ui.tableView_obj.setItemDelegate(delegate)
         return ret_code
 
@@ -111,9 +118,9 @@ if __name__ == '__main__':
     ui_wizard = Ui_DetailedWizard()
     ui_wizard.setupUi(wizard)
 
-    proxy_model = CustomProxyModel(g_problem)
-    proxy_model.setSourceModel(g_problem)
-    ui_wizard.treeView.setModel(proxy_model)
+    g_proxy_model = CustomProxyModel(g_problem)
+    g_proxy_model.setSourceModel(g_problem)
+    ui_wizard.treeView.setModel(g_proxy_model)
 
     wizard.set_ui(ui_wizard)  # ui を登録
     wizard.update_problem()  # ui へのモデルの登録

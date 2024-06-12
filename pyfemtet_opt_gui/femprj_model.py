@@ -36,6 +36,7 @@ class FEMPrjModel(MyStandardItemAsTableModel):
         self._root.setColumnCount(max(self._root.columnCount(), self._item.columnCount()))
 
     def load(self) -> ReturnCode:
+        """setChild starts with row=0 because this model have no need to show via WithoutHeader proxy model."""
 
         self.initialize_table()
 
@@ -61,6 +62,7 @@ class FEMPrjModel(MyStandardItemAsTableModel):
         self.beginResetModel()
 
         # ===== femprj =====
+        # setChild starts with row=0 so header row is overwritten
         # use
         item = QStandardItem()
         self._item.setChild(0, 0, item)
