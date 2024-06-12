@@ -13,6 +13,18 @@ from pyfemtet_opt_gui.ui.return_code import ReturnCode
 import _p  # must be same folder and cannot import via `from` keyword.
 
 
+def should_stop(ret_code) -> bool:
+    if ret_code in ReturnCode.WARNING:
+        _p.logger.warning(ret_code.value)
+        return False
+
+    elif ret_code in ReturnCode.ERROR:
+        _p.logger.error(ret_code.value)
+        return True
+
+    return False
+
+
 # noinspection PyMethodMayBeStatic
 class MainWizard(QWizard):
 
@@ -29,27 +41,15 @@ class MainWizard(QWizard):
         self._ui.tableView_run.setModel(model)
 
     def update_problem(self):
-        ret_code = self.load_femprj()
-        if ret_code in ReturnCode.WARNING:
-            _p.logger.warning(ret_code.value)
-        elif ret_code in ReturnCode.ERROR:
-            _p.logger.error(ret_code.value)
-            return
+        return_codes = []
 
-        if self._ui.plainTextEdit_prj.toPlainText():
-            ret_code = self.load_prm()
-            if ret_code in ReturnCode.WARNING:
-                _p.logger.warning(ret_code.value)
-            elif ret_code in ReturnCode.ERROR:
-                _p.logger.error(ret_code.value)
-                return
+        return_codes.append(self.load_femprj())
+        return_codes.append(self.load_prm())
+        return_codes.append(self.load_obj())
 
-            ret_code = self.load_obj()
-            if ret_code in ReturnCode.WARNING:
-                _p.logger.warning(ret_code.value)
-            elif ret_code in ReturnCode.ERROR:
-                _p.logger.error(ret_code.value)
-                return
+        for return_code in return_codes:
+            if should_stop(return_code):  # show message
+                break  # if error, stop show message
 
     def load_femprj(self) -> ReturnCode:
         # モデルの再読み込み
@@ -60,31 +60,23 @@ class MainWizard(QWizard):
         return ret_code
 
     def load_prm(self) -> ReturnCode:
-        if self._ui.plainTextEdit_prj.toPlainText():
-            # モデルの再読み込み
-            ret_code = self._problem.prm_model.load()
-            # モデルをビューに再設定
-            model = self._problem.prm_model
-            self._ui.tableView_prm.setModel(model)
-            return ret_code
+        # モデルの再読み込み
+        ret_code = self._problem.prm_model.load()
+        # モデルをビューに再設定
+        model = self._problem.prm_model
+        self._ui.tableView_prm.setModel(model)
+        return ret_code
 
-        else:
-            return ReturnCode.WARNING.PARAMETER_EMPTY
 
     def load_obj(self) -> ReturnCode:
-        if self._ui.plainTextEdit_prj.toPlainText():
-            # モデルの再読み込み
-            ret_code = self._problem.obj_model.load()
-
-            # モデルをビューに再設定
-            model = self._problem.obj_model
-            self._ui.tableView_obj.setModel(model)
-            delegate = ObjTableDelegate(model)
-            self._ui.tableView_obj.setItemDelegate(delegate)
-            return ret_code
-
-        else:
-            return ReturnCode.WARNING.PARAMETRIC_OUTPUT_EMPTY
+        # モデルの再読み込み
+        ret_code = self._problem.obj_model.load()
+        # モデルをビューに再設定
+        model = self._problem.obj_model
+        self._ui.tableView_obj.setModel(model)
+        delegate = ObjTableDelegate(model)
+        self._ui.tableView_obj.setItemDelegate(delegate)
+        return ret_code
 
     def connect_process(self):
         if _p.connect_femtet():

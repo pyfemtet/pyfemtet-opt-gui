@@ -23,6 +23,9 @@ class PrmModel(MyStandardItemAsTableModel):
     """
 
     def load(self) -> ReturnCode:
+
+        self.beginResetModel()
+
         # initialize table
         table: QStandardItem = self._item
         table.clearData()
@@ -38,6 +41,9 @@ class PrmModel(MyStandardItemAsTableModel):
             'test',
         ])
         self._root.setColumnCount(max(self._root.columnCount(), table.columnCount()))
+
+        self.endResetModel()
+
 
         # if Femtet is not alive, do nothing
         if not _p.check_femtet_alive():

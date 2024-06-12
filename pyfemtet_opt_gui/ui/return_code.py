@@ -4,9 +4,6 @@ from enum import Enum
 __all__ = ['ReturnCode']
 
 
-
-
-
 class _INFO(Enum):
     SUCCEED = ''
 
