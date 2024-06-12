@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'wizardplSmXK.ui'
+## Form generated from reading UI file 'wizardrboDGT.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.7.1
 ##
@@ -16,34 +16,60 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QAbstractItemView, QAbstractScrollArea, QApplication, QFormLayout,
-    QFrame, QHBoxLayout, QHeaderView, QLabel,
-    QPlainTextEdit, QPushButton, QSizePolicy, QSpacerItem,
-    QTableView, QTextEdit, QTreeView, QVBoxLayout,
-    QWidget, QWizard, QWizardPage)
+    QFrame, QGridLayout, QHBoxLayout, QHeaderView,
+    QLabel, QPlainTextEdit, QPushButton, QSizePolicy,
+    QSpacerItem, QTableView, QTextEdit, QTreeView,
+    QVBoxLayout, QWidget, QWizard, QWizardPage)
 
 class Ui_Wizard(object):
     def setupUi(self, Wizard):
         if not Wizard.objectName():
             Wizard.setObjectName(u"Wizard")
-        Wizard.resize(701, 402)
+        Wizard.resize(701, 445)
         Wizard.setWizardStyle(QWizard.WizardStyle.ModernStyle)
         Wizard.setOptions(QWizard.WizardOption.HelpButtonOnRight)
         self.wizardPage1_launch = QWizardPage()
         self.wizardPage1_launch.setObjectName(u"wizardPage1_launch")
-        self.verticalLayout_6 = QVBoxLayout(self.wizardPage1_launch)
-        self.verticalLayout_6.setObjectName(u"verticalLayout_6")
-        self.verticalSpacer = QSpacerItem(20, 172, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+        self.gridLayout = QGridLayout(self.wizardPage1_launch)
+        self.gridLayout.setObjectName(u"gridLayout")
+        self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
-        self.verticalLayout_6.addItem(self.verticalSpacer)
+        self.gridLayout.addItem(self.horizontalSpacer_3, 1, 0, 1, 1)
 
         self.pushButton_launch = QPushButton(self.wizardPage1_launch)
         self.pushButton_launch.setObjectName(u"pushButton_launch")
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.pushButton_launch.sizePolicy().hasHeightForWidth())
+        self.pushButton_launch.setSizePolicy(sizePolicy)
+        self.pushButton_launch.setFlat(False)
 
-        self.verticalLayout_6.addWidget(self.pushButton_launch)
+        self.gridLayout.addWidget(self.pushButton_launch, 1, 1, 1, 1)
 
-        self.verticalSpacer_2 = QSpacerItem(20, 172, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+        self.textEdit_2 = QTextEdit(self.wizardPage1_launch)
+        self.textEdit_2.setObjectName(u"textEdit_2")
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.textEdit_2.sizePolicy().hasHeightForWidth())
+        self.textEdit_2.setSizePolicy(sizePolicy1)
+        self.textEdit_2.setSizeAdjustPolicy(QAbstractScrollArea.SizeAdjustPolicy.AdjustToContents)
+        self.textEdit_2.setReadOnly(True)
 
-        self.verticalLayout_6.addItem(self.verticalSpacer_2)
+        self.gridLayout.addWidget(self.textEdit_2, 4, 0, 1, 3)
+
+        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.gridLayout.addItem(self.verticalSpacer, 0, 1, 1, 1)
+
+        self.horizontalSpacer_4 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.gridLayout.addItem(self.horizontalSpacer_4, 1, 2, 1, 1)
+
+        self.verticalSpacer_2 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.gridLayout.addItem(self.verticalSpacer_2, 2, 1, 1, 1)
 
         Wizard.addPage(self.wizardPage1_launch)
         self.wizardPage2_model = QWizardPage()
@@ -73,9 +99,6 @@ class Ui_Wizard(object):
 
         self.plainTextEdit_prj = QPlainTextEdit(self.wizardPage2_model)
         self.plainTextEdit_prj.setObjectName(u"plainTextEdit_prj")
-        sizePolicy = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.plainTextEdit_prj.sizePolicy().hasHeightForWidth())
         self.plainTextEdit_prj.setSizePolicy(sizePolicy)
         self.plainTextEdit_prj.setLineWrapMode(QPlainTextEdit.LineWrapMode.WidgetWidth)
@@ -85,9 +108,6 @@ class Ui_Wizard(object):
 
         self.plainTextEdit_model = QPlainTextEdit(self.wizardPage2_model)
         self.plainTextEdit_model.setObjectName(u"plainTextEdit_model")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-        sizePolicy1.setHorizontalStretch(0)
-        sizePolicy1.setVerticalStretch(0)
         sizePolicy1.setHeightForWidth(self.plainTextEdit_model.sizePolicy().hasHeightForWidth())
         self.plainTextEdit_model.setSizePolicy(sizePolicy1)
         self.plainTextEdit_model.setInputMethodHints(Qt.InputMethodHint.ImhNone)
@@ -241,7 +261,8 @@ class Ui_Wizard(object):
         self.treeView.setObjectName(u"treeView")
         self.treeView.setFrameShape(QFrame.Shape.Panel)
         self.treeView.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.treeView.setHeaderHidden(True)
+        self.treeView.setWordWrap(False)
+        self.treeView.setHeaderHidden(False)
 
         self.verticalLayout_4.addWidget(self.treeView)
 
@@ -279,6 +300,21 @@ class Ui_Wizard(object):
     def retranslateUi(self, Wizard):
         Wizard.setWindowTitle(QCoreApplication.translate("Wizard", u"Wizard", None))
         self.pushButton_launch.setText(QCoreApplication.translate("Wizard", u"Connect to Femtet", None))
+        self.textEdit_2.setMarkdown(QCoreApplication.translate("Wizard", u"\u6700\u9069\u5316\u3092\u884c\u3046\u305f\u3081\u306e\u30b9\u30af\u30ea\u30d7\u30c8\u306e\u8a2d\u5b9a\u3092\u884c\u3044\u307e\u3059\u3002\n"
+"\u6700\u521d\u306b\u3001Femtet \u306b\u63a5\u7d9a\u3057\u3066\u6700\u9069\u5316\u3092\u884c\u3046\u89e3\u6790\u30e2\u30c7\u30eb\u3092\u6c7a\u3081\u307e\u3059\u3002\n"
+"\u30dc\u30bf\u30f3\u3092\u62bc\u3059\u3068 Fetmet\n"
+"\u3068\u306e\u81ea\u52d5\u63a5\u7d9a\u304c\u59cb\u307e\u308a\u307e\u3059\u3002\n"
+"\n"
+"", None))
+        self.textEdit_2.setHtml(QCoreApplication.translate("Wizard", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><meta charset=\"utf-8\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"hr { height: 1px; border-width: 0; }\n"
+"li.unchecked::marker { content: \"\\2610\"; }\n"
+"li.checked::marker { content: \"\\2612\"; }\n"
+"</style></head><body style=\" font-family:'Yu Gothic UI'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">\u6700\u9069\u5316\u3092\u884c\u3046\u305f\u3081\u306e\u30b9\u30af\u30ea\u30d7\u30c8\u306e\u8a2d\u5b9a\u3092\u884c\u3044\u307e\u3059\u3002<br />\u6700\u521d\u306b\u3001Femtet \u306b\u63a5\u7d9a\u3057\u3066\u6700\u9069\u5316\u3092\u884c\u3046\u89e3\u6790\u30e2\u30c7\u30eb\u3092\u6c7a\u3081\u307e\u3059\u3002<br />\u30dc\u30bf\u30f3\u3092\u62bc\u3059\u3068 Fetmet \u3068\u306e\u81ea\u52d5\u63a5\u7d9a\u304c"
+                        "\u59cb\u307e\u308a\u307e\u3059\u3002</p></body></html>", None))
         self.wizardPage2_model.setSubTitle(QCoreApplication.translate("Wizard", u"<table class=MsoNormalTable border=0 cellspacing=0 cellpadding=0 width=\"83%\"  style='width:83.32%;border-collapse:collapse'>  <tr>   <td width=\"19%\" valign=top style='width:19.98%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><b><i><span style='color:#0987D5'>\u30e2\u30c7\u30eb\u6307\u5b9a</span></i></b></p>   </td>   <td width=\"20%\" valign=top style='width:20.0%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><span style='color:#7F7F7F'>\u5909\u6570\u6307\u5b9a</span></p>   </td>   <td width=\"20%\" valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><span style='color:#7F7F7F'>\u76ee\u7684\u6307\u5b9a</span></p>   </td>   <td width=\"20%\" valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><span style='color:#7F7F7F'>\u5b9f\u884c\u8a2d\u5b9a</span></p>   </td>   <td width=\"19%\" valign=top style='width:19.96%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><span style='color:#7F7F7F'>\u78ba\u8a8d</span></p>   </td>  </tr> </table>", None))
         self.pushButton_load_femprj.setText(QCoreApplication.translate("Wizard", u"Load", None))
         self.label_project.setText(QCoreApplication.translate("Wizard", u".femprj", None))
