@@ -68,7 +68,6 @@ class MainWizard(QWizard):
         self._ui.tableView_prm.setModel(model)
         return ret_code
 
-
     def load_obj(self) -> ReturnCode:
         # モデルの再読み込み
         ret_code = self._problem.obj_model.load()

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'wizardArCWPD.ui'
+## Form generated from reading UI file 'wizardplSmXK.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.7.1
 ##
@@ -16,10 +16,10 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QAbstractItemView, QAbstractScrollArea, QApplication, QFormLayout,
-    QHBoxLayout, QHeaderView, QLabel, QPlainTextEdit,
-    QPushButton, QSizePolicy, QSpacerItem, QTableView,
-    QTextEdit, QTreeView, QVBoxLayout, QWidget,
-    QWizard, QWizardPage)
+    QFrame, QHBoxLayout, QHeaderView, QLabel,
+    QPlainTextEdit, QPushButton, QSizePolicy, QSpacerItem,
+    QTableView, QTextEdit, QTreeView, QVBoxLayout,
+    QWidget, QWizard, QWizardPage)
 
 class Ui_Wizard(object):
     def setupUi(self, Wizard):
@@ -130,13 +130,16 @@ class Ui_Wizard(object):
         self.tableView_prm.setObjectName(u"tableView_prm")
         sizePolicy.setHeightForWidth(self.tableView_prm.sizePolicy().hasHeightForWidth())
         self.tableView_prm.setSizePolicy(sizePolicy)
+        self.tableView_prm.setFrameShape(QFrame.Shape.Panel)
+        self.tableView_prm.setFrameShadow(QFrame.Shadow.Sunken)
         self.tableView_prm.setSizeAdjustPolicy(QAbstractScrollArea.SizeAdjustPolicy.AdjustIgnored)
         self.tableView_prm.setEditTriggers(QAbstractItemView.EditTrigger.AllEditTriggers)
         self.tableView_prm.setVerticalScrollMode(QAbstractItemView.ScrollMode.ScrollPerItem)
         self.tableView_prm.setHorizontalScrollMode(QAbstractItemView.ScrollMode.ScrollPerPixel)
         self.tableView_prm.horizontalHeader().setCascadingSectionResizes(True)
+        self.tableView_prm.horizontalHeader().setHighlightSections(False)
         self.tableView_prm.horizontalHeader().setStretchLastSection(True)
-        self.tableView_prm.verticalHeader().setVisible(True)
+        self.tableView_prm.verticalHeader().setVisible(False)
 
         self.horizontalLayout_2.addWidget(self.tableView_prm)
 
@@ -167,11 +170,14 @@ class Ui_Wizard(object):
 
         self.tableView_obj = QTableView(self.wizardPage4_obj)
         self.tableView_obj.setObjectName(u"tableView_obj")
+        self.tableView_obj.setFrameShape(QFrame.Shape.Panel)
         self.tableView_obj.setEditTriggers(QAbstractItemView.EditTrigger.AllEditTriggers)
         self.tableView_obj.setVerticalScrollMode(QAbstractItemView.ScrollMode.ScrollPerItem)
         self.tableView_obj.setHorizontalScrollMode(QAbstractItemView.ScrollMode.ScrollPerPixel)
         self.tableView_obj.horizontalHeader().setCascadingSectionResizes(True)
+        self.tableView_obj.horizontalHeader().setHighlightSections(False)
         self.tableView_obj.horizontalHeader().setStretchLastSection(True)
+        self.tableView_obj.verticalHeader().setVisible(False)
 
         self.horizontalLayout_3.addWidget(self.tableView_obj)
 
@@ -200,8 +206,11 @@ class Ui_Wizard(object):
 
         self.tableView_run = QTableView(self.wizardPage6_run)
         self.tableView_run.setObjectName(u"tableView_run")
+        self.tableView_run.setFrameShape(QFrame.Shape.Panel)
         self.tableView_run.horizontalHeader().setCascadingSectionResizes(True)
+        self.tableView_run.horizontalHeader().setHighlightSections(False)
         self.tableView_run.horizontalHeader().setStretchLastSection(True)
+        self.tableView_run.verticalHeader().setVisible(False)
 
         self.horizontalLayout_4.addWidget(self.tableView_run)
 
@@ -230,6 +239,7 @@ class Ui_Wizard(object):
         self.verticalLayout_4.setObjectName(u"verticalLayout_4")
         self.treeView = QTreeView(self.wizardPage9_verify)
         self.treeView.setObjectName(u"treeView")
+        self.treeView.setFrameShape(QFrame.Shape.Panel)
         self.treeView.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         self.treeView.setHeaderHidden(True)
 
