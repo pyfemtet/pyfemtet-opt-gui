@@ -58,18 +58,16 @@ class ObjModel(MyStandardItemAsTableModel):
     # use / name is uneditable
 
     """
-    CATEGORY = 'objective'
     HEADER = ['use', 'name', 'direction', 'set to']
 
     def load(self) -> ReturnCode:
         # initialize table
-        table: QStandardItem = self._item
-        table.clearData()
-        table.setText(self.CATEGORY)
-        table.setRowCount(0)
-        table.setColumnCount(len(self.HEADER))
+        self._item.clearData()
+        self._item.setText(self._category)
+        self._item.setRowCount(0)
+        self._item.setColumnCount(len(self.HEADER))
         self.set_header(self.HEADER)
-        self._root.setColumnCount(max(self._root.columnCount(), table.columnCount()))
+        self._root.setColumnCount(max(self._root.columnCount(), self._item.columnCount()))
 
         # if Femtet is not alive, do nothing
         if not _p.check_femtet_alive():
@@ -88,26 +86,26 @@ class ObjModel(MyStandardItemAsTableModel):
         self.beginResetModel()
 
         # set data to table
-        table.setRowCount(len(names))
+        self._item.setRowCount(len(names))
 
         for row, name in enumerate(names):
             # use
             item = QStandardItem()
             item.setCheckable(True)
             item.setCheckState(Qt.CheckState.Checked)
-            table.setChild(row, 0, item)
+            self._item.setChild(row, 0, item)
 
             # name
             item = QStandardItem(name)
-            table.setChild(row, 1, item)
+            self._item.setChild(row, 1, item)
 
             # direction
             item = QStandardItem('maximize')  # TODO: load if previous setting exists
-            table.setChild(row, 2, item)
+            self._item.setChild(row, 2, item)
 
             # set to
             item = QStandardItem('(ignore) 0')
-            table.setChild(row, 3, item)
+            self._item.setChild(row, 3, item)
 
         # notify to end editing to the abstract model
         self.endResetModel()

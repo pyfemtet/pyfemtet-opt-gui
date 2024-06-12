@@ -29,7 +29,7 @@ class PrmModel(MyStandardItemAsTableModel):
         # initialize table
         table: QStandardItem = self._item
         table.clearData()
-        table.setText('prm')
+        table.setText(self._category)
         table.setRowCount(0)
         table.setColumnCount(6)
         self.set_header([

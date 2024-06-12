@@ -13,10 +13,10 @@ class ProblemItemModel(QStandardItemModel):
         self.root: QStandardItem = self.invisibleRootItem()
 
         self.femprj_item: QStandardItem = self.append_table_item('model')
-        self.prm_item: QStandardItem = self.append_table_item('prm')
+        self.prm_item: QStandardItem = self.append_table_item('parameter')
         self.obj_item: QStandardItem = self.append_table_item('objective')
-        self.cns_item: QStandardItem = self.append_table_item('cns')
-        self.run_item: QStandardItem = self.append_table_item('run')
+        # self.cns_item: QStandardItem = self.append_table_item('constraint')
+        self.run_item: QStandardItem = self.append_table_item('settings')
 
         self.femprj_model: FEMPrjModel = FEMPrjModel(self.femprj_item, self.root)
         self.prm_model: PrmModel = PrmModel(self.prm_item, self.root)
@@ -46,16 +46,18 @@ class CustomProxyModel(QSortFilterProxyModel):
         if not source_parent.isValid():
             return True
 
-        # # if prm or obj, invisible if unchecked
-        # category = source_parent.data()
-        # if category in ['prm', 'objective']:
-        #     index = self.sourceModel().index(source_row, 0, source_parent)
-        #     data = index.data(Qt.CheckStateRole)
-        #     if data == Qt.CheckState.Unchecked.value:
-        #         return False
+        sourceModel: ProblemItemModel = self.sourceModel()
+
+        # if prm or obj, invisible if non-checkable
+        category = source_parent.data()
+        if category in ['parameter', 'objective']:
+            index = sourceModel.index(source_row, 0, source_parent)
+            item: QStandardItem = sourceModel.itemFromIndex(index)
+            if not item.isCheckable():
+                return False
 
         # invisible if unchecked
-        first_column_index = self.sourceModel().index(source_row, 0, source_parent)
+        first_column_index = sourceModel.index(source_row, 0, source_parent)
         first_column_data = first_column_index.data(Qt.ItemDataRole.CheckStateRole)
         if first_column_data == Qt.CheckState.Unchecked.value:
             return False
@@ -63,6 +65,18 @@ class CustomProxyModel(QSortFilterProxyModel):
         # else, show anyway
         return True
 
-    def flags(self, index):
+    def flags(self, proxyIndex):
         # uneditable anyway
-        return Qt.ItemIsEnabled
+        return Qt.ItemFlag.ItemIsEnabled
+
+    def data(self, proxyIndex, role=Qt.ItemDataRole.DisplayRole):
+        sourceIndex = self.mapToSource(proxyIndex)
+        sourceModel: ProblemItemModel = self.sourceModel()
+        item = sourceModel.itemFromIndex(sourceIndex)
+        if item.isCheckable():
+            return None
+        return super().data(proxyIndex, role)
+
+
+
+

@@ -19,7 +19,6 @@ class FEMPrjModel(MyStandardItemAsTableModel):
     # uneditable
 
     """
-    CATEGORY = 'model'
     HEADER = ['use', 'item', 'value']
     ROW_COUNT = 2
 
@@ -30,7 +29,7 @@ class FEMPrjModel(MyStandardItemAsTableModel):
     def initialize_table(self):
         # initialize table
         self._item.clearData()
-        self._item.setText(self.CATEGORY)
+        self._item.setText(self._category)
         self._item.setRowCount(self.ROW_COUNT)
         self._item.setColumnCount(3)
         self.set_header(self.HEADER)

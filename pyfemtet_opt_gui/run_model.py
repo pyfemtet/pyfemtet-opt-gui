@@ -23,7 +23,6 @@ class RunModel(MyStandardItemAsTableModel):
     # if Uncheckable, the row is disabled excluding use column.
 
     """
-    CATEGORY = 'optimization setting'
     HEADER = ['use', 'item', 'value']
     ROW_COUNT = 3
 
@@ -31,7 +30,7 @@ class RunModel(MyStandardItemAsTableModel):
         # initialize table
         table: QStandardItem = self._item
         table.clearData()
-        table.setText(self.CATEGORY)
+        table.setText(self._category)
         table.setRowCount(self.ROW_COUNT)
         table.setColumnCount(3)
         self.set_header(self.HEADER)
