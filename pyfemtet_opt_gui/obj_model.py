@@ -5,6 +5,7 @@ from PySide6.QtWidgets import QStyledItemDelegate, QComboBox
 import _p
 
 from item_as_model import MyStandardItemAsTableModel, _isnumeric
+from pyfemtet_opt_gui.ui.return_code import ReturnCode
 
 
 class ObjTableDelegate(QStyledItemDelegate):
@@ -60,40 +61,34 @@ class ObjModel(MyStandardItemAsTableModel):
     CATEGORY = 'objective'
     HEADER = ['use', 'name', 'direction', 'set to']
 
-    def load(self):
+    def load(self) -> ReturnCode:
         # initialize table
         table: QStandardItem = self._item
         table.clearData()
         table.setText(self.CATEGORY)
         table.setRowCount(0)
         table.setColumnCount(len(self.HEADER))
-
+        self.set_header(self.HEADER)
         self._root.setColumnCount(max(self._root.columnCount(), table.columnCount()))
-        # table.parent().setColumnCount(max(table.parent().columnCount(), table.columnCount()))
 
         # if Femtet is not alive, do nothing
         if not _p.check_femtet_alive():
-            _p.logger.warning('Femtet との接続ができていません。')
-            return False
+            return ReturnCode.ERROR.FEMTET_CONNECTION_FAILED
 
         # load prm
         names = _p.get_parametric_output_names()
 
-        # TODO: if no prm, show warning dialog
         if names is None:
-            _p.logger.warning('Femtet のパラメトリック解析 / 結果出力タブで結果を設定してください。')
-            return False
-        elif len(names) == 0:
-            _p.logger.warning('Femtet のパラメトリック解析 / 結果出力タブで結果を設定してください。')
-            return False
+            return ReturnCode.WARNING.PARAMETRIC_OUTPUT_EMPTY
+
+        if len(names) == 0:
+            return ReturnCode.WARNING.PARAMETRIC_OUTPUT_EMPTY
 
         # notify to start editing to the abstract model
         self.beginResetModel()
 
         # set data to table
         table.setRowCount(len(names))
-
-        self.set_header(self.HEADER)
 
         for row, name in enumerate(names):
             # use
@@ -116,6 +111,8 @@ class ObjModel(MyStandardItemAsTableModel):
 
         # notify to end editing to the abstract model
         self.endResetModel()
+
+        return super().load()
 
     def flags(self, index):
         if not index.isValid(): return super().flags(index)

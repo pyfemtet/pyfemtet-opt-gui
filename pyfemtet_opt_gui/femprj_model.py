@@ -5,6 +5,7 @@ from PySide6.QtWidgets import QStyledItemDelegate, QComboBox
 import _p
 
 from item_as_model import MyStandardItemAsTableModel, _isnumeric
+from pyfemtet_opt_gui.ui.return_code import ReturnCode
 
 
 class FEMPrjModel(MyStandardItemAsTableModel):
@@ -24,39 +25,41 @@ class FEMPrjModel(MyStandardItemAsTableModel):
 
     def __init__(self, table_item: QStandardItem, root: QStandardItem, parent=None):
         super().__init__(table_item, root, parent)
+        self.initialize_table()
 
+    def initialize_table(self):
         # initialize table
         self._item.clearData()
         self._item.setText(self.CATEGORY)
         self._item.setRowCount(self.ROW_COUNT)
         self._item.setColumnCount(3)
+        self.set_header(self.HEADER)
         self._root.setColumnCount(max(self._root.columnCount(), self._item.columnCount()))
 
+    def load(self) -> ReturnCode:
 
-    def load(self):
+        self.initialize_table()
 
         # if Femtet is not alive, do nothing
         if not _p.check_femtet_alive():
-            _p.logger.warning('Femtet との接続ができていません。')
-            return False
+            # _p.logger.warning('Femtet との接続ができていません。')
+            return ReturnCode.ERROR.FEMTET_NOT_FOUND
 
         # load value
         prj = _p.Femtet.Project
         model = _p.Femtet.AnalysisModelName
-
-        # TODO: if no prm, show warning dialog
         if prj is None:
-            _p.logger.warning('Femtet でプロジェクトが開かれていません。')
-            return False
+            ret_code = ReturnCode.ERROR.FEMTET_NO_PROJECT
         elif prj == '':
-            _p.logger.warning('Femtet でプロジェクトが開かれていません。')
-            return False
+            ret_code = ReturnCode.ERROR.FEMTET_NO_PROJECT
+        else:
+            ret_code = ReturnCode.INFO.SUCCEED
+
+        if ret_code == ReturnCode.ERROR.FEMTET_NO_PROJECT:
+            prj, model = '', ''
 
         # notify to start editing to the abstract model
         self.beginResetModel()
-
-        # set data to table
-        self.set_header(self.HEADER)
 
         # ===== femprj =====
         # use
@@ -82,6 +85,8 @@ class FEMPrjModel(MyStandardItemAsTableModel):
 
         # notify to end editing to the abstract model
         self.endResetModel()
+
+        return ret_code
 
     def get_femprj(self):
         femprj_item = self.get_item(0, 2)

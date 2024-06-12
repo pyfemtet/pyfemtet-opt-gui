@@ -4,6 +4,7 @@ from PySide6.QtGui import QStandardItem
 import _p
 
 from item_as_model import MyStandardItemAsTableModel, _isnumeric
+from pyfemtet_opt_gui.ui.return_code import ReturnCode
 
 
 class PrmModel(MyStandardItemAsTableModel):
@@ -21,39 +22,13 @@ class PrmModel(MyStandardItemAsTableModel):
 
     """
 
-    def load(self):
+    def load(self) -> ReturnCode:
         # initialize table
         table: QStandardItem = self._item
         table.clearData()
         table.setText('prm')
         table.setRowCount(0)
         table.setColumnCount(6)
-
-        self._root.setColumnCount(max(self._root.columnCount(), table.columnCount()))
-        # table.parent().setColumnCount(max(table.parent().columnCount(), table.columnCount()))
-
-        # if Femtet is not alive, do nothing
-        if not _p.check_femtet_alive():
-            _p.logger.warning('Femtet との接続ができていません。')
-            return False
-
-        # load prm
-        names = _p.Femtet.GetVariableNames_py()
-
-        # TODO: if no prm, show warning dialog
-        if names is None:
-            _p.logger.warning('Femtet で変数を設定してください。')
-            return False
-        elif len(names) == 0:
-            _p.logger.warning('Femtet で変数を設定してください。')
-            return False
-
-        # notify to start editing to the abstract model
-        self.beginResetModel()
-
-        # set data to table
-        table.setRowCount(len(names))
-
         self.set_header([
             'use',
             'name',
@@ -62,6 +37,26 @@ class PrmModel(MyStandardItemAsTableModel):
             'ub',
             'test',
         ])
+        self._root.setColumnCount(max(self._root.columnCount(), table.columnCount()))
+
+        # if Femtet is not alive, do nothing
+        if not _p.check_femtet_alive():
+            return ReturnCode.ERROR.FEMTET_CONNECTION_FAILED
+
+        # load prm
+        names = _p.Femtet.GetVariableNames_py()
+
+        if names is None:
+            return ReturnCode.WARNING.PARAMETER_EMPTY
+
+        if len(names) == 0:
+            return ReturnCode.WARNING.PARAMETER_EMPTY
+
+        # notify to start editing to the abstract model
+        self.beginResetModel()
+
+        # set data to table
+        table.setRowCount(len(names))
 
         for row, name in enumerate(names):
 
@@ -99,6 +94,8 @@ class PrmModel(MyStandardItemAsTableModel):
 
         # notify to end editing to the abstract model
         self.endResetModel()
+
+        return super().load()
 
     def flags(self, index):
         if not index.isValid(): return super().flags(index)

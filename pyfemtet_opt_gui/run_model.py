@@ -3,6 +3,8 @@ from PySide6.QtGui import QStandardItem
 from PySide6.QtWidgets import QStyledItemDelegate, QComboBox
 
 from item_as_model import MyStandardItemAsTableModel, _isnumeric
+from pyfemtet_opt_gui.ui.return_code import ReturnCode
+
 
 import _p  # for logger
 
@@ -25,62 +27,64 @@ class RunModel(MyStandardItemAsTableModel):
     HEADER = ['use', 'item', 'value']
     ROW_COUNT = 3
 
-    def __init__(self, table_item: QStandardItem, root: QStandardItem, parent=None):
-        super().__init__(table_item=table_item, root=root, parent=parent)
-
+    def initialize_table(self):
         # initialize table
         table: QStandardItem = self._item
         table.clearData()
         table.setText(self.CATEGORY)
         table.setRowCount(self.ROW_COUNT)
         table.setColumnCount(3)
+        self.set_header(self.HEADER)
+        self._root.setColumnCount(max(self._root.columnCount(), self._item.columnCount()))
 
-        # extend root column if needed.
-        self._root.setColumnCount(max(self._root.columnCount(), table.columnCount()))
+
+    def __init__(self, table_item: QStandardItem, root: QStandardItem, parent=None):
+        super().__init__(table_item=table_item, root=root, parent=parent)
+
+        self.initialize_table()
 
         # notify to start editing to the abstract model
         self.beginResetModel()
 
         # set data to table
-        table.setRowCount(self.ROW_COUNT)
-        self.set_header(self.HEADER)
+        self._item.setRowCount(self.ROW_COUNT)
 
         # ===== n_trial =====
         # use
         item = QStandardItem()
         item.setCheckable(True)
         item.setCheckState(Qt.CheckState.Unchecked)
-        table.setChild(0, 0, item)
+        self._item.setChild(0, 0, item)
         # item
         item = QStandardItem('n_trials')
-        table.setChild(0, 1, item)
+        self._item.setChild(0, 1, item)
         # value
         item = QStandardItem('10')
-        table.setChild(0, 2, item)
+        self._item.setChild(0, 2, item)
 
         # ===== timeout =====
         # use
         item = QStandardItem()
         item.setCheckable(True)
         item.setCheckState(Qt.CheckState.Unchecked)
-        table.setChild(1, 0, item)
+        self._item.setChild(1, 0, item)
         # item
         item = QStandardItem('timeout')
-        table.setChild(1, 1, item)
+        self._item.setChild(1, 1, item)
         # value
         item = QStandardItem('3')
-        table.setChild(1, 2, item)
+        self._item.setChild(1, 2, item)
 
         # ===== n_parallel =====
         # use
         item = QStandardItem()
-        table.setChild(2, 0, item)
+        self._item.setChild(2, 0, item)
         # item
         item = QStandardItem('n_parallel')
-        table.setChild(2, 1, item)
+        self._item.setChild(2, 1, item)
         # value
         item = QStandardItem('1')
-        table.setChild(2, 2, item)
+        self._item.setChild(2, 2, item)
 
         # notify to end editing to the abstract model
         self.endResetModel()

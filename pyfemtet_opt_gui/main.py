@@ -3,11 +3,12 @@ import sys
 
 from PySide6.QtWidgets import (QApplication, QWizard, QFileDialog)
 
-from ui_wizard import Ui_Wizard
+from ui.ui_wizard import Ui_Wizard
 from problem_model import ProblemItemModel, CustomProxyModel
 from obj_model import ObjTableDelegate
 from script_builder import build_script
 
+from pyfemtet_opt_gui.ui.return_code import ReturnCode
 
 import _p  # must be same folder and cannot import via `from` keyword.
 
@@ -28,44 +29,62 @@ class MainWizard(QWizard):
         self._ui.tableView_run.setModel(model)
 
     def update_problem(self):
-        self.load_femprj()
+        ret_code = self.load_femprj()
+        if ret_code in ReturnCode.WARNING:
+            _p.logger.warning(ret_code.value)
+        elif ret_code in ReturnCode.ERROR:
+            _p.logger.error(ret_code.value)
+            return
+
         if self._ui.plainTextEdit_prj.toPlainText():
-            self.load_prm()
-            self.load_obj()
+            ret_code = self.load_prm()
+            if ret_code in ReturnCode.WARNING:
+                _p.logger.warning(ret_code.value)
+            elif ret_code in ReturnCode.ERROR:
+                _p.logger.error(ret_code.value)
+                return
 
-    def load_femprj(self):
-        if _p.check_femtet_alive():
-            prj = _p.Femtet.Project
-            model = _p.Femtet.AnalysisModelName
-            if prj:
-                self._ui.plainTextEdit_prj.setPlainText(prj)
-                self._ui.plainTextEdit_model.setPlainText(model)
+            ret_code = self.load_obj()
+            if ret_code in ReturnCode.WARNING:
+                _p.logger.warning(ret_code.value)
+            elif ret_code in ReturnCode.ERROR:
+                _p.logger.error(ret_code.value)
+                return
 
-                # モデルの再読み込み
-                self._problem.femprj_model.load()
+    def load_femprj(self) -> ReturnCode:
+        # モデルの再読み込み
+        ret_code = self._problem.femprj_model.load()
+        prj, model = self._problem.femprj_model.get_femprj()
+        self._ui.plainTextEdit_prj.setPlainText(prj)
+        self._ui.plainTextEdit_model.setPlainText(model)
+        return ret_code
 
-            else:
-                _p.logger.warning('Femtet で解析プロジェクトが開かれていません。')
-        else:
-            _p.logger.warning('Femtet との接続ができていません。')
-
-    def load_prm(self):
+    def load_prm(self) -> ReturnCode:
         if self._ui.plainTextEdit_prj.toPlainText():
             # モデルの再読み込み
-            self._problem.prm_model.load()
+            ret_code = self._problem.prm_model.load()
             # モデルをビューに再設定
             model = self._problem.prm_model
             self._ui.tableView_prm.setModel(model)
+            return ret_code
 
-    def load_obj(self):
+        else:
+            return ReturnCode.WARNING.PARAMETER_EMPTY
+
+    def load_obj(self) -> ReturnCode:
         if self._ui.plainTextEdit_prj.toPlainText():
             # モデルの再読み込み
-            self._problem.obj_model.load()
+            ret_code = self._problem.obj_model.load()
+
             # モデルをビューに再設定
             model = self._problem.obj_model
             self._ui.tableView_obj.setModel(model)
             delegate = ObjTableDelegate(model)
             self._ui.tableView_obj.setItemDelegate(delegate)
+            return ret_code
+
+        else:
+            return ReturnCode.WARNING.PARAMETRIC_OUTPUT_EMPTY
 
     def connect_process(self):
         if _p.connect_femtet():

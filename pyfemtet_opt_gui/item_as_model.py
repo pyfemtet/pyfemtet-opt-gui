@@ -1,7 +1,7 @@
-
 from PySide6.QtGui import QStandardItem
 from PySide6.QtCore import Qt, QAbstractTableModel
 
+from pyfemtet_opt_gui.ui.return_code import ReturnCode
 
 
 def _isnumeric(exp):
@@ -20,8 +20,8 @@ class MyStandardItemAsTableModel(QAbstractTableModel):
         self._root: QStandardItem = root
         super().__init__(parent)
 
-    def load(self):
-        pass
+    def load(self) -> ReturnCode:
+        return ReturnCode.INFO.SUCCEED
 
     def rowCount(self, parent=None): return self._item.rowCount()
     def columnCount(self, parent=None): return self._item.columnCount()
