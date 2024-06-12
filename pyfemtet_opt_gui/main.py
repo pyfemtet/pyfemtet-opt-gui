@@ -2,12 +2,13 @@ import os
 import sys
 
 from PySide6.QtWidgets import (QApplication, QWizard, QFileDialog)
+from PySide6.QtCore import Qt
 
 
 from ui.ui_detailed_wizard import Ui_DetailedWizard
 from problem_model import ProblemItemModel, CustomProxyModel
 from obj_model import ObjTableDelegate
-from script_builder import build_script
+from script_builder import build_script_main
 
 from pyfemtet_opt_gui.ui.return_code import ReturnCode
 from pyfemtet_opt_gui.item_as_model import MyStandardItemAsTableModelWithoutHeader
@@ -102,7 +103,8 @@ class MainWizard(QWizard):
             path = dialog.selectedFiles()[0]
             dir_path = os.path.dirname(path)
             if os.path.isdir(dir_path):
-                build_script(self._problem, path)
+                with_run = self._ui.checkBox_save_with_run.checkState() == Qt.CheckState.Checked
+                build_script_main(self._problem, path, with_run)
             else:
                 _p.logger.error('存在しないフォルダのファイルが指定されました。')
 

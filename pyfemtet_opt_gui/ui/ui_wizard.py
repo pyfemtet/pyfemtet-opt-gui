@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'wizardrboDGT.ui'
+## Form generated from reading UI file 'wizardrytRjB.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.7.1
 ##
@@ -15,11 +15,12 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QAbstractItemView, QAbstractScrollArea, QApplication, QFormLayout,
-    QFrame, QGridLayout, QHBoxLayout, QHeaderView,
-    QLabel, QPlainTextEdit, QPushButton, QSizePolicy,
-    QSpacerItem, QTableView, QTextEdit, QTreeView,
-    QVBoxLayout, QWidget, QWizard, QWizardPage)
+from PySide6.QtWidgets import (QAbstractItemView, QAbstractScrollArea, QApplication, QCheckBox,
+    QFormLayout, QFrame, QGridLayout, QHBoxLayout,
+    QHeaderView, QLabel, QPlainTextEdit, QPushButton,
+    QSizePolicy, QSpacerItem, QTableView, QTextEdit,
+    QTreeView, QVBoxLayout, QWidget, QWizard,
+    QWizardPage)
 
 class Ui_Wizard(object):
     def setupUi(self, Wizard):
@@ -255,16 +256,22 @@ class Ui_Wizard(object):
         Wizard.addPage(self.wizardPage6_run)
         self.wizardPage9_verify = QWizardPage()
         self.wizardPage9_verify.setObjectName(u"wizardPage9_verify")
-        self.verticalLayout_4 = QVBoxLayout(self.wizardPage9_verify)
-        self.verticalLayout_4.setObjectName(u"verticalLayout_4")
-        self.treeView = QTreeView(self.wizardPage9_verify)
-        self.treeView.setObjectName(u"treeView")
-        self.treeView.setFrameShape(QFrame.Shape.Panel)
-        self.treeView.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
-        self.treeView.setWordWrap(False)
-        self.treeView.setHeaderHidden(False)
+        self.gridLayout_2 = QGridLayout(self.wizardPage9_verify)
+        self.gridLayout_2.setObjectName(u"gridLayout_2")
+        self.checkBox_save_with_run = QCheckBox(self.wizardPage9_verify)
+        self.checkBox_save_with_run.setObjectName(u"checkBox_save_with_run")
+        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.checkBox_save_with_run.sizePolicy().hasHeightForWidth())
+        self.checkBox_save_with_run.setSizePolicy(sizePolicy2)
 
-        self.verticalLayout_4.addWidget(self.treeView)
+        self.gridLayout_2.addWidget(self.checkBox_save_with_run, 4, 1, 1, 1)
+
+        self.pushButton_save_script = QPushButton(self.wizardPage9_verify)
+        self.pushButton_save_script.setObjectName(u"pushButton_save_script")
+
+        self.gridLayout_2.addWidget(self.pushButton_save_script, 4, 0, 1, 1)
 
         self.textEdit_4 = QTextEdit(self.wizardPage9_verify)
         self.textEdit_4.setObjectName(u"textEdit_4")
@@ -273,12 +280,16 @@ class Ui_Wizard(object):
         self.textEdit_4.setSizeAdjustPolicy(QAbstractScrollArea.SizeAdjustPolicy.AdjustToContents)
         self.textEdit_4.setReadOnly(True)
 
-        self.verticalLayout_4.addWidget(self.textEdit_4)
+        self.gridLayout_2.addWidget(self.textEdit_4, 1, 0, 1, 2)
 
-        self.pushButton = QPushButton(self.wizardPage9_verify)
-        self.pushButton.setObjectName(u"pushButton")
+        self.treeView = QTreeView(self.wizardPage9_verify)
+        self.treeView.setObjectName(u"treeView")
+        self.treeView.setFrameShape(QFrame.Shape.Panel)
+        self.treeView.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.treeView.setWordWrap(False)
+        self.treeView.setHeaderHidden(False)
 
-        self.verticalLayout_4.addWidget(self.pushButton)
+        self.gridLayout_2.addWidget(self.treeView, 0, 0, 1, 2)
 
         Wizard.addPage(self.wizardPage9_verify)
 #if QT_CONFIG(shortcut)
@@ -290,7 +301,7 @@ class Ui_Wizard(object):
         self.pushButton_launch.clicked.connect(Wizard.connect_process)
         self.pushButton_load_prm.clicked.connect(Wizard.update_problem)
         self.pushButton_load_obj.clicked.connect(Wizard.update_problem)
-        self.pushButton.clicked.connect(Wizard.build_script)
+        self.pushButton_save_script.clicked.connect(Wizard.build_script)
         self.pushButton_load_femprj.clicked.connect(Wizard.update_problem)
         Wizard.currentIdChanged.connect(self.treeView.expandAll)
 
@@ -378,6 +389,8 @@ class Ui_Wizard(object):
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">\u5b9f\u884c\u6642\u306e\u8a2d\u5b9a\u3092\u884c\u3063\u3066\u304f\u3060\u3055\u3044\u3002</p></body></html>", None))
         self.wizardPage9_verify.setSubTitle(QCoreApplication.translate("Wizard", u"<table class=MsoNormalTable border=0 cellspacing=0 cellpadding=0 width=\"83%\"  style='width:83.32%;border-collapse:collapse'>  <tr>   <td width=\"19%\" valign=top style='width:19.98%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><span style='color:#7F7F7F'>\u30e2\u30c7\u30eb\u6307\u5b9a</span></p>   </td>   <td width=\"20%\" valign=top style='width:20.0%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><span style='color:#7F7F7F'>\u5909\u6570\u6307\u5b9a</span></p>   </td>   <td width=\"20%\" valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><span style='color:#7F7F7F'>\u76ee\u7684\u6307\u5b9a</span></p>   </td>   <td width=\"20%\" valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><span style='color:#7F7F7F'>\u5b9f\u884c\u8a2d\u5b9a</span></p>   </td>   <td width=\"19%\" valign=top style='width:19.96%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><b><i><span style='color:#0987D5'>\u78ba\u8a8d</span></i></b></p>   </td>  </tr> </table>"
                         " ", None))
+        self.checkBox_save_with_run.setText(QCoreApplication.translate("Wizard", u"\u30b9\u30af\u30ea\u30d7\u30c8\u306e\u4fdd\u5b58\u5f8c\u5b9f\u884c\u3059\u308b", None))
+        self.pushButton_save_script.setText(QCoreApplication.translate("Wizard", u"\u30b9\u30af\u30ea\u30d7\u30c8\u3092\u4fdd\u5b58\u3059\u308b", None))
         self.textEdit_4.setHtml(QCoreApplication.translate("Wizard", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><meta charset=\"utf-8\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
@@ -386,6 +399,5 @@ class Ui_Wizard(object):
 "li.checked::marker { content: \"\\2612\"; }\n"
 "</style></head><body style=\" font-family:'Yu Gothic UI'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">\u3088\u308d\u3057\u3044\u3067\u3059\u304b\uff1f</p></body></html>", None))
-        self.pushButton.setText(QCoreApplication.translate("Wizard", u"\u30b9\u30af\u30ea\u30d7\u30c8\u3092\u4fdd\u5b58\u3057\u3066\u5b9f\u884c\u3059\u308b", None))
     # retranslateUi
 

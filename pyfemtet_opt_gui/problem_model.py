@@ -1,4 +1,4 @@
-from PySide6.QtGui import QStandardItemModel, QStandardItem
+from PySide6.QtGui import QStandardItemModel, QStandardItem, QFont
 from PySide6.QtCore import Qt, QSortFilterProxyModel
 
 from prm_model import PrmModel
@@ -88,6 +88,23 @@ class CustomProxyModel(QSortFilterProxyModel):
             return None
 
         # invisible item its header is 'test'
-        ...
+        is_prm_model = sourceIndex.parent().data() == sourceModel.prm_item.text()
+        is_test_column = sourceIndex.column() == sourceModel.prm_model.get_col_from_name('test')
+        if is_prm_model and is_test_column:
+            return None
+
+        for __ in range(1):  # dummy loop to use if-break
+            # bold if header row
+            if (sourceIndex.row() == 0) and (sourceIndex.column() > 0):
+
+                # only femprj_model have no header row
+                if sourceIndex.parent().data() == sourceModel.femprj_item.text():
+                    break
+
+                if role == Qt.ItemDataRole.FontRole:
+                    font = QFont()
+                    font.setBold(True)
+                    font.setItalic(True)
+                    return font
 
         return super().data(proxyIndex, role)

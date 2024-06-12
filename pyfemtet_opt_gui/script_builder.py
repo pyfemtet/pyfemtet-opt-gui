@@ -114,7 +114,7 @@ if __name__ == '__main__':
     return code
 
 
-def build_script(model: ProblemItemModel, path: str):
+def build_script_main(model: ProblemItemModel, path: str, with_run=False):
     code = ''
 
     code += get_header()
@@ -127,12 +127,13 @@ def build_script(model: ProblemItemModel, path: str):
     with open(path, 'w', encoding='utf-8') as f:
         f.write(code)
 
-    import os
-    import sys
-    there, it = os.path.split(path)
-    module_name = os.path.splitext(it)[0]
-    sys.path.append(there)
-    # exec(f'import {module_name}; {module_name}.main()')
+    if with_run:
+        import os
+        import sys
+        there, it = os.path.split(path)
+        module_name = os.path.splitext(it)[0]
+        sys.path.append(there)
+        exec(f'import {module_name}; {module_name}.main()')
 
 
 
