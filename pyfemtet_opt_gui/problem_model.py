@@ -93,8 +93,9 @@ class CustomProxyModel(QSortFilterProxyModel):
         if is_prm_model and is_test_column:
             return None
 
+        # bold if header row
         for __ in range(1):  # dummy loop to use if-break
-            # bold if header row
+
             if (sourceIndex.row() == 0) and (sourceIndex.column() > 0):
 
                 # only femprj_model have no header row
@@ -106,5 +107,9 @@ class CustomProxyModel(QSortFilterProxyModel):
                     font.setBold(True)
                     font.setItalic(True)
                     return font
+
+        # invisible if contains (ignored)
+        if '(ignore)' in item.text():
+            return None
 
         return super().data(proxyIndex, role)
