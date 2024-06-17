@@ -14,9 +14,12 @@ def _isnumeric(exp):
 
 
 class MyStandardItemAsTableModel(QAbstractTableModel):
+
+    HEADER = []
+
     def __init__(self, table_item: QStandardItem, root: QStandardItem, parent=None):
         self._item: QStandardItem = table_item  # QStandardItem what has table structure children.
-        self._header: list[str] = []
+        self._header: list[str] = self.HEADER
         self._root: QStandardItem = root
         self._category: str = self._item.text()
         super().__init__(parent)

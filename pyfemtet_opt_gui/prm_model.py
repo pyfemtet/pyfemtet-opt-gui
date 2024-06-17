@@ -22,6 +22,15 @@ class PrmModel(MyStandardItemAsTableModel):
 
     """
 
+    HEADER = [
+            'use',
+            'name',
+            'expression',
+            'lb',
+            'ub',
+            'test',
+        ]
+
     def load(self) -> ReturnCode:
 
         self.beginResetModel()
@@ -32,14 +41,7 @@ class PrmModel(MyStandardItemAsTableModel):
         table.setText(self._category)
         table.setRowCount(0)
         table.setColumnCount(6)
-        self.set_header([
-            'use',
-            'name',
-            'expression',
-            'lb',
-            'ub',
-            'test',
-        ])
+        self.set_header(self.HEADER)
         self._root.setColumnCount(max(self._root.columnCount(), table.columnCount()))
 
         self.endResetModel()
@@ -175,3 +177,11 @@ class PrmModel(MyStandardItemAsTableModel):
                 return False
 
         return super().setData(index, value, role)
+
+    def check_use_any(self):
+        col = self.get_col_from_name('use')
+        used = []
+        for row in range(1, self.rowCount()):
+            index = self.createIndex(row, col)
+            used.append(self.data(index, Qt.ItemDataRole.CheckStateRole))
+        return any(used)

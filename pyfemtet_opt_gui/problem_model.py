@@ -12,12 +12,14 @@ class ProblemItemModel(QStandardItemModel):
         super().__init__(parent)
         self.root: QStandardItem = self.invisibleRootItem()
 
+        # standard item
         self.femprj_item: QStandardItem = self.append_table_item('model')
         self.prm_item: QStandardItem = self.append_table_item('parameter')
         self.obj_item: QStandardItem = self.append_table_item('objective')
         # self.cns_item: QStandardItem = self.append_table_item('constraint')
         self.run_item: QStandardItem = self.append_table_item('settings')
 
+        # standard item model to view in tableview
         self.femprj_model: FEMPrjModel = FEMPrjModel(self.femprj_item, self.root)
         self.prm_model: PrmModel = PrmModel(self.prm_item, self.root)
         self.obj_model: ObjModel = ObjModel(self.obj_item, self.root)

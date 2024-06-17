@@ -17,6 +17,7 @@ class FEMPrjModel(MyStandardItemAsTableModel):
     None | model  | str
 
     # uneditable
+    # use column is a dummy column
 
     """
     HEADER = ['use', 'item', 'value']

@@ -45,6 +45,17 @@ class MainWizard(QWizard):
         proxy_model.setSourceModel(model)
         self._ui.tableView_run.setModel(proxy_model)
 
+        # disable next button if checker returns False
+        self._ui.wizardPage2_model.isComplete = lambda: self._problem.femprj_model.get_femprj()[0] != ''
+        self._ui.wizardPage3_param.isComplete = lambda: self._problem.prm_model.check_use_any()
+        self._ui.wizardPage4_obj.isComplete = lambda: self._problem.obj_model.check_use_any()
+        # self._ui.wizardPage6_run.isComplete =  # currently, FEMOpt.optimize() requires no arguments.
+
+        # connect dataChanged to completeChanged(=emit isComplete)
+        for page_id in self.pageIds():
+            page = self.page(page_id)
+            self._problem.dataChanged.connect(page.completeChanged)
+
     def update_problem(self):
         return_codes = []
 

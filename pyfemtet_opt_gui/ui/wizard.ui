@@ -17,7 +17,7 @@
    <enum>QWizard::WizardStyle::ModernStyle</enum>
   </property>
   <property name="options">
-   <set>QWizard::WizardOption::HelpButtonOnRight</set>
+   <set>QWizard::WizardOption::HaveNextButtonOnLastPage|QWizard::WizardOption::HelpButtonOnRight|QWizard::WizardOption::NoCancelButtonOnLastPage</set>
   </property>
   <widget class="QWizardPage" name="wizardPage1_launch">
    <layout class="QGridLayout" name="gridLayout">
@@ -595,8 +595,8 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <slot>connect_process()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>322</x>
-     <y>275</y>
+     <x>461</x>
+     <y>272</y>
     </hint>
     <hint type="destinationlabel">
      <x>339</x>
@@ -612,7 +612,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <hints>
     <hint type="sourcelabel">
      <x>93</x>
-     <y>205</y>
+     <y>204</y>
     </hint>
     <hint type="destinationlabel">
      <x>84</x>
@@ -627,8 +627,8 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <slot>update_problem()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>88</x>
-     <y>205</y>
+     <x>93</x>
+     <y>204</y>
     </hint>
     <hint type="destinationlabel">
      <x>64</x>
@@ -644,7 +644,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <hints>
     <hint type="sourcelabel">
      <x>117</x>
-     <y>394</y>
+     <y>391</y>
     </hint>
     <hint type="destinationlabel">
      <x>165</x>
@@ -659,8 +659,8 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <slot>update_problem()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>82</x>
-     <y>205</y>
+     <x>93</x>
+     <y>204</y>
     </hint>
     <hint type="destinationlabel">
      <x>44</x>
@@ -679,8 +679,8 @@ li.checked::marker { content: &quot;\2612&quot;; }
      <y>424</y>
     </hint>
     <hint type="destinationlabel">
-     <x>402</x>
-     <y>257</y>
+     <x>99</x>
+     <y>91</y>
     </hint>
    </hints>
   </connection>

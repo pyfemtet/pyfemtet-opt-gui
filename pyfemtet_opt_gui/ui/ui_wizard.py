@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'wizardrytRjB.ui'
+## Form generated from reading UI file 'wizardMCQQqs.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.7.1
 ##
@@ -28,7 +28,7 @@ class Ui_Wizard(object):
             Wizard.setObjectName(u"Wizard")
         Wizard.resize(701, 445)
         Wizard.setWizardStyle(QWizard.WizardStyle.ModernStyle)
-        Wizard.setOptions(QWizard.WizardOption.HelpButtonOnRight)
+        Wizard.setOptions(QWizard.WizardOption.HaveNextButtonOnLastPage|QWizard.WizardOption.HelpButtonOnRight|QWizard.WizardOption.NoCancelButtonOnLastPage)
         self.wizardPage1_launch = QWizardPage()
         self.wizardPage1_launch.setObjectName(u"wizardPage1_launch")
         self.gridLayout = QGridLayout(self.wizardPage1_launch)

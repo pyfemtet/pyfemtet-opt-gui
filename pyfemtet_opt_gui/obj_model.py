@@ -186,3 +186,11 @@ class ObjModel(MyStandardItemAsTableModel):
                 return False
 
         return super().setData(index, value, role)
+
+    def check_use_any(self):
+        col = self.get_col_from_name('use')
+        used = []
+        for row in range(1, self.rowCount()):
+            index = self.createIndex(row, col)
+            used.append(self.data(index, Qt.ItemDataRole.CheckStateRole))
+        return any(used)
