@@ -77,3 +77,13 @@ class MyStandardItemAsTableModelWithoutHeader(QSortFilterProxyModel):
         if source_row == 0:
             return False
         return True
+
+    def get_col_name(self, col: int) -> str:
+        return self.sourceModel().get_col_name(col)
+
+    def get_col_from_name(self, header_string: str) -> int:
+        return self.sourceModel().get_col_from_name(header_string)
+
+    # get item directory
+    def get_item(self, row, col) -> QStandardItem:
+        return self.sourceModel().get_item(row, col)
