@@ -132,6 +132,7 @@ def build_script_main(model: ProblemItemModel, path: str, with_run=False):
         import sys
         there, it = os.path.split(path)
         module_name = os.path.splitext(it)[0]
+        os.chdir(there)
         sys.path.append(there)
         exec(f'import {module_name}; {module_name}.main()')
 
