@@ -21,6 +21,19 @@
   </property>
   <widget class="QWizardPage" name="wizardPage1_launch">
    <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="1">
+     <spacer name="verticalSpacer">
+      <property name="orientation">
+       <enum>Qt::Orientation::Vertical</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>20</width>
+        <height>40</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
     <item row="1" column="0">
      <spacer name="horizontalSpacer_3">
       <property name="orientation">
@@ -42,6 +55,9 @@
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
+      <property name="accessibleName">
+       <string>Connect to Femtet</string>
+      </property>
       <property name="text">
        <string>Connect to Femtet</string>
       </property>
@@ -50,7 +66,7 @@
       </property>
      </widget>
     </item>
-    <item row="4" column="0" colspan="3">
+    <item row="5" column="0" colspan="3">
      <widget class="QTextEdit" name="textEdit_2">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
@@ -84,8 +100,8 @@ li.checked::marker { content: &quot;\2612&quot;; }
       </property>
      </widget>
     </item>
-    <item row="0" column="1">
-     <spacer name="verticalSpacer">
+    <item row="3" column="1">
+     <spacer name="verticalSpacer_2">
       <property name="orientation">
        <enum>Qt::Orientation::Vertical</enum>
       </property>
@@ -111,17 +127,17 @@ li.checked::marker { content: &quot;\2612&quot;; }
      </spacer>
     </item>
     <item row="2" column="1">
-     <spacer name="verticalSpacer_2">
-      <property name="orientation">
-       <enum>Qt::Orientation::Vertical</enum>
+     <widget class="QLabel" name="label_connectionState">
+      <property name="accessibleName">
+       <string/>
       </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>20</width>
-        <height>40</height>
-       </size>
+      <property name="text">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style='color:#FF0000'&gt;接続されていません。&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
-     </spacer>
+      <property name="alignment">
+       <set>Qt::AlignmentFlag::AlignCenter</set>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -576,7 +592,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <hints>
     <hint type="sourcelabel">
      <x>433</x>
-     <y>272</y>
+     <y>195</y>
     </hint>
     <hint type="destinationlabel">
      <x>339</x>
@@ -640,7 +656,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <hints>
     <hint type="sourcelabel">
      <x>93</x>
-     <y>204</y>
+     <y>142</y>
     </hint>
     <hint type="destinationlabel">
      <x>44</x>

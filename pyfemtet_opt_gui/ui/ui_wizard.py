@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'wizardYTYfHR.ui'
+## Form generated from reading UI file 'wizardRcrFsS.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.7.1
 ##
@@ -33,6 +33,10 @@ class Ui_Wizard(object):
         self.wizardPage1_launch.setObjectName(u"wizardPage1_launch")
         self.gridLayout = QGridLayout(self.wizardPage1_launch)
         self.gridLayout.setObjectName(u"gridLayout")
+        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.gridLayout.addItem(self.verticalSpacer, 0, 1, 1, 1)
+
         self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.gridLayout.addItem(self.horizontalSpacer_3, 1, 0, 1, 1)
@@ -58,19 +62,21 @@ class Ui_Wizard(object):
         self.textEdit_2.setSizeAdjustPolicy(QAbstractScrollArea.SizeAdjustPolicy.AdjustToContents)
         self.textEdit_2.setReadOnly(True)
 
-        self.gridLayout.addWidget(self.textEdit_2, 4, 0, 1, 3)
+        self.gridLayout.addWidget(self.textEdit_2, 5, 0, 1, 3)
 
-        self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+        self.verticalSpacer_2 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
-        self.gridLayout.addItem(self.verticalSpacer, 0, 1, 1, 1)
+        self.gridLayout.addItem(self.verticalSpacer_2, 3, 1, 1, 1)
 
         self.horizontalSpacer_4 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.gridLayout.addItem(self.horizontalSpacer_4, 1, 2, 1, 1)
 
-        self.verticalSpacer_2 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+        self.label_connectionState = QLabel(self.wizardPage1_launch)
+        self.label_connectionState.setObjectName(u"label_connectionState")
+        self.label_connectionState.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        self.gridLayout.addItem(self.verticalSpacer_2, 2, 1, 1, 1)
+        self.gridLayout.addWidget(self.label_connectionState, 2, 1, 1, 1)
 
         Wizard.addPage(self.wizardPage1_launch)
         self.wizardPage2_model = QWizardPage()
@@ -304,6 +310,9 @@ class Ui_Wizard(object):
 
     def retranslateUi(self, Wizard):
         Wizard.setWindowTitle(QCoreApplication.translate("Wizard", u"Wizard", None))
+#if QT_CONFIG(accessibility)
+        self.pushButton_launch.setAccessibleName(QCoreApplication.translate("Wizard", u"Connect to Femtet", None))
+#endif // QT_CONFIG(accessibility)
         self.pushButton_launch.setText(QCoreApplication.translate("Wizard", u"Connect to Femtet", None))
         self.textEdit_2.setMarkdown(QCoreApplication.translate("Wizard", u"\u6700\u9069\u5316\u3092\u884c\u3046\u305f\u3081\u306e\u30b9\u30af\u30ea\u30d7\u30c8\u306e\u8a2d\u5b9a\u3092\u884c\u3044\u307e\u3059\u3002\n"
 "\u6700\u521d\u306b\u3001Femtet \u306b\u63a5\u7d9a\u3057\u3066\u6700\u9069\u5316\u3092\u884c\u3046\u89e3\u6790\u30e2\u30c7\u30eb\u3092\u6c7a\u3081\u307e\u3059\u3002\n"
@@ -320,6 +329,10 @@ class Ui_Wizard(object):
 "</style></head><body style=\" font-family:'Yu Gothic UI'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">\u6700\u9069\u5316\u3092\u884c\u3046\u305f\u3081\u306e\u30b9\u30af\u30ea\u30d7\u30c8\u306e\u8a2d\u5b9a\u3092\u884c\u3044\u307e\u3059\u3002<br />\u6700\u521d\u306b\u3001Femtet \u306b\u63a5\u7d9a\u3057\u3066\u6700\u9069\u5316\u3092\u884c\u3046\u89e3\u6790\u30e2\u30c7\u30eb\u3092\u6c7a\u3081\u307e\u3059\u3002<br />\u30dc\u30bf\u30f3\u3092\u62bc\u3059\u3068 Fetmet \u3068\u306e\u81ea\u52d5\u63a5\u7d9a\u304c"
                         "\u59cb\u307e\u308a\u307e\u3059\u3002</p></body></html>", None))
+#if QT_CONFIG(accessibility)
+        self.label_connectionState.setAccessibleName("")
+#endif // QT_CONFIG(accessibility)
+        self.label_connectionState.setText(QCoreApplication.translate("Wizard", u"<html><head/><body><p><span style='color:#FF0000'>\u63a5\u7d9a\u3055\u308c\u3066\u3044\u307e\u305b\u3093\u3002</span></p></body></html>", None))
         self.wizardPage2_model.setSubTitle(QCoreApplication.translate("Wizard", u"<table class=MsoNormalTable border=0 cellspacing=0 cellpadding=0 width=\"83%\"  style='width:83.32%;border-collapse:collapse'>  <tr>   <td width=\"19%\" valign=top style='width:19.98%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><b><i><span style='color:#0987D5'>\u30e2\u30c7\u30eb\u6307\u5b9a</span></i></b></p>   </td>   <td width=\"20%\" valign=top style='width:20.0%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><span style='color:#7F7F7F'>\u5909\u6570\u6307\u5b9a</span></p>   </td>   <td width=\"20%\" valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><span style='color:#7F7F7F'>\u76ee\u7684\u6307\u5b9a</span></p>   </td>   <td width=\"20%\" valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><span style='color:#7F7F7F'>\u5b9f\u884c\u8a2d\u5b9a</span></p>   </td>   <td width=\"19%\" valign=top style='width:19.96%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><span style='color:#7F7F7F'>\u78ba\u8a8d</span></p>   </td>  </tr> </table>", None))
         self.pushButton_load_femprj.setText(QCoreApplication.translate("Wizard", u"Load", None))
         self.label_project.setText(QCoreApplication.translate("Wizard", u".femprj", None))

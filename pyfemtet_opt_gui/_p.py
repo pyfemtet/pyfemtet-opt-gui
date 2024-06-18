@@ -42,7 +42,7 @@ def connect_femtet():
         return False
 
 
-def check_femtet_alive():
+def check_femtet_alive() -> bool:
     global Femtet, pid
 
     # Femtet is None
