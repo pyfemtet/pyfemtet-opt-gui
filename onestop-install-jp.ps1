@@ -36,18 +36,46 @@ $ErrorActionPreference = "Stop"
 # ===== main =====
 
 # install pyfemtet-opt-gui
-py -m pip install pyfemtet-opt-gui -U
+py -m pip install pyfemtet-opt-gui -U --no-warn-script-location
+
+# check pyfemtet-opt-gui installed
+$installed_packages = py -m pip list
+if (-not ($installed_packages | Select-String -Pattern 'pyfemtet-opt-gui')) {
+    $title = "Error!"
+    $message = "PyFemtet のインストールに失敗しました。"
+    [System.Windows.Forms.MessageBox]::Show($message, $title)
+    throw $message
+}
 
 # get Femtet.exe path using femtetuitls
-$femtet_exe_path = py -c "from femtetutils import util;util.get_femtet_exe_path()"
-$femtet_exe_path = $femtet_exe_path.replace("INFO: ", "")
+$femtet_exe_path = py -c "from femtetutils import util;from logging import disable;disable();print(util.get_femtet_exe_path())"
 # estimate FemtetMacro.dll path
 $femtet_macro_dll_path = $femtet_exe_path.replace("Femtet.exe", "FemtetMacro.dll")
+if (-not (test-path $femtet_macro_dll_path)) {
+    $title = "Error!"
+    $message = "Femtet マクロインターフェース設定に失敗しました。"
+    [System.Windows.Forms.MessageBox]::Show($message, $title)
+    throw $message
+} else {
+    write-host "regsvr32 OK"
+}
+
 # regsvr
-regsvr32 $femtet_macro_dll_path
+regsvr32 $femtet_macro_dll_path  # returns nothing, dialog only
 
 # win32com.client.makepy
-py -m win32com.client.makepy FemtetMacro
+py -m win32com.client.makepy FemtetMacro  # return nothing
+
+# check constants setting
+$ret = py -c "from win32com.client import constants, Dispatch;Dispatch('FemtetMacro.Femtet');print(constants.SOLVER_NONE_C)"
+if (-not ($ret -eq "0")) {
+    $title = "Error!"
+    $message = "Femtet COM 定数設定に失敗しました。"
+    [System.Windows.Forms.MessageBox]::Show($message, $title)
+    throw $message
+} else {
+    write-host "makepy OK"
+}
 
 # make desktop shortcut for pyfemtet-opt-gui
 $python_executable = py -c "import sys;print(sys.executable)"
@@ -76,7 +104,9 @@ if (-not (Test-Path $Scripts_dir)) {
     $Shortcut = $WScriptShell.CreateShortcut($Shortcut_file)
     $Shortcut.TargetPath = $Target_exe
     $Shortcut.Save()
+    
+    # complete
+    [System.Windows.Forms.MessageBox]::Show("PyFemtet インストール が完了しました。", "Complete!")
+
 }
 
-# complete
-[System.Windows.Forms.MessageBox]::Show("PyFemtet インストール が完了しました。", "Complete!")
