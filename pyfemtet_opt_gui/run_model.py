@@ -123,6 +123,10 @@ class RunModel(MyStandardItemAsTableModel):
         if col_name == 'item':
             return Qt.ItemFlag.ItemIsEnabled
 
+        # description is uneditable
+        if col_name == 'description':
+            return Qt.ItemFlag.ItemIsEnabled
+
         return super().flags(index)
 
     def setData(self, index, value, role=Qt.EditRole) -> bool:
