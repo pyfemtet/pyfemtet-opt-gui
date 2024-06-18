@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'wizardMCQQqs.ui'
+## Form generated from reading UI file 'wizardbCCTee.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.7.1
 ##
@@ -304,6 +304,8 @@ class Ui_Wizard(object):
         self.pushButton_save_script.clicked.connect(Wizard.build_script)
         self.pushButton_load_femprj.clicked.connect(Wizard.update_problem)
         Wizard.currentIdChanged.connect(self.treeView.expandAll)
+        self.tableView_prm.pressed.connect(Wizard.check_prm_used_any)
+        self.tableView_obj.pressed.connect(Wizard.check_obj_used_any)
 
         QMetaObject.connectSlotsByName(Wizard)
     # setupUi

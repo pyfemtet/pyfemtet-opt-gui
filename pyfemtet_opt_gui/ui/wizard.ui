@@ -643,8 +643,8 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <slot>build_script()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>117</x>
-     <y>391</y>
+     <x>99</x>
+     <y>91</y>
     </hint>
     <hint type="destinationlabel">
      <x>165</x>
@@ -684,6 +684,38 @@ li.checked::marker { content: &quot;\2612&quot;; }
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>tableView_prm</sender>
+   <signal>pressed(QModelIndex)</signal>
+   <receiver>Wizard</receiver>
+   <slot>check_prm_used_any()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>261</x>
+     <y>165</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>223</x>
+     <y>418</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>tableView_obj</sender>
+   <signal>pressed(QModelIndex)</signal>
+   <receiver>Wizard</receiver>
+   <slot>check_obj_used_any()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>267</x>
+     <y>157</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>267</x>
+     <y>424</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <signal>process_loaded()</signal>
@@ -691,5 +723,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
   <slot>connect_process()</slot>
   <slot>build_script()</slot>
   <slot>update_problem()</slot>
+  <slot>check_prm_used_any()</slot>
+  <slot>check_obj_used_any()</slot>
  </slots>
 </ui>

@@ -1,9 +1,9 @@
 import os
 import sys
+from functools import partial
 
 from PySide6.QtWidgets import (QApplication, QWizard, QFileDialog)
 from PySide6.QtCore import Qt
-
 
 from ui.ui_detailed_wizard import Ui_DetailedWizard
 from problem_model import ProblemItemModel, CustomProxyModel
@@ -13,19 +13,9 @@ from script_builder import build_script_main
 from pyfemtet_opt_gui.ui.return_code import ReturnCode
 from pyfemtet_opt_gui.item_as_model import MyStandardItemAsTableModelWithoutHeader
 
+from ui.return_code import should_stop
+
 import _p  # must be same folder and cannot import via `from` keyword.
-
-
-def should_stop(ret_code) -> bool:
-    if ret_code in ReturnCode.WARNING:
-        _p.logger.warning(ret_code.value)
-        return False
-
-    elif ret_code in ReturnCode.ERROR:
-        _p.logger.error(ret_code.value)
-        return True
-
-    return False
 
 
 # noinspection PyMethodMayBeStatic
@@ -46,9 +36,9 @@ class MainWizard(QWizard):
         self._ui.tableView_run.setModel(proxy_model)
 
         # disable next button if checker returns False
-        self._ui.wizardPage2_model.isComplete = lambda: self._problem.femprj_model.get_femprj()[0] != ''
-        self._ui.wizardPage3_param.isComplete = lambda: self._problem.prm_model.check_use_any()
-        self._ui.wizardPage4_obj.isComplete = lambda: self._problem.obj_model.check_use_any()
+        self._ui.wizardPage2_model.isComplete = partial(self.check_femprj_valid, show_warning=False)
+        self._ui.wizardPage3_param.isComplete = partial(self.check_prm_used_any, show_warning=False)
+        self._ui.wizardPage4_obj.isComplete = partial(self.check_obj_used_any, show_warning=False)
         # self._ui.wizardPage6_run.isComplete =  # currently, FEMOpt.optimize() requires no arguments.
 
         # connect dataChanged to completeChanged(=emit isComplete)
@@ -56,16 +46,17 @@ class MainWizard(QWizard):
             page = self.page(page_id)
             self._problem.dataChanged.connect(page.completeChanged)
 
-    def update_problem(self):
+    def update_problem(self, show_warning=True):
         return_codes = []
 
         return_codes.append(self.load_femprj())
         return_codes.append(self.load_prm())
         return_codes.append(self.load_obj())
 
-        for return_code in return_codes:
-            if should_stop(return_code):  # show message
-                break  # if error, stop show message
+        if show_warning:
+            for return_code in return_codes:
+                if should_stop(return_code):  # show message
+                    break  # if error, stop show message
 
     def load_femprj(self) -> ReturnCode:
         # モデルの再読み込み
@@ -102,7 +93,7 @@ class MainWizard(QWizard):
             _p.logger.info(f'Connected! (pid: {_p.pid})')  # TODO: show dialog
 
             # update model
-            self.update_problem()
+            self.update_problem(False)
 
     def build_script(self):
 
@@ -118,6 +109,44 @@ class MainWizard(QWizard):
                 build_script_main(self._problem, path, with_run)
             else:
                 _p.logger.error('存在しないフォルダのファイルが指定されました。')
+
+    def check_femprj_valid(self, show_warning=True):
+        femprj_model = self._problem.femprj_model
+        femprj, model = femprj_model.get_femprj()
+        out = False
+        if femprj == '':
+            out = False
+        elif not os.path.exists(femprj):
+            out = False
+        else:
+            out = True
+        if show_warning and not out:
+            should_stop(ReturnCode.ERROR.FEMTET_NO_PROJECT, parent=self)
+        return out
+
+    def check_prm_used_any(self, show_warning=True):
+        prm_model = self._problem.prm_model
+        col = prm_model.get_col_from_name('use')
+        used = []
+        for row in range(1, prm_model.rowCount()):
+            index = prm_model.createIndex(row, col)
+            used.append(prm_model.data(index, Qt.ItemDataRole.CheckStateRole))
+        out = any(used)
+        if show_warning and not out:
+            should_stop(ReturnCode.WARNING.PARAMETER_NOT_SELECTED, parent=self)
+        return out
+
+    def check_obj_used_any(self, show_warning=True):
+        obj_model = self._problem.obj_model
+        col = obj_model.get_col_from_name('use')
+        used = []
+        for row in range(1, obj_model.rowCount()):
+            index = obj_model.createIndex(row, col)
+            used.append(obj_model.data(index, Qt.ItemDataRole.CheckStateRole))
+        out = any(used)
+        if show_warning and not out:
+            should_stop(ReturnCode.WARNING.OBJECTIVE_NOT_SELECTED, parent=self)
+        return out
 
 
 if __name__ == '__main__':
@@ -136,7 +165,7 @@ if __name__ == '__main__':
     ui_wizard.treeView.setModel(g_proxy_model)
 
     wizard.set_ui(ui_wizard)  # ui を登録
-    wizard.update_problem()  # ui へのモデルの登録
+    wizard.update_problem(False)  # ui へのモデルの登録
 
     wizard.show()  # ビューの表示
     sys.exit(app.exec())  # アプリケーションの実行

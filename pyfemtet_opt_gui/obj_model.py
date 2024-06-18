@@ -5,7 +5,7 @@ from PySide6.QtWidgets import QStyledItemDelegate, QComboBox
 import _p
 
 from item_as_model import MyStandardItemAsTableModel, _isnumeric
-from pyfemtet_opt_gui.ui.return_code import ReturnCode
+from pyfemtet_opt_gui.ui.return_code import ReturnCode, should_stop
 
 
 class ObjTableDelegate(QStyledItemDelegate):
@@ -42,6 +42,8 @@ class ObjTableDelegate(QStyledItemDelegate):
             model.setData(index, editor.currentText(), Qt.EditRole)
         else:
             super().setModelData(editor, model, index)
+
+
 
 
 class ObjModel(MyStandardItemAsTableModel):
@@ -151,6 +153,7 @@ class ObjModel(MyStandardItemAsTableModel):
         col, row = index.column(), index.row()
         col_name = self.get_col_name(col)
 
+        # when direction is changed, change 'Set to...'.
         if col_name == 'direction':
             IGNORE_PREFIX = '(ignore) '
 
@@ -185,12 +188,16 @@ class ObjModel(MyStandardItemAsTableModel):
                 _p.logger.error('数値を入力してください。')
                 return False
 
-        return super().setData(index, value, role)
+        # if all of 'use' is unchecked, raise warning (continue processing)
+        if (col_name == 'use') and (role == Qt.ItemDataRole.CheckStateRole):
+            col2 = self.get_col_from_name('use')
+            unchecked = {}
+            for row2 in range(1, self.rowCount()):
+                unchecked.update(
+                    {row2: self.get_item(row2, col2).checkState() == Qt.CheckState.Unchecked}
+                )
+            unchecked[row] = value == Qt.CheckState.Unchecked.value
+            if all(unchecked.values()):
+                should_stop(ReturnCode.WARNING.OBJECTIVE_NOT_SELECTED)
 
-    def check_use_any(self):
-        col = self.get_col_from_name('use')
-        used = []
-        for row in range(1, self.rowCount()):
-            index = self.createIndex(row, col)
-            used.append(self.data(index, Qt.ItemDataRole.CheckStateRole))
-        return any(used)
+        return super().setData(index, value, role)

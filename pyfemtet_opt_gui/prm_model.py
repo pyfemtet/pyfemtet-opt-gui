@@ -4,7 +4,7 @@ from PySide6.QtGui import QStandardItem
 import _p
 
 from item_as_model import MyStandardItemAsTableModel, _isnumeric
-from pyfemtet_opt_gui.ui.return_code import ReturnCode
+from pyfemtet_opt_gui.ui.return_code import ReturnCode, should_stop
 
 
 class PrmModel(MyStandardItemAsTableModel):
@@ -165,23 +165,28 @@ class PrmModel(MyStandardItemAsTableModel):
             ub_float = float(value) if col_name == 'ub' else float(self.data(ub_index))
 
             if not (lb_float <= exp_float):
-                _p.logger.error('初期値が下限を下回っています。')
+                should_stop(ReturnCode.ERROR.BOUND_INIT_UNDER_LB)
                 return False
 
             if not (exp_float <= ub_float):
-                _p.logger.error('初期値が上限を上回っています。')
+                should_stop(ReturnCode.ERROR.BOUND_INIT_OVER_UB)
                 return False
 
             if lb_float == ub_float:
-                _p.logger.error('上限と下限が一致しています。変数の値を変更したくない場合は、use 列のチェックを外してください。')
+                should_stop(ReturnCode.ERROR.BOUND_NO_RANGE)
+                return False
+
+        # if all of 'use' is unchecked, raise warning (continue processing)
+        if (col_name == 'use') and (role == Qt.ItemDataRole.CheckStateRole):
+            col2 = self.get_col_from_name('use')
+            unchecked = {}
+            for row2 in range(1, self.rowCount()):
+                unchecked.update(
+                    {row2: self.get_item(row2, col2).checkState() == Qt.CheckState.Unchecked}
+                )
+            unchecked[row] = value == Qt.CheckState.Unchecked.value
+            if all(unchecked.values()):
+                should_stop(ReturnCode.WARNING.PARAMETER_NOT_SELECTED)
                 return False
 
         return super().setData(index, value, role)
-
-    def check_use_any(self):
-        col = self.get_col_from_name('use')
-        used = []
-        for row in range(1, self.rowCount()):
-            index = self.createIndex(row, col)
-            used.append(self.data(index, Qt.ItemDataRole.CheckStateRole))
-        return any(used)
