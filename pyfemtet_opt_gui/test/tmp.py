@@ -4,7 +4,7 @@ from pyfemtet.opt import FemtetInterface, OptunaOptimizer, FEMOpt
 
 def main():
 
-    femprj_path = r"C:\Users\mm11592\Documents\myFiles2\working\1_PyFemtetOpt\pyfemtet-opt-gui\pyfemtet_opt_gui\test\test_parametric.femprj"
+    femprj_path = r"E:\pyfemtet\pyfemtet\tests\test_5_ParametricIF\test_parametric.femprj"
     model_name = "解析モデル"
     fem = FemtetInterface(
         femprj_path=femprj_path,

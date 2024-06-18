@@ -217,8 +217,8 @@ class OptimizationWorker(QThread):
         self.finished.emit()
 
 
-if __name__ == '__main__':
 
+def main():
     app = QApplication(sys.argv)
 
     g_problem: ProblemItemModel = ProblemItemModel()
@@ -237,3 +237,7 @@ if __name__ == '__main__':
 
     wizard.show()  # ビューの表示
     sys.exit(app.exec())  # アプリケーションの実行
+
+
+if __name__ == '__main__':
+    main()
