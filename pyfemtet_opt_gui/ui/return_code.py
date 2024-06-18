@@ -2,7 +2,7 @@ from enum import Enum
 
 from PySide6.QtWidgets import QMessageBox
 
-from pyfemtet_opt_gui._p import logger
+import pyfemtet_opt_gui._p as _p
 
 
 __all__ = ['ReturnCode']
@@ -43,12 +43,12 @@ class ReturnCode:
 
 def should_stop(ret_code, parent=None) -> bool:
     if ret_code in ReturnCode.WARNING:
-        logger.warning(ret_code.value)
+        _p.logger.warning(ret_code.value)
         QMessageBox.warning(parent, 'warning', ret_code.value, QMessageBox.StandardButton.Ok)
         return False
 
     elif ret_code in ReturnCode.ERROR:
-        logger.error(ret_code.value)
+        _p.logger.error(ret_code.value)
         QMessageBox.critical(parent, 'error', ret_code.value, QMessageBox.StandardButton.Ok)
         return True
 

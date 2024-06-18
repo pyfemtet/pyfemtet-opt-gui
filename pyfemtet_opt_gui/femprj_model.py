@@ -2,7 +2,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QStandardItem
 from PySide6.QtWidgets import QStyledItemDelegate, QComboBox
 
-import _p
+import pyfemtet_opt_gui._p as _p
 
 from item_as_model import MyStandardItemAsTableModel, _isnumeric
 from pyfemtet_opt_gui.ui.return_code import ReturnCode

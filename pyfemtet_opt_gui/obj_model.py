@@ -2,7 +2,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QStandardItem
 from PySide6.QtWidgets import QStyledItemDelegate, QComboBox
 
-import _p
+import pyfemtet_opt_gui._p as _p
 
 from pyfemtet_opt_gui.item_as_model import MyStandardItemAsTableModel, _isnumeric
 
@@ -184,12 +184,12 @@ class ObjModel(MyStandardItemAsTableModel):
 
             if (
                     dir_value == 'Set to...'
-                and not _isnumeric(value)
+                    and not _isnumeric(value)
             ):
                 _p.logger.error('数値を入力してください。')
                 return False
 
-        # if all of 'use' is unchecked, raise warning (continue processing)
+        # if all of 'use' is unchecked, raise warning
         if (col_name == 'use') and (role == Qt.ItemDataRole.CheckStateRole):
             col2 = self.get_col_from_name('use')
             unchecked = {}
@@ -200,5 +200,6 @@ class ObjModel(MyStandardItemAsTableModel):
             unchecked[row] = value == Qt.CheckState.Unchecked.value
             if all(unchecked.values()):
                 should_stop(ReturnCode.WARNING.OBJECTIVE_NOT_SELECTED)
+                return False
 
         return super().setData(index, value, role)

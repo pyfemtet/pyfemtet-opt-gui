@@ -15,7 +15,7 @@ from pyfemtet_opt_gui.script_builder import build_script_main
 
 from pyfemtet_opt_gui.ui.return_code import ReturnCode, should_stop
 
-import _p  # must be same folder and cannot import via `from` keyword.
+import pyfemtet_opt_gui._p as _p  # must be same folder and cannot import via `from` keyword.
 
 
 # noinspection PyMethodMayBeStatic

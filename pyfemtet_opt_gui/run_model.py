@@ -4,7 +4,7 @@ from PySide6.QtGui import QStandardItem
 from pyfemtet_opt_gui.item_as_model import MyStandardItemAsTableModel, _isnumeric
 
 
-import _p  # for logger
+import pyfemtet_opt_gui._p as _p
 
 
 class RunModel(MyStandardItemAsTableModel):

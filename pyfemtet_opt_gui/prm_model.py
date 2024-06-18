@@ -1,7 +1,7 @@
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QStandardItem
 
-import _p
+import pyfemtet_opt_gui._p as _p
 
 from pyfemtet_opt_gui.item_as_model import MyStandardItemAsTableModel, _isnumeric
 from pyfemtet_opt_gui.ui.return_code import ReturnCode, should_stop
@@ -176,7 +176,7 @@ class PrmModel(MyStandardItemAsTableModel):
                 should_stop(ReturnCode.ERROR.BOUND_NO_RANGE)
                 return False
 
-        # if all of 'use' is unchecked, raise warning (continue processing)
+        # if all of 'use' is unchecked, raise warning
         if (col_name == 'use') and (role == Qt.ItemDataRole.CheckStateRole):
             col2 = self.get_col_from_name('use')
             unchecked = {}
