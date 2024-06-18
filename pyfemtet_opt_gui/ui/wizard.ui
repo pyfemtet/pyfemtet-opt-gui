@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>701</width>
+    <width>658</width>
     <height>445</height>
    </rect>
   </property>
@@ -436,22 +436,12 @@ li.checked::marker { content: &quot;\2612&quot;; }
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_4">
       <item>
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Orientation::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
        <widget class="QTableView" name="tableView_run">
         <property name="frameShape">
          <enum>QFrame::Shape::Panel</enum>
+        </property>
+        <property name="wordWrap">
+         <bool>false</bool>
         </property>
         <attribute name="horizontalHeaderCascadingSectionResizes">
          <bool>true</bool>
@@ -466,19 +456,6 @@ li.checked::marker { content: &quot;\2612&quot;; }
          <bool>false</bool>
         </attribute>
        </widget>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer_2">
-        <property name="orientation">
-         <enum>Qt::Orientation::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
       </item>
      </layout>
     </item>
@@ -681,38 +658,6 @@ li.checked::marker { content: &quot;\2612&quot;; }
     <hint type="destinationlabel">
      <x>99</x>
      <y>91</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>tableView_prm</sender>
-   <signal>pressed(QModelIndex)</signal>
-   <receiver>Wizard</receiver>
-   <slot>check_prm_used_any()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>261</x>
-     <y>165</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>223</x>
-     <y>418</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>tableView_obj</sender>
-   <signal>pressed(QModelIndex)</signal>
-   <receiver>Wizard</receiver>
-   <slot>check_obj_used_any()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>267</x>
-     <y>157</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>267</x>
-     <y>424</y>
     </hint>
    </hints>
   </connection>

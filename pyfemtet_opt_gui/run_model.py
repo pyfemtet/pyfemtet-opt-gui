@@ -12,18 +12,18 @@ import _p  # for logger
 class RunModel(MyStandardItemAsTableModel):
     """A table to set arguments for FEMOpt.optimize().
 
-    use              | item         | value
-    ----------------------------------------------
-    checkbox         | n_trial      | 10 (positive int only)
-    checkbox         | timeout      | 10 (minutes, positive int only)
-    None             | n_parallel   | 1 (positive int only)
+    use              | item         | value                           | description
+    --------------------------------------------------------------------------------------------
+    checkbox         | n_trials     | 10 (positive int only)          | 指定回数の解析が終了すると最適化を終了します。
+    checkbox         | timeout      | 10 (minutes, positive int only) | 指定時間（分）のプロセスが終了すると最適化を終了します。
+    None             | n_parallel   | 1 (positive int only)           | 指定数の Femtet プロセスを使用して並列計算します。並列数分のライセンスが必要です。
 
-    # if both n_trial and timeout are Unchecked, show warning.
+    # if both n_trials and timeout are Unchecked, show warning.
     # use and item are uneditable.
     # if Uncheckable, the row is disabled excluding use column.
 
     """
-    HEADER = ['use', 'item', 'value']
+    HEADER = ['use', 'item', 'value', 'description']
     ROW_COUNT = 4  # including header row
 
     def initialize_table(self):
@@ -59,6 +59,9 @@ class RunModel(MyStandardItemAsTableModel):
         # value
         item = QStandardItem('10')
         self._item.setChild(1, 2, item)
+        # description
+        item = QStandardItem('指定回数の解析が終了すると最適化を終了します。')
+        self._item.setChild(1, 3, item)
 
         # ===== timeout =====
         # use
@@ -72,6 +75,9 @@ class RunModel(MyStandardItemAsTableModel):
         # value
         item = QStandardItem('3')
         self._item.setChild(2, 2, item)
+        # description
+        item = QStandardItem('指定時間（分）のプロセスが終了すると最適化を終了します。')
+        self._item.setChild(2, 3, item)
 
         # ===== n_parallel =====
         # use
@@ -83,6 +89,9 @@ class RunModel(MyStandardItemAsTableModel):
         # value
         item = QStandardItem('1')
         self._item.setChild(3, 2, item)
+        # description
+        item = QStandardItem('指定数の Femtet プロセスを使用して並列計算します。並列数分のライセンスが必要です。')
+        self._item.setChild(3, 3, item)
 
         # notify to end editing to the abstract model
         self.endResetModel()
@@ -175,3 +184,22 @@ class RunModel(MyStandardItemAsTableModel):
                     return False
 
         return super().setData(index, value, role)
+
+    def get_finish_conditions(self):
+        finish_conditions = {}
+        for row in range(1, self.rowCount()):
+            col = self.get_col_from_name('use')
+            item = self.get_item(row, col)
+
+            # if checkable but unchecked, ignore
+            if item.isCheckable() and item.checkState() == Qt.CheckState.Unchecked:
+                continue
+
+            # if used finish condition, add to out
+            arg_key = self.get_item_name(row)
+            if (arg_key == 'n_trials') or (arg_key == 'timeout'):
+                col = self.get_col_from_name('value')
+                arg_value = self.get_item(row, col).text()
+                finish_conditions[arg_key] = arg_value
+
+        return finish_conditions

@@ -2,7 +2,7 @@ import os
 import sys
 from functools import partial
 
-from PySide6.QtWidgets import (QApplication, QWizard, QFileDialog)
+from PySide6.QtWidgets import (QApplication, QWizard, QFileDialog, QMessageBox)
 from PySide6.QtCore import Qt
 
 from ui.ui_detailed_wizard import Ui_DetailedWizard
@@ -45,6 +45,22 @@ class MainWizard(QWizard):
         for page_id in self.pageIds():
             page = self.page(page_id)
             self._problem.dataChanged.connect(page.completeChanged)
+
+        # running condition warning
+        def validate_run_model() -> bool:
+            out = True
+            # If finish condition is not specified,
+            # the optimization process will be an endless loop.
+            if len(self._problem.run_model.get_finish_conditions()) == 0:
+                ret = QMessageBox.warning(
+                    self, 'warning', '終了判定に関わる条件が指定されていないため、生成されるプログラムは手動で停止するまで計算を続けます。よろしいですか？',
+                    QMessageBox.StandardButton.Yes, QMessageBox.StandardButton.No
+                )
+                out = ret == QMessageBox.StandardButton.Yes
+            return out
+        self._ui.wizardPage6_run.validatePage = validate_run_model
+
+
 
     def update_problem(self, show_warning=True):
         return_codes = []
@@ -147,6 +163,7 @@ class MainWizard(QWizard):
         if show_warning and not out:
             should_stop(ReturnCode.WARNING.OBJECTIVE_NOT_SELECTED, parent=self)
         return out
+
 
 
 if __name__ == '__main__':

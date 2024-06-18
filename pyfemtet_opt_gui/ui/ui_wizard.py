@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'wizardbCCTee.ui'
+## Form generated from reading UI file 'wizardkopvfY.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.7.1
 ##
@@ -26,7 +26,7 @@ class Ui_Wizard(object):
     def setupUi(self, Wizard):
         if not Wizard.objectName():
             Wizard.setObjectName(u"Wizard")
-        Wizard.resize(701, 445)
+        Wizard.resize(658, 445)
         Wizard.setWizardStyle(QWizard.WizardStyle.ModernStyle)
         Wizard.setOptions(QWizard.WizardOption.HaveNextButtonOnLastPage|QWizard.WizardOption.HelpButtonOnRight|QWizard.WizardOption.NoCancelButtonOnLastPage)
         self.wizardPage1_launch = QWizardPage()
@@ -221,23 +221,16 @@ class Ui_Wizard(object):
         self.verticalLayout_5.setObjectName(u"verticalLayout_5")
         self.horizontalLayout_4 = QHBoxLayout()
         self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
-        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-
-        self.horizontalLayout_4.addItem(self.horizontalSpacer)
-
         self.tableView_run = QTableView(self.wizardPage6_run)
         self.tableView_run.setObjectName(u"tableView_run")
         self.tableView_run.setFrameShape(QFrame.Shape.Panel)
+        self.tableView_run.setWordWrap(False)
         self.tableView_run.horizontalHeader().setCascadingSectionResizes(True)
         self.tableView_run.horizontalHeader().setHighlightSections(False)
         self.tableView_run.horizontalHeader().setStretchLastSection(True)
         self.tableView_run.verticalHeader().setVisible(False)
 
         self.horizontalLayout_4.addWidget(self.tableView_run)
-
-        self.horizontalSpacer_2 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-
-        self.horizontalLayout_4.addItem(self.horizontalSpacer_2)
 
 
         self.verticalLayout_5.addLayout(self.horizontalLayout_4)
@@ -304,8 +297,6 @@ class Ui_Wizard(object):
         self.pushButton_save_script.clicked.connect(Wizard.build_script)
         self.pushButton_load_femprj.clicked.connect(Wizard.update_problem)
         Wizard.currentIdChanged.connect(self.treeView.expandAll)
-        self.tableView_prm.pressed.connect(Wizard.check_prm_used_any)
-        self.tableView_obj.pressed.connect(Wizard.check_obj_used_any)
 
         QMetaObject.connectSlotsByName(Wizard)
     # setupUi
