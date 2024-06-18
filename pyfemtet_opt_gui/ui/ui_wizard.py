@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'wizardkopvfY.ui'
+## Form generated from reading UI file 'wizardYTYfHR.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.7.1
 ##
@@ -297,6 +297,7 @@ class Ui_Wizard(object):
         self.pushButton_save_script.clicked.connect(Wizard.build_script)
         self.pushButton_load_femprj.clicked.connect(Wizard.update_problem)
         Wizard.currentIdChanged.connect(self.treeView.expandAll)
+        self.checkBox_save_with_run.checkStateChanged.connect(Wizard.check_save_button_should_enabled)
 
         QMetaObject.connectSlotsByName(Wizard)
     # setupUi
@@ -383,6 +384,9 @@ class Ui_Wizard(object):
         self.wizardPage9_verify.setSubTitle(QCoreApplication.translate("Wizard", u"<table class=MsoNormalTable border=0 cellspacing=0 cellpadding=0 width=\"83%\"  style='width:83.32%;border-collapse:collapse'>  <tr>   <td width=\"19%\" valign=top style='width:19.98%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><span style='color:#7F7F7F'>\u30e2\u30c7\u30eb\u6307\u5b9a</span></p>   </td>   <td width=\"20%\" valign=top style='width:20.0%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><span style='color:#7F7F7F'>\u5909\u6570\u6307\u5b9a</span></p>   </td>   <td width=\"20%\" valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><span style='color:#7F7F7F'>\u76ee\u7684\u6307\u5b9a</span></p>   </td>   <td width=\"20%\" valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><span style='color:#7F7F7F'>\u5b9f\u884c\u8a2d\u5b9a</span></p>   </td>   <td width=\"19%\" valign=top style='width:19.96%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><b><i><span style='color:#0987D5'>\u78ba\u8a8d</span></i></b></p>   </td>  </tr> </table>"
                         " ", None))
         self.checkBox_save_with_run.setText(QCoreApplication.translate("Wizard", u"\u30b9\u30af\u30ea\u30d7\u30c8\u306e\u4fdd\u5b58\u5f8c\u5b9f\u884c\u3059\u308b", None))
+#if QT_CONFIG(accessibility)
+        self.pushButton_save_script.setAccessibleName(QCoreApplication.translate("Wizard", u"\u30b9\u30af\u30ea\u30d7\u30c8\u3092\u4fdd\u5b58\u3059\u308b", None))
+#endif // QT_CONFIG(accessibility)
         self.pushButton_save_script.setText(QCoreApplication.translate("Wizard", u"\u30b9\u30af\u30ea\u30d7\u30c8\u3092\u4fdd\u5b58\u3059\u308b", None))
         self.textEdit_4.setHtml(QCoreApplication.translate("Wizard", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><meta charset=\"utf-8\" /><style type=\"text/css\">\n"

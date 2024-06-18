@@ -24,6 +24,8 @@ class MainWizard(QWizard):
     def __init__(self, problem: ProblemItemModel, parent=None):
         super().__init__(parent=parent)
         self._problem: ProblemItemModel = problem
+        self.worker = OptimizationWorker()
+        self.worker.finished.connect(self.optimization_finished)
 
     def set_ui(self, ui):
         # noinspection PyAttributeOutsideInit
@@ -49,17 +51,14 @@ class MainWizard(QWizard):
         # show warning if finish duaring optimization
         def validate_finish() -> bool:
             out = True
-
-            if not self._ui.pushButton_save_script.isEnabled():
+            if self.worker.running:
                 ret = QMessageBox.warning(
-                    self, 'warning', '最適化の実行中にダイアログを閉じると最適化は強制終了します。よろしいですか？',
+                    self, 'warning', '最適化の実行中にダイアログを閉じると最適化は強制終了されます。よろしいですか？',
                     QMessageBox.StandardButton.Yes, QMessageBox.StandardButton.No
                 )
                 out = ret == QMessageBox.StandardButton.Yes
-
             return out
         self._ui.wizardPage9_verify.validatePage = validate_finish
-
 
         # running condition warning
         def validate_run_model() -> bool:
@@ -139,7 +138,7 @@ class MainWizard(QWizard):
                 with_run = self._ui.checkBox_save_with_run.checkState() == Qt.CheckState.Checked
 
                 if with_run:
-                    self.worker = Worker(path, self._problem)
+                    self.worker.set(path, self._problem)
                     self.start_optimization()
                 else:
                     build_script_main(self._problem, path, False)
@@ -147,16 +146,22 @@ class MainWizard(QWizard):
             else:
                 _p.logger.error('存在しないフォルダのファイルが指定されました。')
 
+    def check_save_button_should_enabled(self):
+        button = self._ui.pushButton_save_script
+        if self.worker.running and self._ui.checkBox_save_with_run.isChecked():
+            button.setEnabled(False)  # Disable the button while the function is running
+            button.setText('最適化の実行中はスクリプトを保存できません。')
+        else:
+            button.setEnabled(True)  # Enable the button when the function has finished
+            button.setText(button.accessibleName())
+
     def start_optimization(self):
-        self.worker.finished.connect(self.optimization_finished)
-        self._ui.pushButton_save_script.setEnabled(False)  # Disable the button while the function is running
-        self.tmp = self._ui.pushButton_save_script.text()
-        self._ui.pushButton_save_script.setText('最適化の実行中はスクリプトを保存できません。')
         self.worker.start()
+        self.worker.running = True  # おそらく実行時間の問題で self.run() が走るより先に check が走るので、先に True にしておく。
+        self.check_save_button_should_enabled()
 
     def optimization_finished(self):
-        self._ui.pushButton_save_script.setEnabled(True)  # Enable the button when the function has finished
-        self._ui.pushButton_save_script.setText(self.tmp)
+        self.check_save_button_should_enabled()
 
     def check_femprj_valid(self, show_warning=True):
         femprj_model = self._problem.femprj_model
@@ -197,16 +202,18 @@ class MainWizard(QWizard):
         return out
 
 
-class Worker(QThread):
+class OptimizationWorker(QThread):
     finished = Signal()
+    running = False
 
-    def __init__(self, path, problem):
-        super().__init__()
+    def set(self, path, problem):
         self.path = path
         self.problem = problem
 
     def run(self):  # Override the run method to execute your long-time function
+        self.running = True
         build_script_main(self.problem, self.path, True)
+        self.running = False
         self.finished.emit()
 
 

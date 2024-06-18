@@ -513,6 +513,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
     </item>
     <item row="4" column="0">
      <widget class="QPushButton" name="pushButton_save_script">
+      <property name="accessibleName">
+       <string>スクリプトを保存する</string>
+      </property>
       <property name="text">
        <string>スクリプトを保存する</string>
       </property>
@@ -572,7 +575,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <slot>connect_process()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>461</x>
+     <x>433</x>
      <y>272</y>
     </hint>
     <hint type="destinationlabel">
@@ -620,8 +623,8 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <slot>build_script()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>99</x>
-     <y>91</y>
+     <x>117</x>
+     <y>391</y>
     </hint>
     <hint type="destinationlabel">
      <x>165</x>
@@ -661,6 +664,22 @@ li.checked::marker { content: &quot;\2612&quot;; }
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>checkBox_save_with_run</sender>
+   <signal>checkStateChanged(Qt::CheckState)</signal>
+   <receiver>Wizard</receiver>
+   <slot>check_save_button_should_enabled()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>507</x>
+     <y>378</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>343</x>
+     <y>419</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <signal>process_loaded()</signal>
@@ -670,5 +689,6 @@ li.checked::marker { content: &quot;\2612&quot;; }
   <slot>update_problem()</slot>
   <slot>check_prm_used_any()</slot>
   <slot>check_obj_used_any()</slot>
+  <slot>check_save_button_should_enabled()</slot>
  </slots>
 </ui>
