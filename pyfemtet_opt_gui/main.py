@@ -133,6 +133,7 @@ class MainWizard(QWizard):
 
         if dialog.exec():
             path = dialog.selectedFiles()[0]
+            if not path.endswith('.py'): path += '.py'
             dir_path = os.path.dirname(path)
             if os.path.isdir(dir_path):
                 with_run = self._ui.checkBox_save_with_run.checkState() == Qt.CheckState.Checked
