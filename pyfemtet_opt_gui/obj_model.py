@@ -1,4 +1,4 @@
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QPoint
 from PySide6.QtGui import QStandardItem
 from PySide6.QtWidgets import QStyledItemDelegate, QComboBox
 
@@ -22,6 +22,7 @@ class ObjTableDelegate(QStyledItemDelegate):
             # コンボボックスエディタを作成
             comboBox = QComboBox(parent)
             comboBox.addItems(['maximize', 'minimize', 'Set to...'])
+            comboBox.setFrame(False)
             return comboBox
         return super().createEditor(parent, option, index)
 
@@ -44,7 +45,27 @@ class ObjTableDelegate(QStyledItemDelegate):
         else:
             super().setModelData(editor, model, index)
 
+    def paint(self, painter, option, index):
+        col, row = index.column(), index.row()
+        col_name = self._model.get_col_name(col)
+        if col_name == 'direction':
+            # index...proxyindex
+            # _model...original
+            value = self._model.get_item(index.row()+1, index.column()).text()
+            combo = QComboBox()
+            combo.addItems([value])
+            combo.setCurrentText(value)
+            combo.setFrame(False)
 
+            painter.save()
+
+            painter.translate(option.rect.topLeft())
+            combo.resize(option.rect.size())
+            combo.render(painter, QPoint())
+
+            painter.restore()
+        else:
+            super().paint(painter, option, index)
 
 
 class ObjModel(MyStandardItemAsTableModel):
