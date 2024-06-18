@@ -1,7 +1,7 @@
 from PySide6.QtCore import Qt
 
-from problem_model import ProblemItemModel
-from item_as_model import MyStandardItemAsTableModel
+from pyfemtet_opt_gui.problem_model import ProblemItemModel
+from pyfemtet_opt_gui.item_as_model import MyStandardItemAsTableModel
 
 
 def get_header():

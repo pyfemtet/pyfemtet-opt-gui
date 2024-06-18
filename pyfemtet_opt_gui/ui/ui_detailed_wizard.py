@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QHeaderView
 
-from .ui_wizard import Ui_Wizard
+from pyfemtet_opt_gui.ui.ui_wizard import Ui_Wizard
 
 
 class Ui_DetailedWizard(Ui_Wizard):

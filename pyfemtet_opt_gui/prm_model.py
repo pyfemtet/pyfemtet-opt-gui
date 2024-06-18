@@ -3,7 +3,7 @@ from PySide6.QtGui import QStandardItem
 
 import _p
 
-from item_as_model import MyStandardItemAsTableModel, _isnumeric
+from pyfemtet_opt_gui.item_as_model import MyStandardItemAsTableModel, _isnumeric
 from pyfemtet_opt_gui.ui.return_code import ReturnCode, should_stop
 
 

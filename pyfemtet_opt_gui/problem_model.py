@@ -1,10 +1,10 @@
 from PySide6.QtGui import QStandardItemModel, QStandardItem, QFont
 from PySide6.QtCore import Qt, QSortFilterProxyModel
 
-from prm_model import PrmModel
-from obj_model import ObjModel
-from run_model import RunModel
-from femprj_model import FEMPrjModel
+from pyfemtet_opt_gui.prm_model import PrmModel
+from pyfemtet_opt_gui.obj_model import ObjModel
+from pyfemtet_opt_gui.run_model import RunModel
+from pyfemtet_opt_gui.femprj_model import FEMPrjModel
 
 
 class ProblemItemModel(QStandardItemModel):

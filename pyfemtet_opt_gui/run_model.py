@@ -1,9 +1,7 @@
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QStandardItem
-from PySide6.QtWidgets import QStyledItemDelegate, QComboBox
 
-from item_as_model import MyStandardItemAsTableModel, _isnumeric
-from pyfemtet_opt_gui.ui.return_code import ReturnCode
+from pyfemtet_opt_gui.item_as_model import MyStandardItemAsTableModel, _isnumeric
 
 
 import _p  # for logger

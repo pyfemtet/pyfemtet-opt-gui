@@ -5,15 +5,15 @@ from functools import partial
 from PySide6.QtWidgets import (QApplication, QWizard, QFileDialog, QMessageBox)
 from PySide6.QtCore import Qt, QThread, Signal
 
-from ui.ui_detailed_wizard import Ui_DetailedWizard
-from problem_model import ProblemItemModel, CustomProxyModel
-from obj_model import ObjTableDelegate
-from script_builder import build_script_main
+from pyfemtet_opt_gui.ui.ui_detailed_wizard import Ui_DetailedWizard
 
-from pyfemtet_opt_gui.ui.return_code import ReturnCode
 from pyfemtet_opt_gui.item_as_model import MyStandardItemAsTableModelWithoutHeader
+from pyfemtet_opt_gui.problem_model import ProblemItemModel, CustomProxyModel
+from pyfemtet_opt_gui.obj_model import ObjTableDelegate
 
-from ui.return_code import should_stop
+from pyfemtet_opt_gui.script_builder import build_script_main
+
+from pyfemtet_opt_gui.ui.return_code import ReturnCode, should_stop
 
 import _p  # must be same folder and cannot import via `from` keyword.
 
