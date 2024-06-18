@@ -185,7 +185,7 @@ class ObjModel(MyStandardItemAsTableModel):
 
             # if direction is "Maximize" or "Minimize,
             # set_to = (ignored) + set_to
-            if value in ['Minimize', 'Maximize']:
+            if value in ['minimize', 'maximize']:
                 if IGNORE_PREFIX not in setto_value:
                     setto_value = IGNORE_PREFIX + setto_value
                     super().setData(setto_index, setto_value)
