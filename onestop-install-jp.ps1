@@ -53,11 +53,11 @@ $femtet_exe_path = py -c "from femtetutils import util;from logging import disab
 $femtet_macro_dll_path = $femtet_exe_path.replace("Femtet.exe", "FemtetMacro.dll")
 if (-not (test-path $femtet_macro_dll_path)) {
     $title = "Error!"
-    $message = "Femtet マクロインターフェース設定に失敗しました。"
+    $message = "Femtet マクロインターフェース設定に失敗しました。Femtet マクロヘルプを参照し「マクロの有効化」手順を実行してください。"
     [System.Windows.Forms.MessageBox]::Show($message, $title)
     throw $message
 } else {
-    write-host "regsvr32 OK"
+    write-host "regsvr32 will be OK"
 }
 
 # regsvr
@@ -66,47 +66,33 @@ regsvr32 $femtet_macro_dll_path  # returns nothing, dialog only
 # win32com.client.makepy
 py -m win32com.client.makepy FemtetMacro  # return nothing
 
-# check constants setting
-$ret = py -c "from win32com.client import constants, Dispatch;Dispatch('FemtetMacro.Femtet');print(constants.SOLVER_NONE_C)"
-if (-not ($ret -eq "0")) {
-    $title = "Error!"
-    $message = "Femtet COM 定数設定に失敗しました。"
+# check COM constants setting
+$SOLVER_NON_C = py -c "from win32com.client import Dispatch, constants;Dispatch('FemtetMacro.Femtet');print(constants.SOLVER_NONE_C)"
+if ($SOLVER_NON_C -eq "0") {
+    write-host "COM constants setting: OK"
+} else{
+    $title = "warning"
+    $message = "PyFmetet のインストールは完了しましたが、COM 定数設定に失敗しました。"
+    $message += "コマンドプロンプトで下記のコマンドを実行してください。"
+    $message += "\n py -m win32com.client.makepy FemtetMacro"
     [System.Windows.Forms.MessageBox]::Show($message, $title)
-    throw $message
-} else {
-    write-host "makepy OK"
 }
 
 # make desktop shortcut for pyfemtet-opt-gui
-$python_executable = py -c "import sys;print(sys.executable)"
-$python_executable_dir = Split-Path $python_executable
-$Scripts_dir = "NOT FOUND"  # null or empty string raises error in test-path
-if ($python_executable_dir.EndsWith("Scripts")) {
-    # i.e. for `venv` virtualenv
-    $Scripts_dir = $python_executable_dir
-} else  {
-    # i.e. windows installer, miniforge, 
-    $buff = Join-Path $python_executable_dir "Scripts"
-    if (test-path $buff) {
-        $Scripts_dir = $buff
-    }
-}
-if (-not (Test-Path $Scripts_dir)) {
-    $title = "warning"
-    $message = "PyFmetet のインストールは完了しましたが、デスクトップにショートカットを作成できませんでした。"
-    [System.Windows.Forms.MessageBox]::Show($message, $title)
-} else {
+$pyfemtet_package_path = py -c "import pyfemtet;print(pyfemtet.__file__)"
+$pyfemtet_opt_gui_path = $pyfemtet_package_path.replace("Lib\site-packages\pyfemtet\__init__.py", "Scripts\pyfemtet-opt.exe")
+if (test-path $pyfemtet_opt_gui_path) {
     # create desktop shortcut of pyfemtet-opt.exe in $Scripts_dir folder
-    $Target_exe = "$Scripts_dir\pyfemtet-opt.exe"
-    $Shortcut_file = "$env:USERPROFILE\Desktop\pyfemtet-opt.lnk"
-    
+    $Shortcut_file = "$env:USERPROFILE\Desktop\pyfemtet-opt.lnk"    
     $WScriptShell = New-Object -ComObject WScript.Shell
     $Shortcut = $WScriptShell.CreateShortcut($Shortcut_file)
-    $Shortcut.TargetPath = $Target_exe
+    $Shortcut.TargetPath = $pyfemtet_opt_gui_path
     $Shortcut.Save()
-    
-    # complete
-    [System.Windows.Forms.MessageBox]::Show("PyFemtet インストール が完了しました。", "Complete!")
-
+    write-host "create desktop shortcut: OK"
+} else {
+    $title = "warning"
+    $message = "PyFmetet のインストールは完了しましたが、デスクトップにショートカットを作成できませんでした。Python 実行環境の Scripts フォルダ内の pyfemtet-opt.exe が見つかりません。"
+    [System.Windows.Forms.MessageBox]::Show($message, $title)
 }
 
+[System.Windows.Forms.MessageBox]::Show("PyFemtet インストール が完了しました。", "Complete!")
