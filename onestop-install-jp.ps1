@@ -19,15 +19,21 @@ $null = $Win32Helpers::SetProcessDPIAware()
 
 # ===== pre-requirement =====
 
-
 # --runas (reload)
-if (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole("Administrators")) { Start-Process powershell.exe "-File `"$PSCommandPath`"" -Verb RunAs; exit }
+# if (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole("Administrators")) { Start-Process powershell.exe "-File `"$PSCommandPath`"" -Verb RunAs; exit }
 
 # error setting
 $ErrorActionPreference = "Stop"
 
 # message
-[System.Windows.Forms.MessageBox]::Show("Femtet(2023.1以降) Python(3.11以降, 3.13未満) が必要です。インストールされていることを確認してから続けてください。", "pre-request")
+$res = [System.Windows.Forms.MessageBox]::Show(
+    "Femtet(2023.1以降), Python(3.11以降, 3.13未満) が必要です。インストールされていることを確認してから続けてください。",
+    "pre-request",
+    [System.Windows.Forms.MessageBoxButtons]::YesNo
+)
+if ($res -eq [System.Windows.Forms.DialogResult]::No) {
+    throw '処理を取り消します。'
+}
 
 
 # TODO: before run regsvr32, does it need to terminate femtet?
@@ -35,6 +41,10 @@ $ErrorActionPreference = "Stop"
 
 # ===== main =====
 
+write-host
+write-host "======================"
+write-host "installing pyfemtet..."
+write-host "======================"
 # install pyfemtet-opt-gui
 py -m pip install pyfemtet-opt-gui -U --no-warn-script-location
 
@@ -45,8 +55,15 @@ if (-not ($installed_packages | Select-String -Pattern 'pyfemtet-opt-gui')) {
     $message = "PyFemtet のインストールに失敗しました。"
     [System.Windows.Forms.MessageBox]::Show($message, $title)
     throw $message
+} else {
+    write-host "Install pyfemtet OK"
 }
 
+
+write-host
+write-host "========================="
+write-host "Enabling Python Macro ..."
+write-host "========================="
 # get Femtet.exe path using femtetuitls
 $femtet_exe_path = py -c "from femtetutils import util;from logging import disable;disable();print(util.get_femtet_exe_path())"
 # estimate FemtetMacro.dll path
@@ -63,6 +80,11 @@ if (-not (test-path $femtet_macro_dll_path)) {
 # regsvr
 regsvr32 $femtet_macro_dll_path  # returns nothing, dialog only
 
+
+write-host
+write-host "========================"
+write-host "COM constants setting..."
+write-host "========================"
 # win32com.client.makepy
 py -m win32com.client.makepy FemtetMacro  # return nothing
 
@@ -78,21 +100,46 @@ if ($SOLVER_NON_C -eq "0") {
     [System.Windows.Forms.MessageBox]::Show($message, $title)
 }
 
+write-host
+write-host "==========================="
+write-host "Create Desktop shortcuts..."
+write-host "==========================="
 # make desktop shortcut for pyfemtet-opt-gui
 $pyfemtet_package_path = py -c "import pyfemtet;print(pyfemtet.__file__)"
-$pyfemtet_opt_gui_path = $pyfemtet_package_path.replace("Lib\site-packages\pyfemtet\__init__.py", "Scripts\pyfemtet-opt.exe")
-if (test-path $pyfemtet_opt_gui_path) {
+$pyfemtet_opt_script_builder_path = $pyfemtet_package_path.replace("Lib\site-packages\pyfemtet\__init__.py", "Scripts\pyfemtet-opt.exe")
+$pyfemtet_opt_result_viewer_path = $pyfemtet_package_path.replace("Lib\site-packages\pyfemtet\__init__.py", "Scripts\opt-show.exe")
+
+$succeed = $true
+$succeed = (test-path $pyfemtet_opt_script_builder_path) -and (test-path $pyfemtet_opt_result_viewer_path)
+
+if ($succeed) {
     # create desktop shortcut of pyfemtet-opt.exe in $Scripts_dir folder
-    $Shortcut_file = "$env:USERPROFILE\Desktop\pyfemtet-opt.lnk"    
-    $WScriptShell = New-Object -ComObject WScript.Shell
-    $Shortcut = $WScriptShell.CreateShortcut($Shortcut_file)
-    $Shortcut.TargetPath = $pyfemtet_opt_gui_path
-    $Shortcut.Save()
-    write-host "create desktop shortcut: OK"
-} else {
+    try {
+        $Shortcut_file = "$env:USERPROFILE\Desktop\pyfemtet-opt.lnk"
+        $WScriptShell = New-Object -ComObject WScript.Shell
+        $Shortcut = $WScriptShell.CreateShortcut($Shortcut_file)
+        $Shortcut.TargetPath = $pyfemtet_opt_script_builder_path
+        $Shortcut.Save()
+    }
+    catch {
+        $succeed = $false
+    }
+    try {
+        $Shortcut_file = "$env:USERPROFILE\Desktop\pyfemtet-opt-result-viewer.lnk"
+        $WScriptShell = New-Object -ComObject WScript.Shell
+        $Shortcut = $WScriptShell.CreateShortcut($Shortcut_file)
+        $Shortcut.TargetPath = $pyfemtet_opt_result_viewer_path
+        $Shortcut.Save()
+    }
+    catch {
+        $succeed = $false
+    }
+}
+
+if (-not $succeed) {
     $title = "warning"
     $message = "PyFmetet のインストールは完了しましたが、デスクトップにショートカットを作成できませんでした。Python 実行環境の Scripts フォルダ内の pyfemtet-opt.exe が見つかりません。"
     [System.Windows.Forms.MessageBox]::Show($message, $title)
 }
 
-[System.Windows.Forms.MessageBox]::Show("PyFemtet インストール が完了しました。", "Complete!")
+[System.Windows.Forms.MessageBox]::Show("PyFemtet インストールとセットアップが完了しました。", "Complete!")

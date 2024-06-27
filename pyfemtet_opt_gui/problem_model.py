@@ -114,14 +114,12 @@ class CustomProxyModel(QSortFilterProxyModel):
         if '(ignore)' in item.text():
             return None
 
-        # if all of objective setto is (ignore), hide 'set to'
+        # if all objectives set to (ignore), hide 'set to'
         if item.text() == 'set to':
             if role == Qt.ItemDataRole.DisplayRole:
                 unused = []
                 col = sourceModel.obj_model.get_col_from_name('set to')
                 for row in range(1, sourceModel.obj_model.rowCount()):
-                    print(sourceModel.obj_model.get_item(row, col).text())
-                    print('(ignore)' in sourceModel.obj_model.get_item(row, col).text())
                     unused.append('(ignore)' in sourceModel.obj_model.get_item(row, col).text())
                 if all(unused):
                     return None

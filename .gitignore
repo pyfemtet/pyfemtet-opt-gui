@@ -2,6 +2,7 @@
 *.csv
 *.uilog
 *.Results/
+*sandbox/
 
 
 # Byte-compiled / optimized / DLL files

@@ -75,8 +75,8 @@ class MainWizard(QWizard):
             return out
         self._ui.wizardPage6_run.validatePage = validate_run_model
 
-    def update_problem(self, show_warning=True):
-        return_codes = []
+    def update_problem(self, _=False, show_warning=True):  # _ is the disposal variable of click() signal.
+        return_codes = list()
 
         return_codes.append(self.load_femprj())
         return_codes.append(self.load_prm())
@@ -120,7 +120,10 @@ class MainWizard(QWizard):
     def connect_process(self):
         button = self._ui.pushButton_launch
 
-        button.setText('接続中です...')
+        if len(_p._get_pids('Femtet.exe')) == 0:
+            button.setText('Femtet を起動して接続します。\n少し時間がかかります...')
+        else:
+            button.setText('接続中です...')
         button.setEnabled(False)
         button.repaint()
 
@@ -128,7 +131,7 @@ class MainWizard(QWizard):
             _p.logger.info(f'Connected! (pid: {_p.pid})')  # TODO: show dialog
 
             # update model
-            self.update_problem(False)
+            self.update_problem(show_warning=False)
 
         button.setText(button.accessibleName())
         button.setEnabled(True)
@@ -261,7 +264,7 @@ def main():
     ui_wizard.treeView.setModel(g_proxy_model)
 
     wizard.set_ui(ui_wizard)  # ui を登録
-    wizard.update_problem(False)  # ui へのモデルの登録
+    wizard.update_problem(show_warning=False)  # ui へのモデルの登録
 
     wizard.show()  # ビューの表示
     sys.exit(app.exec())  # アプリケーションの実行
