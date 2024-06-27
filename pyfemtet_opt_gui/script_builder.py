@@ -34,7 +34,7 @@ def get_femopt(femprj_model: MyStandardItemAsTableModel, obj_model: MyStandardIt
         use_col = obj_model.get_col_from_name('use')
         checked = obj_model.get_item(row, use_col).checkState()
         if checked == Qt.CheckState.Checked:
-            d_col = obj_model.get_col_from_name('direction')
+            d_col = obj_model.get_col_from_name('  direction  ')
             direction = obj_model.get_item(row, d_col).text()
             if direction == 'Set to...':
                 st_col = obj_model.get_col_from_name('set to')

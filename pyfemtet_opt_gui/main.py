@@ -38,6 +38,7 @@ class MainWizard(QWizard):
         self._ui.tableView_run.setModel(proxy_model)
 
         # disable next button if checker returns False
+        self._ui.wizardPage1_launch.isComplete = self.check_femtet_alive
         self._ui.wizardPage2_model.isComplete = partial(self.check_femprj_valid, show_warning=False)
         self._ui.wizardPage3_param.isComplete = partial(self.check_prm_used_any, show_warning=False)
         self._ui.wizardPage4_obj.isComplete = partial(self.check_obj_used_any, show_warning=False)
@@ -48,7 +49,7 @@ class MainWizard(QWizard):
             page = self.page(page_id)
             self._problem.dataChanged.connect(page.completeChanged)
 
-        # show warning if finish duaring optimization
+        # show warning if finish during optimization
         def validate_finish() -> bool:
             out = True
             if self.worker.running:
@@ -73,8 +74,6 @@ class MainWizard(QWizard):
                 out = ret == QMessageBox.StandardButton.Yes
             return out
         self._ui.wizardPage6_run.validatePage = validate_run_model
-
-
 
     def update_problem(self, show_warning=True):
         return_codes = []
@@ -119,11 +118,23 @@ class MainWizard(QWizard):
         return ret_code
 
     def connect_process(self):
+        button = self._ui.pushButton_launch
+
+        button.setText('接続中です...')
+        button.setEnabled(False)
+        button.repaint()
+
         if _p.connect_femtet():
             _p.logger.info(f'Connected! (pid: {_p.pid})')  # TODO: show dialog
 
             # update model
             self.update_problem(False)
+
+        button.setText(button.accessibleName())
+        button.setEnabled(True)
+        button.repaint()
+
+        self._ui.wizardPage1_launch.completeChanged.emit()
 
     def build_script(self):
 
@@ -133,6 +144,7 @@ class MainWizard(QWizard):
 
         if dialog.exec():
             path = dialog.selectedFiles()[0]
+            if not path.endswith('.py'): path += '.py'
             dir_path = os.path.dirname(path)
             if os.path.isdir(dir_path):
                 with_run = self._ui.checkBox_save_with_run.checkState() == Qt.CheckState.Checked
@@ -145,6 +157,22 @@ class MainWizard(QWizard):
 
             else:
                 _p.logger.error('存在しないフォルダのファイルが指定されました。')
+
+    def check_femtet_alive(self):
+        alive = _p.check_femtet_alive()
+
+        label = self._ui.label_connectionState
+        if alive:
+            message = '接続されています。「次へ / Next」を押して下さい。'
+            color = '009900'
+        else:
+            message = '接続されていません。'
+            color = 'FF0000'
+
+        text = f"<html><head/><body><p><span style='color:#{color}'>{message}</span></p></body></html>"
+        label.setText(text)
+
+        return alive
 
     def check_save_button_should_enabled(self):
         button = self._ui.pushButton_save_script

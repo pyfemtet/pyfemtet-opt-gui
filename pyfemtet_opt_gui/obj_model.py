@@ -1,4 +1,4 @@
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QPoint
 from PySide6.QtGui import QStandardItem
 from PySide6.QtWidgets import QStyledItemDelegate, QComboBox
 
@@ -18,17 +18,18 @@ class ObjTableDelegate(QStyledItemDelegate):
     def createEditor(self, parent, option, index):
         col, row = index.column(), index.row()
         col_name = self._model.get_col_name(col)
-        if col_name == 'direction':
+        if col_name == '  direction  ':
             # コンボボックスエディタを作成
             comboBox = QComboBox(parent)
             comboBox.addItems(['maximize', 'minimize', 'Set to...'])
+            comboBox.setFrame(False)
             return comboBox
         return super().createEditor(parent, option, index)
 
     def setEditorData(self, editor, index):
         col, row = index.column(), index.row()
         col_name = self._model.get_col_name(col)
-        if col_name == 'direction':
+        if col_name == '  direction  ':
             # コンボボックスにデータを設定
             value = index.model().data(index, Qt.EditRole)
             editor.setCurrentText(value)
@@ -38,13 +39,33 @@ class ObjTableDelegate(QStyledItemDelegate):
     def setModelData(self, editor, model, index):
         col, row = index.column(), index.row()
         col_name = self._model.get_col_name(col)
-        if col_name == 'direction':
+        if col_name == '  direction  ':
             # コンボボックスのデータをモデルに設定
             model.setData(index, editor.currentText(), Qt.EditRole)
         else:
             super().setModelData(editor, model, index)
 
+    def paint(self, painter, option, index):
+        col, row = index.column(), index.row()
+        col_name = self._model.get_col_name(col)
+        if col_name == '  direction  ':
+            # index...proxyindex
+            # _model...original
+            value = self._model.get_item(index.row()+1, index.column()).text()
+            combo = QComboBox()
+            combo.addItems([value])
+            combo.setCurrentText(value)
+            combo.setFrame(False)
 
+            painter.save()
+
+            painter.translate(option.rect.topLeft())
+            combo.resize(option.rect.size())
+            combo.render(painter, QPoint())
+
+            painter.restore()
+        else:
+            super().paint(painter, option, index)
 
 
 class ObjModel(MyStandardItemAsTableModel):
@@ -61,7 +82,7 @@ class ObjModel(MyStandardItemAsTableModel):
     # use / name is uneditable
 
     """
-    HEADER = ['use', 'name', 'direction', 'set to']
+    HEADER = ['use', 'name', '  direction  ', 'set to']  # require margin to paint combobox to objective table, but its resizemode is ResizeToContent so setMargin doesn't work.
 
     def load(self) -> ReturnCode:
         # initialize table
@@ -123,7 +144,7 @@ class ObjModel(MyStandardItemAsTableModel):
 
         if col_name == 'set to':
             # if direction is "Maximize" or "Minimize", (set to)+=(ignored) and disable
-            dir_col = self.get_col_from_name('direction')
+            dir_col = self.get_col_from_name('  direction  ')
             dir_index = self.createIndex(row, dir_col)
             if self.data(dir_index) in ['minimize', 'maximize']:
                 return ~Qt.ItemIsEnabled
@@ -155,7 +176,7 @@ class ObjModel(MyStandardItemAsTableModel):
         col_name = self.get_col_name(col)
 
         # when direction is changed, change 'Set to...'.
-        if col_name == 'direction':
+        if col_name == '  direction  ':
             IGNORE_PREFIX = '(ignore) '
 
             setto_col = self.get_col_from_name('set to')
@@ -164,7 +185,7 @@ class ObjModel(MyStandardItemAsTableModel):
 
             # if direction is "Maximize" or "Minimize,
             # set_to = (ignored) + set_to
-            if value in ['Minimize', 'Maximize']:
+            if value in ['minimize', 'maximize']:
                 if IGNORE_PREFIX not in setto_value:
                     setto_value = IGNORE_PREFIX + setto_value
                     super().setData(setto_index, setto_value)
@@ -178,7 +199,7 @@ class ObjModel(MyStandardItemAsTableModel):
         # set_to must be numeric if direction is 'Set to...'
         if col_name == 'set to':
 
-            dir_col = self.get_col_from_name('direction')
+            dir_col = self.get_col_from_name('  direction  ')
             dir_index = self.createIndex(row, dir_col)
             dir_value = self.data(dir_index)
 

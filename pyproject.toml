@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "pyfemtet_opt_gui"
+name = "pyfemtet-opt-gui"
 version = "0.1.0"
 description = "GUI to build and run a script for pyfemtet.opt"
 authors = ["kazuma.naito <kazuma.naito@murata.com>"]
