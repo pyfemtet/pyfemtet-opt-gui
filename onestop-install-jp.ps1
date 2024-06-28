@@ -20,7 +20,7 @@ $null = $Win32Helpers::SetProcessDPIAware()
 # ===== pre-requirement =====
 
 # --runas (reload)
-# if (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole("Administrators")) { Start-Process powershell.exe "-File `"$PSCommandPath`"" -Verb RunAs; exit }
+if (!([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole("Administrators")) { Start-Process powershell.exe "-File `"$PSCommandPath`"" -Verb RunAs; exit }
 
 # error setting
 $ErrorActionPreference = "Stop"
@@ -107,7 +107,7 @@ write-host "==========================="
 # make desktop shortcut for pyfemtet-opt-gui
 $pyfemtet_package_path = py -c "import pyfemtet;print(pyfemtet.__file__)"
 $pyfemtet_opt_script_builder_path = $pyfemtet_package_path.replace("Lib\site-packages\pyfemtet\__init__.py", "Scripts\pyfemtet-opt.exe")
-$pyfemtet_opt_result_viewer_path = $pyfemtet_package_path.replace("Lib\site-packages\pyfemtet\__init__.py", "Scripts\opt-show.exe")
+$pyfemtet_opt_result_viewer_path = $pyfemtet_package_path.replace("Lib\site-packages\pyfemtet\__init__.py", "Scripts\pyfemtet-opt-result-viewer.exe")
 
 $succeed = $true
 $succeed = (test-path $pyfemtet_opt_script_builder_path) -and (test-path $pyfemtet_opt_result_viewer_path)
@@ -124,22 +124,24 @@ if ($succeed) {
     catch {
         $succeed = $false
     }
-    try {
-        $Shortcut_file = "$env:USERPROFILE\Desktop\pyfemtet-opt-result-viewer.lnk"
-        $WScriptShell = New-Object -ComObject WScript.Shell
-        $Shortcut = $WScriptShell.CreateShortcut($Shortcut_file)
-        $Shortcut.TargetPath = $pyfemtet_opt_result_viewer_path
-        $Shortcut.Save()
-    }
-    catch {
-        $succeed = $false
-    }
+    # plan to add 0.4.9
+    # try {
+    #     $Shortcut_file = "$env:USERPROFILE\Desktop\pyfemtet-opt-result-viewer.lnk"
+    #     $WScriptShell = New-Object -ComObject WScript.Shell
+    #     $Shortcut = $WScriptShell.CreateShortcut($Shortcut_file)
+    #     $Shortcut.TargetPath = $pyfemtet_opt_result_viewer_path
+    #     $Shortcut.Save()
+    # }
+    # catch {
+    #     $succeed = $false
+    # }
 }
 
-if (-not $succeed) {
+if ($succeed) {
+    [System.Windows.Forms.MessageBox]::Show("PyFemtet インストールとセットアップが完了しました。", "Complete!")
+} else {
     $title = "warning"
     $message = "PyFmetet のインストールは完了しましたが、デスクトップにショートカットを作成できませんでした。Python 実行環境の Scripts フォルダ内の pyfemtet-opt.exe が見つかりません。"
     [System.Windows.Forms.MessageBox]::Show($message, $title)
-}
 
-[System.Windows.Forms.MessageBox]::Show("PyFemtet インストールとセットアップが完了しました。", "Complete!")
+}
