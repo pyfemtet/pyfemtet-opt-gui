@@ -21,52 +21,7 @@
   </property>
   <widget class="QWizardPage" name="wizardPage1_launch">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="1">
-     <spacer name="verticalSpacer">
-      <property name="orientation">
-       <enum>Qt::Orientation::Vertical</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>20</width>
-        <height>40</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
-    <item row="1" column="0">
-     <spacer name="horizontalSpacer_3">
-      <property name="orientation">
-       <enum>Qt::Orientation::Horizontal</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>40</width>
-        <height>20</height>
-       </size>
-      </property>
-     </spacer>
-    </item>
-    <item row="1" column="1">
-     <widget class="QPushButton" name="pushButton_launch">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="accessibleName">
-       <string>Connect to Femtet</string>
-      </property>
-      <property name="text">
-       <string>Connect to Femtet</string>
-      </property>
-      <property name="flat">
-       <bool>false</bool>
-      </property>
-     </widget>
-    </item>
-    <item row="5" column="0" colspan="3">
+    <item row="6" column="0" colspan="3">
      <widget class="QTextEdit" name="textEdit_2">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
@@ -100,8 +55,21 @@ li.checked::marker { content: &quot;\2612&quot;; }
       </property>
      </widget>
     </item>
-    <item row="3" column="1">
-     <spacer name="verticalSpacer_2">
+    <item row="1" column="2">
+     <spacer name="horizontalSpacer_4">
+      <property name="orientation">
+       <enum>Qt::Orientation::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>40</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item row="0" column="1">
+     <spacer name="verticalSpacer">
       <property name="orientation">
        <enum>Qt::Orientation::Vertical</enum>
       </property>
@@ -113,15 +81,15 @@ li.checked::marker { content: &quot;\2612&quot;; }
       </property>
      </spacer>
     </item>
-    <item row="1" column="2">
-     <spacer name="horizontalSpacer_4">
+    <item row="4" column="1">
+     <spacer name="verticalSpacer_2">
       <property name="orientation">
-       <enum>Qt::Orientation::Horizontal</enum>
+       <enum>Qt::Orientation::Vertical</enum>
       </property>
       <property name="sizeHint" stdset="0">
        <size>
-        <width>40</width>
-        <height>20</height>
+        <width>20</width>
+        <height>40</height>
        </size>
       </property>
      </spacer>
@@ -136,6 +104,45 @@ li.checked::marker { content: &quot;\2612&quot;; }
       </property>
       <property name="alignment">
        <set>Qt::AlignmentFlag::AlignCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QPushButton" name="pushButton_launch">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="accessibleName">
+       <string>Connect to Femtet</string>
+      </property>
+      <property name="text">
+       <string>Connect to Femtet</string>
+      </property>
+      <property name="flat">
+       <bool>false</bool>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <spacer name="horizontalSpacer_3">
+      <property name="orientation">
+       <enum>Qt::Orientation::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>40</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item row="3" column="1">
+     <widget class="QCheckBox" name="checkBox_demoMode">
+      <property name="text">
+       <string>デモモードで進める</string>
       </property>
      </widget>
     </item>
@@ -592,7 +599,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <hints>
     <hint type="sourcelabel">
      <x>433</x>
-     <y>195</y>
+     <y>178</y>
     </hint>
     <hint type="destinationlabel">
      <x>339</x>
@@ -696,6 +703,22 @@ li.checked::marker { content: &quot;\2612&quot;; }
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>checkBox_demoMode</sender>
+   <signal>checkStateChanged(Qt::CheckState)</signal>
+   <receiver>Wizard</receiver>
+   <slot>set_demo_mode(Qt::CheckState)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>259</x>
+     <y>220</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>228</x>
+     <y>417</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <signal>process_loaded()</signal>
@@ -706,5 +729,6 @@ li.checked::marker { content: &quot;\2612&quot;; }
   <slot>check_prm_used_any()</slot>
   <slot>check_obj_used_any()</slot>
   <slot>check_save_button_should_enabled()</slot>
+  <slot>set_demo_mode(Qt::CheckState)</slot>
  </slots>
 </ui>

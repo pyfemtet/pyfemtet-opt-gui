@@ -26,6 +26,7 @@ class MainWizard(QWizard):
         self._problem: ProblemItemModel = problem
         self.worker = OptimizationWorker()
         self.worker.finished.connect(self.optimization_finished)
+        self.is_demo_mode = False
 
     def set_ui(self, ui):
         # noinspection PyAttributeOutsideInit
@@ -74,6 +75,15 @@ class MainWizard(QWizard):
                 out = ret == QMessageBox.StandardButton.Yes
             return out
         self._ui.wizardPage6_run.validatePage = validate_run_model
+
+        # read demo_mode default value of ui checkbox
+        self.is_demo_mode = self._ui.checkBox_demoMode.isChecked()
+
+    def set_demo_mode(self, value: Qt.CheckState):
+        print('==========')
+        print(value)
+        print(value == Qt.CheckState.Checked)
+        self.is_demo_mode = value == Qt.CheckState.Checked
 
     def update_problem(self, _=False, show_warning=True):  # _ is the disposal variable of click() signal.
         return_codes = list()
