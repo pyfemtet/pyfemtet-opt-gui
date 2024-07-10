@@ -101,6 +101,12 @@ def get_optimize(run_model: MyStandardItemAsTableModel):
         {arg_name}={arg_value},'''
     code += '''
     )
+    
+    print('================================')
+    print('Finished. Press Enter to quit...')
+    print('================================')
+    input()
+
     femopt.terminate_all()
 '''
     return code
