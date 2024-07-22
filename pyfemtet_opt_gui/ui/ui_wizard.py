@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'wizardRcrFsS.ui'
+## Form generated from reading UI file 'wizardpHxyDr.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.7.1
 ##
@@ -383,7 +383,8 @@ class Ui_Wizard(object):
 "</style></head><body style=\" font-family:'Yu Gothic UI'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">\u6700\u9069\u5316\u3059\u308b\u76ee\u7684\u95a2\u6570\u3092\u9078\u3093\u3067\u304f\u3060\u3055\u3044\u3002</p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">\u203b Femtet \u306e\u30d1\u30e9\u30e1\u30c8\u30ea\u30c3\u30af\u89e3\u6790\u30c0\u30a4\u30a2\u30ed\u30b0\u3067\u76ee\u7684\u95a2\u6570\u3092\u5b9a\u7fa9\u3057\u3066"
-                        "\u304f\u3060\u3055\u3044\u3002</p></body></html>", None))
+                        "\u304f\u3060\u3055\u3044\u3002</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">\u203b \u30d7\u30ed\u30b8\u30a7\u30af\u30c8\u306b\u65e2\u5b58\u306e\u30d1\u30e9\u30e1\u30c8\u30ea\u30c3\u30af\u89e3\u6790\u8a2d\u5b9a\u304c\u3042\u308b\u5834\u5408\u3001\u6700\u9069\u5316\u5b9f\u884c\u524d\u306b\u30b9\u30a4\u30fc\u30d7\u30c6\u30fc\u30d6\u30eb\u3092\u524a\u9664\u3057\u3066\u304f\u3060\u3055\u3044\u3002</p></body></html>", None))
         self.wizardPage6_run.setSubTitle(QCoreApplication.translate("Wizard", u"<table class=MsoNormalTable border=0 cellspacing=0 cellpadding=0 width=\"83%\"  style='width:83.32%;border-collapse:collapse'>  <tr>   <td width=\"19%\" valign=top style='width:19.98%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><span style='color:#7F7F7F'>\u30e2\u30c7\u30eb\u6307\u5b9a</span></p>   </td>   <td width=\"20%\" valign=top style='width:20.0%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><span style='color:#7F7F7F'>\u5909\u6570\u6307\u5b9a</span></p>   </td>   <td width=\"20%\" valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><span style='color:#7F7F7F'>\u76ee\u7684\u6307\u5b9a</span></p>   </td>   <td width=\"20%\" valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><b><i><span style='color:#0987D5'>\u5b9f\u884c\u8a2d\u5b9a</span></i></b></p>   </td>   <td width=\"19%\" valign=top style='width:19.96%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><span style='color:#7F7F7F'>\u78ba\u8a8d</span></p>   </td>  </tr> </table>"
                         " ", None))
         self.textEdit_6.setHtml(QCoreApplication.translate("Wizard", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
