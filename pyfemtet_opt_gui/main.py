@@ -17,6 +17,8 @@ from pyfemtet_opt_gui.ui.return_code import ReturnCode, should_stop
 
 import pyfemtet_opt_gui._p as _p  # must be same folder and cannot import via `from` keyword.
 
+here = os.path.dirname(__file__)
+
 
 # noinspection PyMethodMayBeStatic
 class MainWizard(QWizard):
@@ -87,6 +89,55 @@ class MainWizard(QWizard):
                 if should_stop(return_code):  # show message
                     break  # if error, stop show message
 
+    def connect_process(self):
+        button = self._ui.pushButton_launch
+
+        button.setText('接続中です...')
+        button.setEnabled(False)
+        button.repaint()
+
+        # If femtet is already connected or not
+        if _p.check_femtet_alive():
+            # already connected
+            _p.logger.info(f'Femtet との接続はすでに確立しています。')
+
+        else:
+            # not connected
+            if len(_p._get_pids('Femtet.exe')) == 0:
+                # no Femtet exist
+                button.setText('Femtet を起動して接続します。\n少し時間がかかります...')
+            else:
+                # Femtet exists
+                button.setText('Femtet プロセスが見つかりました。\n接続しています...')
+            button.repaint()
+
+            # try to connect
+            if _p.connect_femtet():
+                # successfully connected to femtet
+                _p.logger.info(f'Connected! (pid: {_p.pid})')  # TODO: show dialog
+                # update model
+                self.update_problem(show_warning=False)
+
+            else:
+                # failed to connect
+                _p.logger.warning('Femtet との接続に失敗しました。')
+
+        # open sample file if needed and femtet is connected
+        if self._ui.checkBox_openSampleFemprj.isChecked() and _p.check_femtet_alive():
+            femprj_path = os.path.join(here, 'test', 'test_parametric.femprj')
+            _p.Femtet.LoadProject(
+                femprj_path,
+                True
+            )
+            self.update_problem(show_warning=False)
+
+        # finalize
+        button.setText(button.accessibleName())
+        button.setEnabled(True)
+        button.repaint()
+
+        self._ui.wizardPage1_launch.completeChanged.emit()
+
     def load_femprj(self) -> ReturnCode:
         # モデルの再読み込み
         ret_code = self._problem.femprj_model.load()
@@ -116,28 +167,6 @@ class MainWizard(QWizard):
         delegate = ObjTableDelegate(proxy_model)
         self._ui.tableView_obj.setItemDelegate(delegate)
         return ret_code
-
-    def connect_process(self):
-        button = self._ui.pushButton_launch
-
-        if len(_p._get_pids('Femtet.exe')) == 0:
-            button.setText('Femtet を起動して接続します。\n少し時間がかかります...')
-        else:
-            button.setText('接続中です...')
-        button.setEnabled(False)
-        button.repaint()
-
-        if _p.connect_femtet():
-            _p.logger.info(f'Connected! (pid: {_p.pid})')  # TODO: show dialog
-
-            # update model
-            self.update_problem(show_warning=False)
-
-        button.setText(button.accessibleName())
-        button.setEnabled(True)
-        button.repaint()
-
-        self._ui.wizardPage1_launch.completeChanged.emit()
 
     def build_script(self):
 
@@ -233,6 +262,7 @@ class MainWizard(QWizard):
         return out
 
 
+# noinspection PyAttributeOutsideInit
 class OptimizationWorker(QThread):
     finished = Signal()
     running = False
@@ -246,7 +276,6 @@ class OptimizationWorker(QThread):
         build_script_main(self.problem, self.path, True)
         self.running = False
         self.finished.emit()
-
 
 
 def main():

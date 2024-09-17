@@ -19,8 +19,8 @@ class _WARNING(Enum):
     PARAMETRIC_OUTPUT_EMPTY = 'Femtet のパラメトリック解析 / 結果出力タブで結果を設定してください。'
     PARAMETER_EMPTY = 'Femtet で変数を設定してください。'
     FEMTET_NO_PROJECT = '接続されている Femtet でプロジェクトが開かれていません。'  # when called from launch
-    PARAMETER_NOT_SELECTED = '最低ひとつの変数を選択してください。'
-    OBJECTIVE_NOT_SELECTED = '最低ひとつの目的関数を選択してください。'
+    PARAMETER_NOT_SELECTED = '最低でもひとつの変数を選択してください。'
+    OBJECTIVE_NOT_SELECTED = '最低でもひとつの目的関数を選択してください。'
 
 
 class _ERROR(Enum):
