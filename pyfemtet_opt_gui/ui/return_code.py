@@ -30,6 +30,7 @@ class _ERROR(Enum):
     BOUND_NO_RANGE = '上限と下限が一致しています。変数の値を変更したくない場合は、use 列のチェックを外してください。'
     BOUND_INIT_OVER_UB = '初期値が上限を上回っています。'
     BOUND_INIT_UNDER_LB = '初期値が下限を下回っています。'
+    FEMTET_RECONSTRUCT_FAILED = 'Femtet でモデル再構築に失敗しました。'
 
 
 class ReturnCode:

@@ -91,7 +91,7 @@ class CustomProxyModel(QSortFilterProxyModel):
 
         # invisible item its header is 'test'
         is_prm_model = sourceIndex.parent().data() == sourceModel.prm_item.text()
-        is_test_column = sourceIndex.column() == sourceModel.prm_model.get_col_from_name('test')
+        is_test_column = sourceIndex.column() == sourceModel.prm_model.get_col_from_name(sourceModel.prm_model.TEST)
         if is_prm_model and is_test_column:
             return None
 

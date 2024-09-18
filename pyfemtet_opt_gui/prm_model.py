@@ -10,25 +10,32 @@ from pyfemtet_opt_gui.ui.return_code import ReturnCode, should_stop
 class PrmModel(MyStandardItemAsTableModel):
     """A table for determining whether to use Femtet variables in optimization.
 
-    use        | name       | expression   | lb             | ub             | test
-    -------------------------------------------------------------------------
+    use        | name       | init         | lb             | ub             | test
+    --------------------------------------------------------------------------------
     checkbox   | str        | float or str | float or empty | float or empty | float
-    uneditable | uneditable |              |
+    uneditable | uneditable |              |                |                |
 
-    note: if expression is not numeric, disable the row (including use column).
-    note: expression, lb, ub, test must be a float.
+    note: if init is not numeric, disable the row (including use column).
+    note: init, lb, ub, test must be a float.
     note: if checkbox is false, disable the row (excluding use column).
-    note: must be (lb < expression < ub).
+    note: must be (lb < init < ub).
 
     """
 
+    USE = 'use'
+    NAME = 'name'
+    INIT = 'initial value'
+    LB = 'lower bound'
+    UB = 'upper bound'
+    TEST = 'test value'
+
     HEADER = [
-            'use',
-            'name',
-            'expression',
-            'lb',
-            'ub',
-            'test',
+            USE,
+            NAME,
+            INIT,
+            LB,
+            UB,
+            TEST,
         ]
 
     def load(self) -> ReturnCode:
@@ -45,7 +52,6 @@ class PrmModel(MyStandardItemAsTableModel):
         self._root.setColumnCount(max(self._root.columnCount(), table.columnCount()))
 
         self.endResetModel()
-
 
         # if Femtet is not alive, do nothing
         if not _p.check_femtet_alive():
@@ -83,7 +89,7 @@ class PrmModel(MyStandardItemAsTableModel):
             item = QStandardItem(name)
             table.setChild(row, 1, item)
 
-            # expression
+            # init
             item = QStandardItem(exp)
             table.setChild(row, 2, item)
 
@@ -113,13 +119,13 @@ class PrmModel(MyStandardItemAsTableModel):
         col, row = index.column(), index.row()
         col_name = self.get_col_name(col)
 
-        # note: if expression is not numeric, disable the row (including use column).
-        exp_col = self.get_col_from_name('expression')
+        # note: if init is not numeric, disable the row (including use column).
+        exp_col = self.get_col_from_name(self.INIT)
         exp_index = self.createIndex(row, exp_col)
         if not _isnumeric(self.data(exp_index)):
             return ~Qt.ItemIsEnabled
 
-        # note: expression, lb, ub, test must be a float.
+        # note: init, lb, ub, test must be a float.
         # implemented in setData
 
         # note: if checkbox is false, disable the row (excluding use column).
@@ -129,7 +135,7 @@ class PrmModel(MyStandardItemAsTableModel):
             if col_name != 'use':
                 return ~Qt.ItemIsEnabled
 
-        # note: must be (lb < expression < ub).
+        # note: must be (lb < init < ub).
         # implemented in setData
 
         # use / name is uneditable
@@ -147,22 +153,22 @@ class PrmModel(MyStandardItemAsTableModel):
         col, row = index.column(), index.row()
         col_name = self.get_col_name(col)
 
-        # note: expression, lb, ub, test must be a float.
-        if col_name in ['expression', 'lb', 'ub']:
+        # note: init, lb, ub, test must be a float.
+        if col_name in [self.INIT, self.LB, self.UB, self.TEST]:
             if not _isnumeric(value):
                 _p.logger.error('数値を入力してください。')
                 return False
 
-        # note: must be (lb < expression < ub).
-        if col_name in ['expression', 'lb', 'ub']:
-            exp_index = self.createIndex(row, self.get_col_from_name('expression'))
-            exp_float = float(value) if col_name == 'expression' else float(self.data(exp_index))
+        # note: must be (lb < init < ub).
+        if col_name in [self.INIT, self.LB, self.UB]:
+            exp_index = self.createIndex(row, self.get_col_from_name(self.INIT))
+            exp_float = float(value) if col_name == self.INIT else float(self.data(exp_index))
 
-            lb_index = self.createIndex(row, self.get_col_from_name('lb'))
-            lb_float = float(value) if col_name == 'lb' else float(self.data(lb_index))
+            lb_index = self.createIndex(row, self.get_col_from_name(self.LB))
+            lb_float = float(value) if col_name == self.LB else float(self.data(lb_index))
 
-            ub_index = self.createIndex(row, self.get_col_from_name('ub'))
-            ub_float = float(value) if col_name == 'ub' else float(self.data(ub_index))
+            ub_index = self.createIndex(row, self.get_col_from_name(self.UB))
+            ub_float = float(value) if col_name == self.UB else float(self.data(ub_index))
 
             if not (lb_float <= exp_float):
                 should_stop(ReturnCode.ERROR.BOUND_INIT_UNDER_LB)
@@ -177,8 +183,8 @@ class PrmModel(MyStandardItemAsTableModel):
                 return False
 
         # if all of 'use' is unchecked, raise warning
-        if (col_name == 'use') and (role == Qt.ItemDataRole.CheckStateRole):
-            col2 = self.get_col_from_name('use')
+        if (col_name == self.USE) and (role == Qt.ItemDataRole.CheckStateRole):
+            col2 = self.get_col_from_name(self.USE)
             unchecked = {}
             for row2 in range(1, self.rowCount()):
                 unchecked.update(

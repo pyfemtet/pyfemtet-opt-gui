@@ -15,6 +15,8 @@ from pyfemtet_opt_gui.script_builder import build_script_main
 
 from pyfemtet_opt_gui.ui.return_code import ReturnCode, should_stop
 
+from pyfemtet_opt_gui.prm_model import PrmModel
+
 import pyfemtet_opt_gui._p as _p  # must be same folder and cannot import via `from` keyword.
 
 here = os.path.dirname(__file__)
@@ -238,8 +240,8 @@ class MainWizard(QWizard):
         return out
 
     def check_prm_used_any(self, show_warning=True):
-        prm_model = self._problem.prm_model
-        col = prm_model.get_col_from_name('use')
+        prm_model: 'PrmModel' = self._problem.prm_model
+        col = prm_model.get_col_from_name(prm_model.USE)
         used = []
         for row in range(1, prm_model.rowCount()):
             index = prm_model.createIndex(row, col)
@@ -260,6 +262,46 @@ class MainWizard(QWizard):
         if show_warning and not out:
             should_stop(ReturnCode.WARNING.OBJECTIVE_NOT_SELECTED, parent=self)
         return out
+
+    def update_analysis_model(self):
+        button = self._ui.pushButton_test_prm
+        prm_model: 'PrmModel' = self._problem.prm_model
+
+        # disable button anyway
+        button.setEnabled(False)
+        button.repaint()
+
+        # get used parameters
+        params: dict = {}
+        use_col = prm_model.get_col_from_name(prm_model.USE)
+        name_col = prm_model.get_col_from_name(prm_model.NAME)
+        test_col = prm_model.get_col_from_name(prm_model.TEST)
+        for row in range(1, prm_model.rowCount()):
+            use_index = prm_model.createIndex(row, use_col)
+            if prm_model.data(use_index, Qt.ItemDataRole.CheckStateRole):
+                name = prm_model.get_item(row, name_col).text()
+                test_val = float(prm_model.get_item(row, test_col).text())
+                params.update({name: test_val})
+
+        # update Femtet's parameter
+        try:
+            for name, value in params.items():
+                _p.Femtet.UpdateVariable(name, value)
+            _p.Femtet.Gaudi.Activate()
+            if not _p.Femtet.Gaudi.ReExecute(): raise Exception
+            _p.Femtet.Redraw()
+        except Exception as e:
+            _p.logger.error(f'Femtet でのモデル再構築に失敗しました。エラーメッセージ:{e}')
+            try:
+                _p.Femtet.ShowLastError()
+            except Exception as e:
+                from traceback import print_exception
+                print_exception(e)
+            should_stop(ReturnCode.ERROR.FEMTET_RECONSTRUCT_FAILED, parent=self)
+
+        # re-enable button anyway
+        button.setEnabled(True)
+        button.repaint()
 
 
 # noinspection PyAttributeOutsideInit

@@ -2,6 +2,7 @@ from PySide6.QtCore import Qt
 
 from pyfemtet_opt_gui.problem_model import ProblemItemModel
 from pyfemtet_opt_gui.item_as_model import MyStandardItemAsTableModel
+from pyfemtet_opt_gui.prm_model import PrmModel
 
 
 def get_header():
@@ -54,17 +55,17 @@ def get_femopt(femprj_model: MyStandardItemAsTableModel, obj_model: MyStandardIt
     return code
 
 
-def get_add_parameter(prm_model: MyStandardItemAsTableModel):
+def get_add_parameter(prm_model: PrmModel):
     code = ''
 
     for row in range(prm_model.rowCount()):
-        use_col = prm_model.get_col_from_name('use')
+        use_col = prm_model.get_col_from_name(prm_model.USE)
         use = prm_model.get_item(row, use_col).checkState()
         if use == Qt.CheckState.Checked:  # uncheckable row (i.e. header) must be False
-            name_col = prm_model.get_col_from_name('name')
-            init_col = prm_model.get_col_from_name('expression')
-            lb_col = prm_model.get_col_from_name('lb')
-            ub_col = prm_model.get_col_from_name('ub')
+            name_col = prm_model.get_col_from_name(prm_model.NAME)
+            init_col = prm_model.get_col_from_name(prm_model.INIT)
+            lb_col = prm_model.get_col_from_name(prm_model.LB)
+            ub_col = prm_model.get_col_from_name(prm_model.UB)
             name = prm_model.get_item(row, name_col).text()
             init = prm_model.get_item(row, init_col).text()
             lb = prm_model.get_item(row, lb_col).text()
