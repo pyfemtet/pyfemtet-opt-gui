@@ -10,18 +10,18 @@ import pyfemtet_opt_gui._p as _p
 class RunModel(MyStandardItemAsTableModel):
     """A table to set arguments for FEMOpt.optimize().
 
-    use              | item         | value                           | description
+    use              | key          | value                           | description
     --------------------------------------------------------------------------------------------
     checkbox         | n_trials     | 10 (positive int only)          | 指定回数の解析が終了すると最適化を終了します。
     checkbox         | timeout      | 10 (minutes, positive int only) | 指定時間（分）のプロセスが終了すると最適化を終了します。
     None             | n_parallel   | 1 (positive int only)           | 指定数の Femtet プロセスを使用して並列計算します。並列数分のライセンスが必要です。
 
     # if both n_trials and timeout are Unchecked, show warning.
-    # use and item are uneditable.
+    # use and key  are uneditable.
     # if Uncheckable, the row is disabled excluding use column.
 
     """
-    HEADER = ['use', 'item', 'value', 'description']
+    HEADER = ['use', 'key', 'value', 'description']
     ROW_COUNT = 4  # including header row
 
     def initialize_table(self):
@@ -94,8 +94,8 @@ class RunModel(MyStandardItemAsTableModel):
         # notify to end editing to the abstract model
         self.endResetModel()
 
-    def get_item_name(self, row) -> str:
-        col = self.get_col_from_name('item')
+    def get_key_name(self, row) -> str:
+        col = self.get_col_from_name('key')
         return self.get_item(row, col).text()
 
     def flags(self, index):
@@ -109,16 +109,16 @@ class RunModel(MyStandardItemAsTableModel):
             return Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsUserCheckable
 
         # if checkbox is false, disable the row (excluding use column).
-        item_name = self.get_item_name(row)
-        if item_name in ['n_trials', 'timeout']:
+        key_name = self.get_key_name(row)
+        if key_name in ['n_trials', 'timeout']:
             use_col = self.get_col_from_name('use')
             use_item = self.get_item(row, use_col)
             if use_item.checkState() == Qt.CheckState.Unchecked:
                 if col_name != 'use':
                     return ~Qt.ItemFlag.ItemIsEnabled
 
-        # item is uneditable
-        if col_name == 'item':
+        # key is uneditable
+        if col_name == 'key':
             return Qt.ItemFlag.ItemIsEnabled
 
         # description is uneditable
@@ -136,7 +136,7 @@ class RunModel(MyStandardItemAsTableModel):
         # set_to must be numeric if direction is 'Set to...'
         if col_name == 'value':
 
-            name_col = self.get_col_from_name('item')
+            name_col = self.get_col_from_name('key')
             name_index = self.createIndex(row, name_col)
             name_value = self.data(name_index)
 
@@ -198,7 +198,7 @@ class RunModel(MyStandardItemAsTableModel):
                 continue
 
             # if used finish condition, add to out
-            arg_key = self.get_item_name(row)
+            arg_key = self.get_key_name(row)
             if (arg_key == 'n_trials') or (arg_key == 'timeout'):
                 col = self.get_col_from_name('value')
                 arg_value = self.get_item(row, col).text()

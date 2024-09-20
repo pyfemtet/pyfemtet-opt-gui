@@ -30,6 +30,7 @@ class MyStandardItemAsTableModel(QAbstractTableModel):
 
     def rowCount(self, parent=None): return self._item.rowCount()
     def columnCount(self, parent=None): return self._item.columnCount()
+    # def insertRow(self, row, parent = ...):  # TODO: implement CnsModel.add_row() by correct way.
 
     def flags(self, index):
         if not index.isValid(): return

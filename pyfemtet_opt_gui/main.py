@@ -30,9 +30,9 @@ class MainWizard(QWizard):
         self._problem: ProblemItemModel = problem
         self.worker = OptimizationWorker()
         self.worker.finished.connect(self.optimization_finished)
+        self._ui: Ui_DetailedWizard = None
 
     def set_ui(self, ui):
-        # noinspection PyAttributeOutsideInit
         self._ui = ui
 
         # set optimization settings
@@ -45,7 +45,8 @@ class MainWizard(QWizard):
         self._ui.wizardPage1_launch.isComplete = self.check_femtet_alive
         self._ui.wizardPage2_model.isComplete = partial(self.check_femprj_valid, show_warning=False)
         self._ui.wizardPage3_param.isComplete = partial(self.check_prm_used_any, show_warning=False)
-        self._ui.wizardPage4_obj.isComplete = partial(self.check_obj_used_any, show_warning=False)
+        # self._ui.wizardPage4_cns.isComplete =  # constraint is not necessary.
+        self._ui.wizardPage5_obj.isComplete = partial(self.check_obj_used_any, show_warning=False)
         # self._ui.wizardPage6_run.isComplete =  # currently, FEMOpt.optimize() requires no arguments.
 
         # connect dataChanged to completeChanged(=emit isComplete)
@@ -85,6 +86,7 @@ class MainWizard(QWizard):
         return_codes.append(self.load_femprj())
         return_codes.append(self.load_prm())
         return_codes.append(self.load_obj())
+        return_codes.append(self.load_cns())
 
         if show_warning:
             for return_code in return_codes:
@@ -151,11 +153,13 @@ class MainWizard(QWizard):
     def load_prm(self) -> ReturnCode:
         # モデルの再読み込み
         ret_code = self._problem.prm_model.load()
+
         # モデルをビューに再設定
         model = self._problem.prm_model
         proxy_model = MyStandardItemAsTableModelWithoutHeader(model)
         proxy_model.setSourceModel(model)
         self._ui.tableView_prm.setModel(proxy_model)
+
         return ret_code
 
     def load_obj(self) -> ReturnCode:
@@ -170,27 +174,60 @@ class MainWizard(QWizard):
         self._ui.tableView_obj.setItemDelegate(delegate)
         return ret_code
 
+    def load_cns(self) -> ReturnCode:
+
+        # モデルの再読み込み
+        ret_code = self._problem.cns_model.load()
+
+        # モデルをビューに再設定
+        model = self._problem.cns_model
+        proxy_model = MyStandardItemAsTableModelWithoutHeader(model)
+        proxy_model.setSourceModel(model)
+        self._ui.tableView_cnsList.setModel(proxy_model)
+        return ret_code
+
     def build_script(self):
 
+        # スクリプトの保存ファイル名を指定するダイアログ
         dialog = QFileDialog(self)
         dialog.setFileMode(QFileDialog.FileMode.AnyFile)
         dialog.setNameFilter("Python files (*.py)")
 
+        # ダイアログを表示
         if dialog.exec():
+            # OK の場合
             path = dialog.selectedFiles()[0]
-            if not path.endswith('.py'): path += '.py'
+
+            # 拡張子を確認
+            if not path.endswith('.py'):
+                path += '.py'
+
+            # ディレクトリの存在を確認
             dir_path = os.path.dirname(path)
-            if os.path.isdir(dir_path):
-                with_run = self._ui.checkBox_save_with_run.checkState() == Qt.CheckState.Checked
-
-                if with_run:
-                    self.worker.set(path, self._problem)
-                    self.start_optimization()
-                else:
-                    build_script_main(self._problem, path, False)
-
-            else:
+            if not os.path.isdir(dir_path):
                 _p.logger.error('存在しないフォルダのファイルが指定されました。')
+                should_stop(ReturnCode.ERROR.DIRECTORY_NOT_EXISTS)
+                return None
+
+            # ファイル名が python モジュールとして正しいか確認
+            file_name = os.path.basename(os.path.splitext(path)[0])
+            # 英数字又は_以外を含む
+            for char in file_name:
+                if char not in '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_':
+                    should_stop(ReturnCode.ERROR.NOT_AS_PYTHON_MODULE)
+                    return None
+            # 数字で始まる
+            if file_name[0] in '0123456789':
+                should_stop(ReturnCode.ERROR.NOT_AS_PYTHON_MODULE)
+                return None
+
+            # 保存と実行
+            with_run = self._ui.checkBox_save_with_run.checkState() == Qt.CheckState.Checked
+            if with_run:
+                self.worker.set(path, self._problem)
+                self.start_optimization()
+            else:
+                build_script_main(self._problem, path, False)
 
     def check_femtet_alive(self):
         alive = _p.check_femtet_alive()
@@ -302,6 +339,52 @@ class MainWizard(QWizard):
         # re-enable button anyway
         button.setEnabled(True)
         button.repaint()
+
+    def show_cns_dialog(self):
+        from pyfemtet_opt_gui.cns_dialog import ConstraintInputDialog
+        dialog = ConstraintInputDialog(
+            parent=self,
+            f=Qt.WindowType.Dialog
+        )
+        dialog.show()
+
+    def show_cns_dialog_edit(self):
+        selected_proxy_cns_indexes = self._ui.tableView_cnsList.selectedIndexes()
+        if not selected_proxy_cns_indexes:
+            return
+
+        # get source index
+        proxy_model: MyStandardItemAsTableModelWithoutHeader = self._ui.tableView_cnsList.model()
+        target_index = proxy_model.mapToSource(selected_proxy_cns_indexes[0])
+
+        # get row
+        row = target_index.row()
+
+        # show editor
+        from pyfemtet_opt_gui.cns_dialog import ConstraintInputDialog
+        dialog = ConstraintInputDialog(
+            parent=self,
+            f=Qt.WindowType.Dialog,
+            target_cns_row=row,
+        )
+        dialog.show()
+
+    def remove_cns(self):
+        selected_proxy_cns_indexes = self._ui.tableView_cnsList.selectedIndexes()
+        if not selected_proxy_cns_indexes:
+            return
+
+        # get source index
+        proxy_model: MyStandardItemAsTableModelWithoutHeader = self._ui.tableView_cnsList.model()
+        target_index = proxy_model.mapToSource(selected_proxy_cns_indexes[0])
+
+        # get row
+        row = target_index.row()
+
+        # remove
+        from pyfemtet_opt_gui.cns_model import CnsModel
+        cns_model: CnsModel = proxy_model.sourceModel()
+        cns_model.remove_constraint(row)
 
 
 # noinspection PyAttributeOutsideInit

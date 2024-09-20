@@ -38,10 +38,11 @@ class PrmModel(MyStandardItemAsTableModel):
             TEST,
         ]
 
-    def load(self) -> ReturnCode:
+    def __init__(self, table_item: QStandardItem, root: QStandardItem, parent=None):
+        super().__init__(table_item, root, parent)
+        self.initialize_table()
 
-        self.beginResetModel()
-
+    def initialize_table(self):
         # initialize table
         table: QStandardItem = self._item
         table.clearData()
@@ -51,67 +52,159 @@ class PrmModel(MyStandardItemAsTableModel):
         self.set_header(self.HEADER)
         self._root.setColumnCount(max(self._root.columnCount(), table.columnCount()))
 
-        self.endResetModel()
+    def load(self) -> ReturnCode:
+        # 現在の table の状態と Femtet からの情報を比較し、
+        # table を Femtet と同期する
 
         # if Femtet is not alive, do nothing
         if not _p.check_femtet_alive():
             return ReturnCode.ERROR.FEMTET_CONNECTION_FAILED
 
         # load prm
-        names = _p.Femtet.GetVariableNames_py()
+        new_prm_names = _p.Femtet.GetVariableNames_py()
 
-        if names is None:
+        # if no parameter in Femtet, show error message
+        if new_prm_names is None:
+            return ReturnCode.WARNING.PARAMETER_EMPTY
+        if len(new_prm_names) == 0:
             return ReturnCode.WARNING.PARAMETER_EMPTY
 
-        if len(names) == 0:
-            return ReturnCode.WARNING.PARAMETER_EMPTY
+        # declare
+        table: QStandardItem = self._item
+
+        # get current names and its row
+        current_prm_names: list[str]
+        current_prm_rows: list[int]
+        current_prm_names, current_prm_rows = self.get_variable_names(with_row=True)
 
         # notify to start editing to the abstract model
         self.beginResetModel()
 
-        # set data to table
-        table.setRowCount(len(names)+1)  # including header row (hidden by WithoutHeader proxy).
+        prm_names_to_add = []
+        for new_prm_name in new_prm_names:
+            # if new parameter is in current ones,
+            # update test value only.
+            if new_prm_name in current_prm_names:
+                idx = current_prm_names.index(new_prm_name)
+                row = current_prm_rows[idx]
+                new_prm_exp = str(_p.Femtet.GetVariableExpression(new_prm_name))
+                self.set_parameter(row, test=new_prm_exp)
 
-        for row, name in enumerate(names):
+            # if new parameter is not in current ones,
+            # mark it to add
+            else:
+                prm_names_to_add.append(new_prm_name)
 
-            exp = str(_p.Femtet.GetVariableExpression(name))
+        # if current parameter is not in new ones,
+        # mark it to remove.
+        prm_rows_to_remove = []
+        for current_prm_name, row in zip(current_prm_names, current_prm_rows):
+            if current_prm_name not in new_prm_names:
+                prm_rows_to_remove.append(row)
 
-            row = row + 1  # avoid header row
+        # remove parameters
+        for row in prm_rows_to_remove[::-1]:
+            table.removeRow(row)
 
-            # use
-            item = QStandardItem()
-            if _isnumeric(exp):
-                item.setCheckable(True)
-                item.setCheckState(Qt.CheckState.Checked)
-            table.setChild(row, 0, item)
+        # raises an error without this section
+        # if the all parameters are removed temporally
+        self.endResetModel()
+        self.beginResetModel()
 
-            # name
-            item = QStandardItem(name)
-            table.setChild(row, 1, item)
-
-            # init
-            item = QStandardItem(exp)
-            table.setChild(row, 2, item)
-
-            # lb
-            lb = str(float(exp)-1.0) if _isnumeric(exp) else None
-            item = QStandardItem(lb)
-            table.setChild(row, 3, item)
-
-            # ub
-            ub = str(float(exp)+1.0) if _isnumeric(exp) else None
-            item = QStandardItem(ub)
-            table.setChild(row, 4, item)
-
-            # test
-            test = exp if _isnumeric(exp) else None
-            item = QStandardItem(test)
-            table.setChild(row, 5, item)
+        # add parameters
+        for prm_name in prm_names_to_add:
+            exp = str(_p.Femtet.GetVariableExpression(prm_name))
+            self.add_parameter(name=prm_name, expression=exp)
 
         # notify to end editing to the abstract model
         self.endResetModel()
 
         return super().load()
+
+    def add_parameter(self, name: str, expression: str):
+        # declare
+        table = self._item
+
+        # use
+        use = None
+        if _isnumeric(expression):
+            use = True
+
+        # lb
+        lb = ''
+        if _isnumeric(expression):
+            lb = str(float(expression) - 1.0)
+
+        # ub
+        ub = ''
+        if _isnumeric(expression):
+            ub = str(float(expression) + 1.0)
+
+        # test
+        test = ''
+        if _isnumeric(expression):
+            test = expression
+
+        # append row
+        table.setRowCount(table.rowCount() + 1)
+        self.set_parameter(
+            row=table.rowCount() - 1,
+            name=name,
+            use=use,
+            init=expression,
+            lb=lb,
+            ub=ub,
+            test=test,
+        )
+
+    def set_parameter(
+            self,
+            row: int,
+            name: str = None,
+            use: bool = None,
+            init: str = None,  # expression
+            lb: str = None,  # float
+            ub: str = None,  # float
+            test: str = None,  # expression
+    ):
+        # declare
+        table = self._item
+
+        # use
+        if use is not None:
+            item = QStandardItem()
+            item.setCheckable(True)
+            if use:
+                check_state = Qt.CheckState.Checked
+            else:
+                check_state = Qt.CheckState.Unchecked
+            item.setCheckState(check_state)
+            table.setChild(row, 0, item)
+
+        # name
+        if name is not None:
+            item = QStandardItem(name)
+            table.setChild(row, 1, item)
+
+        # init
+        if init is not None:
+            item = QStandardItem(init)
+            table.setChild(row, 2, item)
+
+        # lb
+        if lb is not None:
+            item = QStandardItem(lb)
+            table.setChild(row, 3, item)
+
+        # ub
+        if ub is not None:
+            item = QStandardItem(ub)
+            table.setChild(row, 4, item)
+
+        # test
+        if test is not None:
+            item = QStandardItem(test)
+            table.setChild(row, 5, item)
 
     def flags(self, index):
         if not index.isValid(): return super().flags(index)
@@ -196,3 +289,18 @@ class PrmModel(MyStandardItemAsTableModel):
                 return False
 
         return super().setData(index, value, role)
+
+    def get_variable_names(self, with_row=False) -> list[str]:
+        # get all variables in model
+        out = []
+        out1 = []
+        table: QStandardItem = self._item
+        for r in range(1, table.rowCount()):
+            # name
+            name = table.child(r, self.get_col_from_name(self.NAME)).text()
+            out.append(name)
+            out1.append(r)
+        if with_row:
+            return out, out1
+        else:
+            return out

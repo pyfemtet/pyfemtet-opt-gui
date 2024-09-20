@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>658</width>
-    <height>445</height>
+    <width>690</width>
+    <height>463</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -150,7 +150,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
   </widget>
   <widget class="QWizardPage" name="wizardPage2_model">
    <property name="subTitle">
-    <string>&lt;table class=MsoNormalTable border=0 cellspacing=0 cellpadding=0 width=&quot;83%&quot;  style='width:83.32%;border-collapse:collapse'&gt;  &lt;tr&gt;   &lt;td width=&quot;19%&quot; valign=top style='width:19.98%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;b&gt;&lt;i&gt;&lt;span style='color:#0987D5'&gt;モデル指定&lt;/span&gt;&lt;/i&gt;&lt;/b&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;20%&quot; valign=top style='width:20.0%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;変数指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;20%&quot; valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;目的指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;20%&quot; valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;実行設定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;19%&quot; valign=top style='width:19.96%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;確認&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;  &lt;/tr&gt; &lt;/table&gt;</string>
+    <string>&lt;html&gt;  &lt;head&gt; &lt;meta http-equiv=Content-Type content=&quot;text/html; charset=shift_jis&quot;&gt; &lt;meta name=Generator content=&quot;Microsoft Word 15 (filtered)&quot;&gt; &lt;style&gt; &lt;!--  /* Font Definitions */  @font-face 	{font-family:&quot;Cambria Math&quot;; 	panose-1:2 4 5 3 5 4 6 3 2 4;} @font-face 	{font-family:游明朝; 	panose-1:2 2 4 0 0 0 0 0 0 0;} @font-face 	{font-family:&quot;ＭＳ Ｐゴシック&quot;; 	panose-1:2 11 6 0 7 2 5 8 2 4;} @font-face 	{font-family:&quot;\@游明朝&quot;;} @font-face 	{font-family:&quot;\@ＭＳ Ｐゴシック&quot;;}  /* Style Definitions */  p.MsoNormal, li.MsoNormal, div.MsoNormal 	{margin:0mm; 	text-align:justify; 	text-justify:inter-ideograph; 	font-size:10.5pt; 	font-family:&quot;游明朝&quot;,serif;} .MsoChpDefault 	{font-size:10.0pt; 	font-family:&quot;游明朝&quot;,serif;} @page WordSection1 	{size:595.3pt 841.9pt; 	margin:99.25pt 30.0mm 30.0mm 30.0mm; 	layout-grid:18.0pt;} div.WordSection1 	{page:WordSection1;} --&gt; &lt;/style&gt;  &lt;/head&gt;  &lt;body lang=JA style='word-wrap:break-word;text-justify-trim:punctuation'&gt;  &lt;div class=WordSection1 style='layout-grid:18.0pt'&gt;  &lt;!-- 現在のページには style='color:#0987D5' と &lt;b&gt;&lt;i&gt; を設定する --&gt; &lt;table class=MsoNormalTable border=0 cellspacing=0 cellpadding=0 width=&quot;83%&quot;  style='width:83.32%;border-collapse:collapse'&gt;  &lt;tr&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:19.98%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt; &lt;b&gt;&lt;i&gt; &lt;span style='color:#0987D5'&gt;モデル指定&lt;/span&gt; &lt;/i&gt;&lt;/b&gt; &lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:20.0%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;変数指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;拘束指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;目的指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;実行設定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:19.96%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;確認&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;  &lt;/tr&gt; &lt;/table&gt;  &lt;p class=MsoNormal&gt;&lt;span lang=EN-US&gt;&amp;nbsp;&lt;/span&gt;&lt;/p&gt;  &lt;/div&gt;  &lt;/body&gt;  &lt;/html&gt; </string>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
@@ -285,7 +285,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
   </widget>
   <widget class="QWizardPage" name="wizardPage3_param">
    <property name="subTitle">
-    <string>&lt;table class=MsoNormalTable border=0 cellspacing=0 cellpadding=0 width=&quot;83%&quot;  style='width:83.32%;border-collapse:collapse'&gt;  &lt;tr&gt;   &lt;td width=&quot;19%&quot; valign=top style='width:19.98%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;モデル指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;20%&quot; valign=top style='width:20.0%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;b&gt;&lt;i&gt;&lt;span style='color:#0987D5'&gt;変数指定&lt;/span&gt;&lt;/i&gt;&lt;/b&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;20%&quot; valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;目的指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;20%&quot; valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;実行設定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;19%&quot; valign=top style='width:19.96%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;確認&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;  &lt;/tr&gt; &lt;/table&gt;</string>
+    <string>&lt;html&gt;  &lt;head&gt; &lt;meta http-equiv=Content-Type content=&quot;text/html; charset=shift_jis&quot;&gt; &lt;meta name=Generator content=&quot;Microsoft Word 15 (filtered)&quot;&gt; &lt;style&gt; &lt;!--  /* Font Definitions */  @font-face 	{font-family:&quot;Cambria Math&quot;; 	panose-1:2 4 5 3 5 4 6 3 2 4;} @font-face 	{font-family:游明朝; 	panose-1:2 2 4 0 0 0 0 0 0 0;} @font-face 	{font-family:&quot;ＭＳ Ｐゴシック&quot;; 	panose-1:2 11 6 0 7 2 5 8 2 4;} @font-face 	{font-family:&quot;\@游明朝&quot;;} @font-face 	{font-family:&quot;\@ＭＳ Ｐゴシック&quot;;}  /* Style Definitions */  p.MsoNormal, li.MsoNormal, div.MsoNormal 	{margin:0mm; 	text-align:justify; 	text-justify:inter-ideograph; 	font-size:10.5pt; 	font-family:&quot;游明朝&quot;,serif;} .MsoChpDefault 	{font-size:10.0pt; 	font-family:&quot;游明朝&quot;,serif;} @page WordSection1 	{size:595.3pt 841.9pt; 	margin:99.25pt 30.0mm 30.0mm 30.0mm; 	layout-grid:18.0pt;} div.WordSection1 	{page:WordSection1;} --&gt; &lt;/style&gt;  &lt;/head&gt;  &lt;body lang=JA style='word-wrap:break-word;text-justify-trim:punctuation'&gt;  &lt;div class=WordSection1 style='layout-grid:18.0pt'&gt;  &lt;!-- 現在のページには style='color:#0987D5' と &lt;b&gt;&lt;i&gt; を設定する --&gt; &lt;table class=MsoNormalTable border=0 cellspacing=0 cellpadding=0 width=&quot;83%&quot;  style='width:83.32%;border-collapse:collapse'&gt;  &lt;tr&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:19.98%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;モデル指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:20.0%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt; &lt;b&gt;&lt;i&gt; &lt;span style='color:#0987D5'&gt;変数指定&lt;/span&gt; &lt;/i&gt;&lt;/b&gt; &lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;拘束指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;目的指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;実行設定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:19.96%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;確認&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;  &lt;/tr&gt; &lt;/table&gt;  &lt;p class=MsoNormal&gt;&lt;span lang=EN-US&gt;&amp;nbsp;&lt;/span&gt;&lt;/p&gt;  &lt;/div&gt;  &lt;/body&gt;  &lt;/html&gt; </string>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_2">
     <item>
@@ -325,6 +325,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
         </property>
         <property name="horizontalScrollMode">
          <enum>QAbstractItemView::ScrollMode::ScrollPerPixel</enum>
+        </property>
+        <property name="sortingEnabled">
+         <bool>false</bool>
         </property>
         <attribute name="horizontalHeaderCascadingSectionResizes">
          <bool>true</bool>
@@ -391,9 +394,128 @@ li.checked::marker { content: &quot;\2612&quot;; }
     </item>
    </layout>
   </widget>
-  <widget class="QWizardPage" name="wizardPage4_obj">
+  <widget class="QWizardPage" name="wizardPage4_cns">
    <property name="subTitle">
-    <string>&lt;table class=MsoNormalTable border=0 cellspacing=0 cellpadding=0 width=&quot;83%&quot;  style='width:83.32%;border-collapse:collapse'&gt;  &lt;tr&gt;   &lt;td width=&quot;19%&quot; valign=top style='width:19.98%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;モデル指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;20%&quot; valign=top style='width:20.0%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;変数指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;20%&quot; valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;b&gt;&lt;i&gt;&lt;span style='color:#0987D5'&gt;目的指定&lt;/span&gt;&lt;/i&gt;&lt;/b&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;20%&quot; valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;実行設定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;19%&quot; valign=top style='width:19.96%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;確認&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;  &lt;/tr&gt; &lt;/table&gt;</string>
+    <string>&lt;html&gt;  &lt;head&gt; &lt;meta http-equiv=Content-Type content=&quot;text/html; charset=shift_jis&quot;&gt; &lt;meta name=Generator content=&quot;Microsoft Word 15 (filtered)&quot;&gt; &lt;style&gt; &lt;!--  /* Font Definitions */  @font-face 	{font-family:&quot;Cambria Math&quot;; 	panose-1:2 4 5 3 5 4 6 3 2 4;} @font-face 	{font-family:游明朝; 	panose-1:2 2 4 0 0 0 0 0 0 0;} @font-face 	{font-family:&quot;ＭＳ Ｐゴシック&quot;; 	panose-1:2 11 6 0 7 2 5 8 2 4;} @font-face 	{font-family:&quot;\@游明朝&quot;;} @font-face 	{font-family:&quot;\@ＭＳ Ｐゴシック&quot;;}  /* Style Definitions */  p.MsoNormal, li.MsoNormal, div.MsoNormal 	{margin:0mm; 	text-align:justify; 	text-justify:inter-ideograph; 	font-size:10.5pt; 	font-family:&quot;游明朝&quot;,serif;} .MsoChpDefault 	{font-size:10.0pt; 	font-family:&quot;游明朝&quot;,serif;} @page WordSection1 	{size:595.3pt 841.9pt; 	margin:99.25pt 30.0mm 30.0mm 30.0mm; 	layout-grid:18.0pt;} div.WordSection1 	{page:WordSection1;} --&gt; &lt;/style&gt;  &lt;/head&gt;  &lt;body lang=JA style='word-wrap:break-word;text-justify-trim:punctuation'&gt;  &lt;div class=WordSection1 style='layout-grid:18.0pt'&gt;  &lt;!-- 現在のページには style='color:#0987D5' と &lt;b&gt;&lt;i&gt; を設定する --&gt; &lt;table class=MsoNormalTable border=0 cellspacing=0 cellpadding=0 width=&quot;83%&quot;  style='width:83.32%;border-collapse:collapse'&gt;  &lt;tr&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:19.98%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;モデル指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:20.0%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;変数指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt; &lt;b&gt;&lt;i&gt; &lt;span style='color:#0987D5'&gt;拘束指定&lt;/span&gt; &lt;/i&gt;&lt;/b&gt; &lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;目的指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;実行設定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:19.96%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;確認&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;  &lt;/tr&gt; &lt;/table&gt;  &lt;p class=MsoNormal&gt;&lt;span lang=EN-US&gt;&amp;nbsp;&lt;/span&gt;&lt;/p&gt;  &lt;/div&gt;  &lt;/body&gt;  &lt;/html&gt; </string>
+   </property>
+   <layout class="QGridLayout" name="gridLayout_3">
+    <item row="0" column="1">
+     <widget class="QLabel" name="label_cnsList">
+      <property name="text">
+       <string>拘束式の一覧</string>
+      </property>
+      <property name="buddy">
+       <cstring>tableView_cnsList</cstring>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QTableView" name="tableView_cnsList">
+      <property name="frameShape">
+       <enum>QFrame::Shape::Panel</enum>
+      </property>
+      <property name="editTriggers">
+       <set>QAbstractItemView::EditTrigger::AnyKeyPressed|QAbstractItemView::EditTrigger::DoubleClicked|QAbstractItemView::EditTrigger::EditKeyPressed</set>
+      </property>
+      <property name="selectionMode">
+       <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
+      </property>
+      <property name="selectionBehavior">
+       <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
+      </property>
+      <property name="horizontalScrollMode">
+       <enum>QAbstractItemView::ScrollMode::ScrollPerPixel</enum>
+      </property>
+      <attribute name="horizontalHeaderCascadingSectionResizes">
+       <bool>true</bool>
+      </attribute>
+      <attribute name="horizontalHeaderHighlightSections">
+       <bool>false</bool>
+      </attribute>
+      <attribute name="horizontalHeaderStretchLastSection">
+       <bool>true</bool>
+      </attribute>
+      <attribute name="verticalHeaderVisible">
+       <bool>false</bool>
+      </attribute>
+     </widget>
+    </item>
+    <item row="0" column="0" rowspan="2">
+     <layout class="QVBoxLayout" name="verticalLayout_4">
+      <item>
+       <widget class="QPushButton" name="pushButton_2">
+        <property name="text">
+         <string>追加</string>
+        </property>
+        <property name="icon">
+         <iconset theme="QIcon::ThemeIcon::ListAdd"/>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton_3">
+        <property name="text">
+         <string>編集</string>
+        </property>
+        <property name="icon">
+         <iconset theme="QIcon::ThemeIcon::MailMessageNew"/>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pushButton">
+        <property name="text">
+         <string>削除</string>
+        </property>
+        <property name="icon">
+         <iconset theme="QIcon::ThemeIcon::ListRemove"/>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item row="4" column="0" colspan="2">
+     <widget class="QTextEdit" name="textEdit_7">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="sizeAdjustPolicy">
+       <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents</enum>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+      <property name="markdown">
+       <string>パラメータの組合せに制限を付けたい場合は、この画面で設定してください。
+
+この画面では、変数を組み合わせた式に対して上限・下限を決めることができます。
+
+必要なければ、「次へ」を押してください。
+
+</string>
+      </property>
+      <property name="html">
+       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;meta charset=&quot;utf-8&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+hr { height: 1px; border-width: 0; }
+li.unchecked::marker { content: &quot;\2610&quot;; }
+li.checked::marker { content: &quot;\2612&quot;; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Yu Gothic UI'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:6px; margin-bottom:6px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;パラメータの組合せに制限を付けたい場合は、この画面で設定してください。&lt;/p&gt;
+&lt;p style=&quot; margin-top:6px; margin-bottom:6px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;この画面では、変数を組み合わせた式に対して上限・下限を決めることができます。&lt;/p&gt;
+&lt;p style=&quot; margin-top:6px; margin-bottom:6px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;必要なければ、「次へ」を押してください。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QWizardPage" name="wizardPage5_obj">
+   <property name="subTitle">
+    <string>&lt;html&gt;  &lt;head&gt; &lt;meta http-equiv=Content-Type content=&quot;text/html; charset=shift_jis&quot;&gt; &lt;meta name=Generator content=&quot;Microsoft Word 15 (filtered)&quot;&gt; &lt;style&gt; &lt;!--  /* Font Definitions */  @font-face 	{font-family:&quot;Cambria Math&quot;; 	panose-1:2 4 5 3 5 4 6 3 2 4;} @font-face 	{font-family:游明朝; 	panose-1:2 2 4 0 0 0 0 0 0 0;} @font-face 	{font-family:&quot;ＭＳ Ｐゴシック&quot;; 	panose-1:2 11 6 0 7 2 5 8 2 4;} @font-face 	{font-family:&quot;\@游明朝&quot;;} @font-face 	{font-family:&quot;\@ＭＳ Ｐゴシック&quot;;}  /* Style Definitions */  p.MsoNormal, li.MsoNormal, div.MsoNormal 	{margin:0mm; 	text-align:justify; 	text-justify:inter-ideograph; 	font-size:10.5pt; 	font-family:&quot;游明朝&quot;,serif;} .MsoChpDefault 	{font-size:10.0pt; 	font-family:&quot;游明朝&quot;,serif;} @page WordSection1 	{size:595.3pt 841.9pt; 	margin:99.25pt 30.0mm 30.0mm 30.0mm; 	layout-grid:18.0pt;} div.WordSection1 	{page:WordSection1;} --&gt; &lt;/style&gt;  &lt;/head&gt;  &lt;body lang=JA style='word-wrap:break-word;text-justify-trim:punctuation'&gt;  &lt;div class=WordSection1 style='layout-grid:18.0pt'&gt;  &lt;!-- 現在のページには style='color:#0987D5' と &lt;b&gt;&lt;i&gt; を設定する --&gt; &lt;table class=MsoNormalTable border=0 cellspacing=0 cellpadding=0 width=&quot;83%&quot;  style='width:83.32%;border-collapse:collapse'&gt;  &lt;tr&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:19.98%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;モデル指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:20.0%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;変数指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;拘束指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt; &lt;b&gt;&lt;i&gt; &lt;span style='color:#0987D5'&gt;目的指定&lt;/span&gt; &lt;/i&gt;&lt;/b&gt; &lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;実行設定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:19.96%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;確認&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;  &lt;/tr&gt; &lt;/table&gt;  &lt;p class=MsoNormal&gt;&lt;span lang=EN-US&gt;&amp;nbsp;&lt;/span&gt;&lt;/p&gt;  &lt;/div&gt;  &lt;/body&gt;  &lt;/html&gt; </string>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_3">
     <item>
@@ -470,7 +592,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
   </widget>
   <widget class="QWizardPage" name="wizardPage6_run">
    <property name="subTitle">
-    <string>&lt;table class=MsoNormalTable border=0 cellspacing=0 cellpadding=0 width=&quot;83%&quot;  style='width:83.32%;border-collapse:collapse'&gt;  &lt;tr&gt;   &lt;td width=&quot;19%&quot; valign=top style='width:19.98%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;モデル指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;20%&quot; valign=top style='width:20.0%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;変数指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;20%&quot; valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;目的指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;20%&quot; valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;b&gt;&lt;i&gt;&lt;span style='color:#0987D5'&gt;実行設定&lt;/span&gt;&lt;/i&gt;&lt;/b&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;19%&quot; valign=top style='width:19.96%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;確認&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;  &lt;/tr&gt; &lt;/table&gt; </string>
+    <string>&lt;html&gt;  &lt;head&gt; &lt;meta http-equiv=Content-Type content=&quot;text/html; charset=shift_jis&quot;&gt; &lt;meta name=Generator content=&quot;Microsoft Word 15 (filtered)&quot;&gt; &lt;style&gt; &lt;!--  /* Font Definitions */  @font-face 	{font-family:&quot;Cambria Math&quot;; 	panose-1:2 4 5 3 5 4 6 3 2 4;} @font-face 	{font-family:游明朝; 	panose-1:2 2 4 0 0 0 0 0 0 0;} @font-face 	{font-family:&quot;ＭＳ Ｐゴシック&quot;; 	panose-1:2 11 6 0 7 2 5 8 2 4;} @font-face 	{font-family:&quot;\@游明朝&quot;;} @font-face 	{font-family:&quot;\@ＭＳ Ｐゴシック&quot;;}  /* Style Definitions */  p.MsoNormal, li.MsoNormal, div.MsoNormal 	{margin:0mm; 	text-align:justify; 	text-justify:inter-ideograph; 	font-size:10.5pt; 	font-family:&quot;游明朝&quot;,serif;} .MsoChpDefault 	{font-size:10.0pt; 	font-family:&quot;游明朝&quot;,serif;} @page WordSection1 	{size:595.3pt 841.9pt; 	margin:99.25pt 30.0mm 30.0mm 30.0mm; 	layout-grid:18.0pt;} div.WordSection1 	{page:WordSection1;} --&gt; &lt;/style&gt;  &lt;/head&gt;  &lt;body lang=JA style='word-wrap:break-word;text-justify-trim:punctuation'&gt;  &lt;div class=WordSection1 style='layout-grid:18.0pt'&gt;  &lt;!-- 現在のページには style='color:#0987D5' と &lt;b&gt;&lt;i&gt; を設定する --&gt; &lt;table class=MsoNormalTable border=0 cellspacing=0 cellpadding=0 width=&quot;83%&quot;  style='width:83.32%;border-collapse:collapse'&gt;  &lt;tr&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:19.98%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;モデル指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:20.0%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;変数指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;拘束指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;目的指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt; &lt;b&gt;&lt;i&gt; &lt;span style='color:#0987D5'&gt;実行設定&lt;/span&gt; &lt;/i&gt;&lt;/b&gt; &lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:19.96%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;確認&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;  &lt;/tr&gt; &lt;/table&gt;  &lt;p class=MsoNormal&gt;&lt;span lang=EN-US&gt;&amp;nbsp;&lt;/span&gt;&lt;/p&gt;  &lt;/div&gt;  &lt;/body&gt;  &lt;/html&gt; </string>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_5">
     <item>
@@ -535,7 +657,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
   </widget>
   <widget class="QWizardPage" name="wizardPage9_verify">
    <property name="subTitle">
-    <string>&lt;table class=MsoNormalTable border=0 cellspacing=0 cellpadding=0 width=&quot;83%&quot;  style='width:83.32%;border-collapse:collapse'&gt;  &lt;tr&gt;   &lt;td width=&quot;19%&quot; valign=top style='width:19.98%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;モデル指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;20%&quot; valign=top style='width:20.0%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;変数指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;20%&quot; valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;目的指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;20%&quot; valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;実行設定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;19%&quot; valign=top style='width:19.96%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;b&gt;&lt;i&gt;&lt;span style='color:#0987D5'&gt;確認&lt;/span&gt;&lt;/i&gt;&lt;/b&gt;&lt;/p&gt;   &lt;/td&gt;  &lt;/tr&gt; &lt;/table&gt; </string>
+    <string>&lt;html&gt;  &lt;head&gt; &lt;meta http-equiv=Content-Type content=&quot;text/html; charset=shift_jis&quot;&gt; &lt;meta name=Generator content=&quot;Microsoft Word 15 (filtered)&quot;&gt; &lt;style&gt; &lt;!--  /* Font Definitions */  @font-face 	{font-family:&quot;Cambria Math&quot;; 	panose-1:2 4 5 3 5 4 6 3 2 4;} @font-face 	{font-family:游明朝; 	panose-1:2 2 4 0 0 0 0 0 0 0;} @font-face 	{font-family:&quot;ＭＳ Ｐゴシック&quot;; 	panose-1:2 11 6 0 7 2 5 8 2 4;} @font-face 	{font-family:&quot;\@游明朝&quot;;} @font-face 	{font-family:&quot;\@ＭＳ Ｐゴシック&quot;;}  /* Style Definitions */  p.MsoNormal, li.MsoNormal, div.MsoNormal 	{margin:0mm; 	text-align:justify; 	text-justify:inter-ideograph; 	font-size:10.5pt; 	font-family:&quot;游明朝&quot;,serif;} .MsoChpDefault 	{font-size:10.0pt; 	font-family:&quot;游明朝&quot;,serif;} @page WordSection1 	{size:595.3pt 841.9pt; 	margin:99.25pt 30.0mm 30.0mm 30.0mm; 	layout-grid:18.0pt;} div.WordSection1 	{page:WordSection1;} --&gt; &lt;/style&gt;  &lt;/head&gt;  &lt;body lang=JA style='word-wrap:break-word;text-justify-trim:punctuation'&gt;  &lt;div class=WordSection1 style='layout-grid:18.0pt'&gt;  &lt;!-- 現在のページには style='color:#0987D5' と &lt;b&gt;&lt;i&gt; を設定する --&gt; &lt;table class=MsoNormalTable border=0 cellspacing=0 cellpadding=0 width=&quot;83%&quot;  style='width:83.32%;border-collapse:collapse'&gt;  &lt;tr&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:19.98%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;モデル指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:20.0%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;変数指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;拘束指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;目的指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;実行設定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:19.96%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt; &lt;b&gt;&lt;i&gt; &lt;span style='color:#0987D5'&gt;確認&lt;/span&gt; &lt;/i&gt;&lt;/b&gt; &lt;/p&gt;   &lt;/td&gt;  &lt;/tr&gt; &lt;/table&gt;  &lt;p class=MsoNormal&gt;&lt;span lang=EN-US&gt;&amp;nbsp;&lt;/span&gt;&lt;/p&gt;  &lt;/div&gt;  &lt;/body&gt;  &lt;/html&gt; </string>
    </property>
    <layout class="QGridLayout" name="gridLayout_2">
     <item row="4" column="1">
@@ -596,7 +718,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
        <set>QAbstractItemView::EditTrigger::NoEditTriggers</set>
       </property>
       <property name="wordWrap">
-       <bool>false</bool>
+       <bool>true</bool>
       </property>
       <property name="headerHidden">
        <bool>false</bool>
@@ -615,8 +737,8 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <slot>connect_process()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>433</x>
-     <y>195</y>
+     <x>413</x>
+     <y>249</y>
     </hint>
     <hint type="destinationlabel">
      <x>339</x>
@@ -648,7 +770,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <hints>
     <hint type="sourcelabel">
      <x>93</x>
-     <y>204</y>
+     <y>213</y>
     </hint>
     <hint type="destinationlabel">
      <x>64</x>
@@ -663,8 +785,8 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <slot>build_script()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>117</x>
-     <y>391</y>
+     <x>99</x>
+     <y>91</y>
     </hint>
     <hint type="destinationlabel">
      <x>165</x>
@@ -711,8 +833,8 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <slot>check_save_button_should_enabled()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>507</x>
-     <y>378</y>
+     <x>99</x>
+     <y>91</y>
     </hint>
     <hint type="destinationlabel">
      <x>343</x>
@@ -727,12 +849,60 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <slot>update_analysis_model()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>586</x>
-     <y>187</y>
+     <x>670</x>
+     <y>213</y>
     </hint>
     <hint type="destinationlabel">
      <x>553</x>
      <y>5</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_2</sender>
+   <signal>clicked()</signal>
+   <receiver>Wizard</receiver>
+   <slot>show_cns_dialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>66</x>
+     <y>124</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>65</x>
+     <y>36</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_3</sender>
+   <signal>clicked()</signal>
+   <receiver>Wizard</receiver>
+   <slot>show_cns_dialog_edit()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>73</x>
+     <y>198</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>230</x>
+     <y>435</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>Wizard</receiver>
+   <slot>remove_cns()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>52</x>
+     <y>276</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>82</x>
+     <y>440</y>
     </hint>
    </hints>
   </connection>
@@ -747,5 +917,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
   <slot>check_obj_used_any()</slot>
   <slot>check_save_button_should_enabled()</slot>
   <slot>update_analysis_model()</slot>
+  <slot>add_prm_to_cns_formula()</slot>
+  <slot>show_cns_dialog()</slot>
+  <slot>show_cns_dialog_edit()</slot>
+  <slot>remove_cns()</slot>
  </slots>
 </ui>

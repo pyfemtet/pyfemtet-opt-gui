@@ -21,6 +21,7 @@ class _WARNING(Enum):
     FEMTET_NO_PROJECT = '接続されている Femtet でプロジェクトが開かれていません。'  # when called from launch
     PARAMETER_NOT_SELECTED = '最低でもひとつの変数を選択してください。'
     OBJECTIVE_NOT_SELECTED = '最低でもひとつの目的関数を選択してください。'
+    PARAMETER_NOT_SELECTED_1 = '変数を選択してください。'
 
 
 class _ERROR(Enum):
@@ -30,7 +31,16 @@ class _ERROR(Enum):
     BOUND_NO_RANGE = '上限と下限が一致しています。変数の値を変更したくない場合は、use 列のチェックを外してください。'
     BOUND_INIT_OVER_UB = '初期値が上限を上回っています。'
     BOUND_INIT_UNDER_LB = '初期値が下限を下回っています。'
+    BOUND_LB_OVER_UB = '上下限の関係が間違っています。'
+    BOUND_EMPTY = '上限か下限のいずれかを指定してください。'
+    BOUND_INCOMPLETE = '上限と下限の両方を指定してください。'
     FEMTET_RECONSTRUCT_FAILED = 'Femtet でモデル再構築に失敗しました。'
+    SYNTAX_ERROR_CNS_FORMULA = '式の文法が間違っています。'
+    NOT_FLOAT = '数値に変換できません。'
+    OLD_PYFEMTET_VERSION = 'この機能は現在のバージョンの PyFemtet ではサポートされていません。`py -m pip install pyfemtet -U` コマンドで PyFemtet をアップデートしてください。'
+    UNDEFINED_FORMULA_NODE = '定義されていない変数、許可されていない関数または演算子が式に含まれています。'
+    DIRECTORY_NOT_EXISTS = '存在しないフォルダのパスが指定されました。'
+    NOT_AS_PYTHON_MODULE = '保存ファイル名は、以下の条件をすべて満たす必要があります。\n1. 半角の英数字及び _ 以外の文字を使わない\n2. 数字で始まらない'
 
 
 class ReturnCode:

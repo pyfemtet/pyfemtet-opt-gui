@@ -45,27 +45,27 @@ class ObjTableDelegate(QStyledItemDelegate):
         else:
             super().setModelData(editor, model, index)
 
-    def paint(self, painter, option, index):
-        col, row = index.column(), index.row()
-        col_name = self._model.get_col_name(col)
-        if col_name == '  direction  ':
-            # index...proxyindex
-            # _model...original
-            value = self._model.get_item(index.row()+1, index.column()).text()
-            combo = QComboBox()
-            combo.addItems([value])
-            combo.setCurrentText(value)
-            combo.setFrame(False)
-
-            painter.save()
-
-            painter.translate(option.rect.topLeft())
-            combo.resize(option.rect.size())
-            combo.render(painter, QPoint())
-
-            painter.restore()
-        else:
-            super().paint(painter, option, index)
+    # def paint(self, painter, option, index):
+    #     col, row = index.column(), index.row()
+    #     col_name = self._model.get_col_name(col)
+    #     if col_name == '  direction  ':
+    #         # index...proxyindex
+    #         # _model...original
+    #         value = self._model.get_item(index.row()+1, index.column()).text()
+    #         combo = QComboBox()
+    #         combo.addItems([value])
+    #         combo.setCurrentText(value)
+    #         combo.setFrame(False)
+    #
+    #         painter.save()
+    #
+    #         painter.translate(option.rect.topLeft())
+    #         combo.resize(option.rect.size())
+    #         combo.render(painter, QPoint())
+    #
+    #         painter.restore()
+    #     else:
+    #         super().paint(painter, option, index)
 
 
 class ObjModel(MyStandardItemAsTableModel):
@@ -84,7 +84,14 @@ class ObjModel(MyStandardItemAsTableModel):
     """
     HEADER = ['use', 'name', '  direction  ', 'set to']  # require margin to paint combobox to objective table, but its resizemode is ResizeToContent so setMargin doesn't work.
 
-    def load(self) -> ReturnCode:
+    def __init__(self, table_item: QStandardItem, root: QStandardItem, parent=None):
+        super().__init__(table_item, root, parent)
+        self.initialize_table()
+
+    def initialize_table(self):
+
+        self.beginResetModel()
+
         # initialize table
         self._item.clearData()
         self._item.setText(self._category)
@@ -93,43 +100,68 @@ class ObjModel(MyStandardItemAsTableModel):
         self.set_header(self.HEADER)
         self._root.setColumnCount(max(self._root.columnCount(), self._item.columnCount()))
 
+        self.endResetModel()
+
+    def load(self) -> ReturnCode:
+        # のちの処理で、ここの順番は Femtet から
+        # 取得した目的関数の順番をそのまま使う
+        # 前提の部分があるので、現在のデータを
+        # 別の形に保存し、目的関数を上書きして
+        # から書き戻す
+
         # if Femtet is not alive, do nothing
         if not _p.check_femtet_alive():
             return ReturnCode.ERROR.FEMTET_CONNECTION_FAILED
 
-        # load prm
+        # load objective names
         names = _p.get_parametric_output_names()
 
+        # if no objectives in Femtet, show error message
         if names is None:
             return ReturnCode.WARNING.PARAMETRIC_OUTPUT_EMPTY
-
         if len(names) == 0:
             return ReturnCode.WARNING.PARAMETRIC_OUTPUT_EMPTY
+
+        # declare
+        table: QStandardItem = self._item
+
+        # get current table state
+        current_data = self.get_current_table_as_dict()
 
         # notify to start editing to the abstract model
         self.beginResetModel()
 
+        # initialize
+        self.initialize_table()
+
         # set data to table
-        self._item.setRowCount(len(names)+1)  # including header row (hidden by WithoutHeader proxy).
+        table.setRowCount(len(names)+1)  # including header row (hidden by WithoutHeader proxy).
 
         for row, name in enumerate(names):
+
             # use
             item = QStandardItem()
             item.setCheckable(True)
             item.setCheckState(Qt.CheckState.Checked)
-            self._item.setChild(row+1, 0, item)
+            if name in current_data.keys():
+                item.setCheckState(current_data[name]['use'])
+            table.setChild(row+1, 0, item)
 
             # name
             item = QStandardItem(name)
-            self._item.setChild(row+1, 1, item)
+            table.setChild(row+1, 1, item)
 
             # direction
-            item = QStandardItem('maximize')  # TODO: load if previous setting exists
-            self._item.setChild(row+1, 2, item)
+            item = QStandardItem('maximize')
+            if name in current_data.keys():
+                item = QStandardItem(current_data[name]['direction'])
+            table.setChild(row+1, 2, item)
 
             # set to
             item = QStandardItem('(ignore) 0')
-            self._item.setChild(row+1, 3, item)
+            if name in current_data.keys():
+                item = QStandardItem(current_data[name]['set_to'])
+            table.setChild(row+1, 3, item)
 
         # notify to end editing to the abstract model
         self.endResetModel()
@@ -224,3 +256,43 @@ class ObjModel(MyStandardItemAsTableModel):
                 return False
 
         return super().setData(index, value, role)
+
+    def get_objective_names(self, with_row=False) -> list[str]:
+        # get all objective names in model
+        out = []
+        out1 = []
+        table: QStandardItem = self._item
+        for r in range(1, table.rowCount()):
+            # name
+            name = table.child(r, self.get_col_from_name('name')).text()
+            out.append(name)
+            out1.append(r)
+        if with_row:
+            return out, out1
+        else:
+            return out
+
+    def get_current_table_as_dict(self) -> dict:
+        out = dict()
+
+        table: QStandardItem = self._item
+        for r in range(1, table.rowCount()):
+            # name
+            name: str = table.child(r, self.get_col_from_name('name')).text()
+
+            # use
+            use: Qt.CheckState = table.child(r, self.get_col_from_name('use')).checkState()
+
+            # direction
+            direction: str = table.child(r, self.get_col_from_name('  direction  ')).text()
+
+            # set to
+            set_to: str = table.child(r, self.get_col_from_name('set to')).text()
+
+            out[name] = dict(
+                use=use,
+                direction=direction,
+                set_to=set_to,
+            )
+
+        return out

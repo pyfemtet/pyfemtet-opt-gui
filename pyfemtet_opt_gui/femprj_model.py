@@ -20,7 +20,7 @@ class FEMPrjModel(MyStandardItemAsTableModel):
     # use column is a dummy column
 
     """
-    HEADER = ['use', 'item', 'value']
+    HEADER = ['use', 'key', 'value']
     ROW_COUNT = 2
 
     def __init__(self, table_item: QStandardItem, root: QStandardItem, parent=None):

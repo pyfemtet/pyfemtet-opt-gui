@@ -3,15 +3,16 @@ from PySide6.QtCore import Qt
 from pyfemtet_opt_gui.problem_model import ProblemItemModel
 from pyfemtet_opt_gui.item_as_model import MyStandardItemAsTableModel
 from pyfemtet_opt_gui.prm_model import PrmModel
+from pyfemtet_opt_gui.cns_model import CnsModel
+from pyfemtet_opt_gui.expression_eval import extract_variables
 
 
-def get_header():
-    code = f'''
+def get_header(cns_model: CnsModel):
+    code = f'''from statistics import mean
 from pyfemtet.opt import FemtetInterface, OptunaOptimizer, FEMOpt
+{get_constraint(cns_model)}
 
-
-def main():
-'''
+def main():'''
     return code
 
 
@@ -21,6 +22,7 @@ def get_femopt(femprj_model: MyStandardItemAsTableModel, obj_model: MyStandardIt
     model_name = femprj_model.get_item(1, 2).text()
 
     code = f'''
+    # settings to open femtet and objectives
     femprj_path = r"{femprj_path}"
     model_name = "{model_name}"
     fem = FemtetInterface(
@@ -55,8 +57,46 @@ def get_femopt(femprj_model: MyStandardItemAsTableModel, obj_model: MyStandardIt
     return code
 
 
-def get_add_parameter(prm_model: PrmModel):
+def get_constraint(cns_model: CnsModel):
     code = ''
+
+    counter = 0
+
+    for row in range(cns_model.rowCount()):
+        use_col = cns_model.get_col_from_name(cns_model.USE)
+        use = cns_model.get_item(row, use_col).checkState()
+        if use == Qt.CheckState.Checked:  # uncheckable row (i.e. header) must be False
+            # get formula
+            col = cns_model.get_col_from_name(cns_model.FORMULA)
+            item = cns_model.get_item(row, col)
+            formula = item.text()
+
+            # format formula
+            formula = formula.replace('\n', '')
+
+            # get Name nodes from ast
+            variables: set = extract_variables(formula)
+
+            # create code snippet
+            counter += 1
+            code += f'''
+
+def constraint_{counter}(Femtet):'''
+
+            for var in variables:
+                code += f'''
+    {var} = Femtet.GetVariableValue("{var}")'''
+
+            code += f'''
+    return {formula}
+'''
+
+    return code
+
+
+def get_add_parameter(prm_model: PrmModel):
+    code = '''
+    # parameter setting'''
 
     for row in range(prm_model.rowCount()):
         use_col = prm_model.get_col_from_name(prm_model.USE)
@@ -77,8 +117,64 @@ def get_add_parameter(prm_model: PrmModel):
     return code
 
 
+def get_add_constraint(cns_model: CnsModel):
+    code = '''
+    
+    # constraints setting'''
+
+    counter = 0
+
+    for row in range(cns_model.rowCount()):
+        use_col = cns_model.get_col_from_name(cns_model.USE)
+        use = cns_model.get_item(row, use_col).checkState()
+
+        if use == Qt.CheckState.Checked:  # uncheckable row (i.e. header) must be False
+            # get name
+            col = cns_model.get_col_from_name(cns_model.NAME)
+            item = cns_model.get_item(row, col)
+
+            if item.text() == cns_model.AUTOMATIC_CNS_NAME:
+                name = None
+            elif not item.text():
+                name = None
+            else:
+                name = f'"{item.text()}"'
+
+            # get function
+            counter += 1
+            func_name: str = f'constraint_{counter}'
+
+            # get lb
+            col = cns_model.get_col_from_name(cns_model.LB)
+            item = cns_model.get_item(row, col)
+            lb: str = item.text() if item.text() else 'None'
+
+            # get ub
+            col = cns_model.get_col_from_name(cns_model.UB)
+            item = cns_model.get_item(row, col)
+            ub: str = item.text() if item.text() else 'None'
+
+            # get strict
+            col = cns_model.get_col_from_name(cns_model.STRICT)
+            item = cns_model.get_item(row, col)
+            strict: str = 'True' if item.checkState() == Qt.CheckState.Checked else 'False'
+
+            # create code
+            code += f'''
+    femopt.add_constraint(
+        fun={func_name},
+        name={name},
+        lower_bound={lb},
+        upper_bound={ub},
+        strict={strict},
+    )'''
+    return code
+
+
 def get_optimize(run_model: MyStandardItemAsTableModel):
     code = '''
+    
+    # run optimization
     femopt.optimize('''
 
     for row in range(1, run_model.rowCount()):  # exclude header row
@@ -101,20 +197,14 @@ def get_optimize(run_model: MyStandardItemAsTableModel):
             code += f'''
         {arg_name}={arg_value},'''
     code += '''
-    )
-    
-    print('================================')
-    print('Finished. Press Enter to quit...')
-    print('================================')
-    input()
-
-    femopt.terminate_all()
-'''
+    )'''
     return code
 
 
 def get_entry_point():
     code = f'''
+
+
 if __name__ == '__main__':
     main()
 '''
@@ -124,9 +214,10 @@ if __name__ == '__main__':
 def build_script_main(model: ProblemItemModel, path: str, with_run=False):
     code = ''
 
-    code += get_header()
+    code += get_header(model.cns_model)
     code += get_femopt(model.femprj_model, model.obj_model)
     code += get_add_parameter(model.prm_model)
+    code += get_add_constraint(model.cns_model)
     code += get_optimize(model.run_model)
     code += get_entry_point()
 
@@ -135,13 +226,20 @@ def build_script_main(model: ProblemItemModel, path: str, with_run=False):
         f.write(code)
 
     if with_run:
+        # Femtet との接続は一度に一プロセスで、
+        # 現在のプロセスが解放されない限り新しい
+        # Femtet が必要なので現在のプロセスで実行する
+
+        # 以下の方法は PyFemtet 内でファイルが存在する
+        # ことを前提に inspect などで処理する機能が
+        # 動作しないので実装してはいけない
+        # exec(code)
+
         import os
         import sys
         there, it = os.path.split(path)
         module_name = os.path.splitext(it)[0]
-        os.chdir(there)
+        os.chdir(there)  # csv 保存ディレクトリを分かりやすくするためカレントディレクトリを変更
         sys.path.append(there)
-        exec(f'import {module_name}; {module_name}.main()')
-
-
+        exec(f'from {module_name} import *; main()')
 

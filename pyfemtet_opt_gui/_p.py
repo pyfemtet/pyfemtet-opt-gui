@@ -23,7 +23,9 @@ def connect_femtet():
 
         # launch new Femtet if no Femtet
         if len(pids) == 0:
-            Femtet, pid = launch_and_dispatch_femtet()
+            Femtet, pid = launch_and_dispatch_femtet(
+                strictly_pid_specify=False
+            )
 
         # try to connect existing Femtet if exists
         else:

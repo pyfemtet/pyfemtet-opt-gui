@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Dialog</class>
+ <widget class="QDialog" name="Dialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>550</width>
+    <height>271</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QLabel" name="label_prmOnCns">
+     <property name="text">
+      <string>変数一覧</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="2" colspan="3">
+    <widget class="QLineEdit" name="lineEdit_name">
+     <property name="minimumSize">
+      <size>
+       <width>171</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="placeholderText">
+      <string>拘束名（空欄時は自動命名）</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QPushButton" name="pushButton_loadPrmOnCns">
+     <property name="maximumSize">
+      <size>
+       <width>75</width>
+       <height>24</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>Load</string>
+     </property>
+     <property name="icon">
+      <iconset theme="QIcon::ThemeIcon::GoDown"/>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2">
+    <widget class="QLineEdit" name="lineEdit_lb">
+     <property name="maximumSize">
+      <size>
+       <width>81</width>
+       <height>21</height>
+      </size>
+     </property>
+     <property name="toolTip">
+      <string>上限と下限のいずれかの入力が必須です。</string>
+     </property>
+     <property name="placeholderText">
+      <string>下限を入力</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="3">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>&lt;= 式 &lt;=</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignmentFlag::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="4" colspan="2">
+    <widget class="QLineEdit" name="lineEdit_ub">
+     <property name="maximumSize">
+      <size>
+       <width>81</width>
+       <height>21</height>
+      </size>
+     </property>
+     <property name="toolTip">
+      <string>上限と下限のいずれかの入力が必須です。</string>
+     </property>
+     <property name="placeholderText">
+      <string>上限を入力</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="2" colspan="4">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="pushButton">
+       <property name="maximumSize">
+        <size>
+         <width>75</width>
+         <height>24</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>max()</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_2">
+       <property name="maximumSize">
+        <size>
+         <width>75</width>
+         <height>24</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>min()</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_3">
+       <property name="maximumSize">
+        <size>
+         <width>75</width>
+         <height>24</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>mean()</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="5" column="5">
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Orientation::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::StandardButton::Cancel|QDialogButtonBox::StandardButton::Ok</set>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QPushButton" name="pushButton_addPrmToCns">
+     <property name="maximumSize">
+      <size>
+       <width>31</width>
+       <height>24</height>
+      </size>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset theme="QIcon::ThemeIcon::DocumentSend"/>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0" rowspan="3">
+    <widget class="QTableView" name="tableView_prmsOnCns">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Maximum" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="sizeAdjustPolicy">
+      <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents</enum>
+     </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::SelectionMode::SingleSelection</enum>
+     </property>
+     <property name="selectionBehavior">
+      <enum>QAbstractItemView::SelectionBehavior::SelectRows</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="2" rowspan="2" colspan="4">
+    <widget class="QPlainTextEdit" name="plainTextEdit_cnsFormula">
+     <property name="placeholderText">
+      <string>式を入力   例：(a + max(b, c)) * d   改行可</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>Dialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>540</x>
+     <y>261</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>270</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>Dialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>540</x>
+     <y>261</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>270</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_loadPrmOnCns</sender>
+   <signal>clicked()</signal>
+   <receiver>Dialog</receiver>
+   <slot>update_problem()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>67</x>
+     <y>47</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>119</x>
+     <y>29</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_addPrmToCns</sender>
+   <signal>clicked()</signal>
+   <receiver>Dialog</receiver>
+   <slot>add_prm_to_cns_formula()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>117</x>
+     <y>89</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>171</x>
+     <y>119</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>Dialog</receiver>
+   <slot>add_max_to_cns_formula()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>219</x>
+     <y>213</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>199</x>
+     <y>243</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_2</sender>
+   <signal>clicked()</signal>
+   <receiver>Dialog</receiver>
+   <slot>add_min_to_cns_formula()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>309</x>
+     <y>219</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>250</x>
+     <y>243</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_3</sender>
+   <signal>clicked()</signal>
+   <receiver>Dialog</receiver>
+   <slot>add_mean_to_cns_formula()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>437</x>
+     <y>219</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>386</x>
+     <y>221</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>update_problem()</slot>
+  <slot>add_prm_to_cns_formula()</slot>
+  <slot>add_max_to_cns_formula()</slot>
+  <slot>add_min_to_cns_formula()</slot>
+  <slot>add_mean_to_cns_formula()</slot>
+ </slots>
+</ui>

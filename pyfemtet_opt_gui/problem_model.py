@@ -2,6 +2,7 @@ from PySide6.QtGui import QStandardItemModel, QStandardItem, QFont
 from PySide6.QtCore import Qt, QSortFilterProxyModel
 
 from pyfemtet_opt_gui.prm_model import PrmModel
+from pyfemtet_opt_gui.cns_model import CnsModel
 from pyfemtet_opt_gui.obj_model import ObjModel
 from pyfemtet_opt_gui.run_model import RunModel
 from pyfemtet_opt_gui.femprj_model import FEMPrjModel
@@ -15,15 +16,15 @@ class ProblemItemModel(QStandardItemModel):
         # standard item
         self.femprj_item: QStandardItem = self.append_table_item('model')
         self.prm_item: QStandardItem = self.append_table_item('parameter')
+        self.cns_item: QStandardItem = self.append_table_item('constraint')
         self.obj_item: QStandardItem = self.append_table_item('objective')
-        # self.cns_item: QStandardItem = self.append_table_item('constraint')
         self.run_item: QStandardItem = self.append_table_item('settings')
 
         # standard item model to view in tableview
         self.femprj_model: FEMPrjModel = FEMPrjModel(self.femprj_item, self.root)
         self.prm_model: PrmModel = PrmModel(self.prm_item, self.root)
+        self.cns_model: CnsModel = CnsModel(self.cns_item, self.root)
         self.obj_model: ObjModel = ObjModel(self.obj_item, self.root)
-        # self.cns_model: QAbstractTableModel = MyStandardItemAsTableModel(self.cns_item)
         self.run_model: RunModel = RunModel(self.run_item, self.root)
 
     def append_table_item(self, text) -> QStandardItem:
@@ -63,7 +64,7 @@ class CustomProxyModel(QSortFilterProxyModel):
             if not item.isCheckable():
                 return False
 
-        # invisible if unchecked
+        # invisible if use is unchecked
         first_column_index = sourceModel.index(source_row, 0, source_parent)
         first_column_data = first_column_index.data(Qt.ItemDataRole.CheckStateRole)
         if first_column_data == Qt.CheckState.Unchecked.value:
@@ -77,46 +78,43 @@ class CustomProxyModel(QSortFilterProxyModel):
         return Qt.ItemFlag.ItemIsEnabled
 
     def data(self, proxyIndex, role=Qt.ItemDataRole.DisplayRole):
-        sourceIndex = self.mapToSource(proxyIndex)
-        sourceModel: ProblemItemModel = self.sourceModel()
+        sourceIndex = self.mapToSource(proxyIndex)  # index of ProblemItemModel
+        sourceModel: ProblemItemModel = self.sourceModel()  # ProblemItemModel
         item = sourceModel.itemFromIndex(sourceIndex)
 
-        # invisible checkbox
-        if item.isCheckable():
-            return None
+        # ===== style =====
 
-        # invisible header item 'use'
-        if item.text() == 'use':
-            return None
+        # hide checkbox if column 0 (perhaps this is use column)
+        if role == Qt.ItemDataRole.CheckStateRole:
+            # if sourceIndex.column() == 0:
+                return None
 
-        # invisible item its header is 'test'
-        is_prm_model = sourceIndex.parent().data() == sourceModel.prm_item.text()
-        is_test_column = sourceIndex.column() == sourceModel.prm_model.get_col_from_name(sourceModel.prm_model.TEST)
-        if is_prm_model and is_test_column:
-            return None
+        # alignment
+        if role == Qt.ItemDataRole.TextAlignmentRole:
+            return Qt.AlignmentFlag.AlignCenter
 
         # bold if header row
-        for __ in range(1):  # dummy loop to use if-break
+        if role == Qt.ItemDataRole.FontRole:
 
-            if (sourceIndex.row() == 0) and (sourceIndex.column() > 0):
+            # femprj_model have no header row
+            if sourceIndex.parent().data() != sourceModel.femprj_item.text():
 
-                # only femprj_model have no header row
-                if sourceIndex.parent().data() == sourceModel.femprj_item.text():
-                    break
-
-                if role == Qt.ItemDataRole.FontRole:
+                if (sourceIndex.row() == 0) and (sourceIndex.column() > 0):
                     font = QFont()
                     font.setBold(True)
                     font.setItalic(True)
                     return font
 
-        # invisible if contains (ignore)
-        if '(ignore)' in item.text():
-            return None
+        # ===== common =====
 
-        # if all objectives set to (ignore), hide 'set to'
-        if item.text() == 'set to':
-            if role == Qt.ItemDataRole.DisplayRole:
+        if role == Qt.ItemDataRole.DisplayRole:
+
+            # hide header item 'use'
+            if item.text() == 'use':
+                return None
+
+            # if all objectives set to (ignore), hide 'set to' from entire table
+            if item.text() == 'set to':
                 unused = []
                 col = sourceModel.obj_model.get_col_from_name('set to')
                 for row in range(1, sourceModel.obj_model.rowCount()):
@@ -124,8 +122,38 @@ class CustomProxyModel(QSortFilterProxyModel):
                 if all(unused):
                     return None
 
-        # alignment
-        if role == Qt.ItemDataRole.TextAlignmentRole:
-            return Qt.AlignmentFlag.AlignCenter
+            # ===== prm_model =====
+            if sourceIndex.parent().data() == sourceModel.prm_item.text():
+
+                # hide if its header is 'test'
+                if sourceIndex.column() == sourceModel.prm_model.get_col_from_name(sourceModel.prm_model.TEST):
+                    return None
+
+            # ===== cns_model =====
+            if sourceIndex.parent().data() == sourceModel.cns_item.text():
+
+                # show yes/no if checkable
+                if item.isCheckable():
+                    if sourceIndex.column() == 0:
+                        return None
+                    if item.checkState() == Qt.CheckState.Checked:
+                        return 'Yes'
+                    else:
+                        return 'No'
+
+            # ===== obj_model =====
+            if sourceIndex.parent().data() == sourceModel.obj_item.text():
+
+                # hide if contains (ignore)
+                if '(ignore)' in item.text():
+                    return None
+
+
+            # ===== run_model =====
+            if sourceIndex.parent().data() == sourceModel.run_item.text():
+
+                # hide if its header is 'description'
+                if sourceIndex.column() == sourceModel.run_model.get_col_from_name('description'):
+                    return None
 
         return super().data(proxyIndex, role)
