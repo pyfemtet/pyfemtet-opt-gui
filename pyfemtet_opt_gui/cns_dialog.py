@@ -107,7 +107,7 @@ class ConstraintInputDialog(QDialog):
         ret_code = self.wizard._problem.prm_model.load()
 
         # cns ページの中で使う prm tableView に設定
-        from cns_model import PrmProxyModelForCns
+        from pyfemtet_opt_gui.cns_model import PrmProxyModelForCns
         model = self.wizard._problem.prm_model
         proxy_model_for_cns = PrmProxyModelForCns(model)
         proxy_model_for_cns.setSourceModel(model)
