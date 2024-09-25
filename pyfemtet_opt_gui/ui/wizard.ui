@@ -517,18 +517,48 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <property name="subTitle">
     <string>&lt;html&gt;  &lt;head&gt; &lt;meta http-equiv=Content-Type content=&quot;text/html; charset=shift_jis&quot;&gt; &lt;meta name=Generator content=&quot;Microsoft Word 15 (filtered)&quot;&gt; &lt;style&gt; &lt;!--  /* Font Definitions */  @font-face 	{font-family:&quot;Cambria Math&quot;; 	panose-1:2 4 5 3 5 4 6 3 2 4;} @font-face 	{font-family:游明朝; 	panose-1:2 2 4 0 0 0 0 0 0 0;} @font-face 	{font-family:&quot;ＭＳ Ｐゴシック&quot;; 	panose-1:2 11 6 0 7 2 5 8 2 4;} @font-face 	{font-family:&quot;\@游明朝&quot;;} @font-face 	{font-family:&quot;\@ＭＳ Ｐゴシック&quot;;}  /* Style Definitions */  p.MsoNormal, li.MsoNormal, div.MsoNormal 	{margin:0mm; 	text-align:justify; 	text-justify:inter-ideograph; 	font-size:10.5pt; 	font-family:&quot;游明朝&quot;,serif;} .MsoChpDefault 	{font-size:10.0pt; 	font-family:&quot;游明朝&quot;,serif;} @page WordSection1 	{size:595.3pt 841.9pt; 	margin:99.25pt 30.0mm 30.0mm 30.0mm; 	layout-grid:18.0pt;} div.WordSection1 	{page:WordSection1;} --&gt; &lt;/style&gt;  &lt;/head&gt;  &lt;body lang=JA style='word-wrap:break-word;text-justify-trim:punctuation'&gt;  &lt;div class=WordSection1 style='layout-grid:18.0pt'&gt;  &lt;!-- 現在のページには style='color:#0987D5' と &lt;b&gt;&lt;i&gt; を設定する --&gt; &lt;table class=MsoNormalTable border=0 cellspacing=0 cellpadding=0 width=&quot;83%&quot;  style='width:83.32%;border-collapse:collapse'&gt;  &lt;tr&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:19.98%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;モデル指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:20.0%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;変数指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;拘束指定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt; &lt;b&gt;&lt;i&gt; &lt;span style='color:#0987D5'&gt;目的指定&lt;/span&gt; &lt;/i&gt;&lt;/b&gt; &lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;実行設定&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;   &lt;td width=&quot;16%&quot; valign=top style='width:19.96%;padding:0mm 5.4pt 0mm 5.4pt'&gt;   &lt;p class=MsoNormal&gt;&lt;span style='color:#7F7F7F'&gt;確認&lt;/span&gt;&lt;/p&gt;   &lt;/td&gt;  &lt;/tr&gt; &lt;/table&gt;  &lt;p class=MsoNormal&gt;&lt;span lang=EN-US&gt;&amp;nbsp;&lt;/span&gt;&lt;/p&gt;  &lt;/div&gt;  &lt;/body&gt;  &lt;/html&gt; </string>
    </property>
-   <layout class="QVBoxLayout" name="verticalLayout_3">
-    <item>
+   <layout class="QGridLayout" name="gridLayout_4">
+    <item row="0" column="0">
      <layout class="QHBoxLayout" name="horizontalLayout_3">
       <item>
-       <widget class="QPushButton" name="pushButton_load_obj">
-        <property name="text">
-         <string>Load</string>
-        </property>
-        <property name="icon">
-         <iconset theme="QIcon::ThemeIcon::GoDown"/>
-        </property>
-       </widget>
+       <layout class="QVBoxLayout" name="verticalLayout_7">
+        <item>
+         <spacer name="verticalSpacer_4">
+          <property name="orientation">
+           <enum>Qt::Orientation::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButton_load_obj">
+          <property name="text">
+           <string>Load</string>
+          </property>
+          <property name="icon">
+           <iconset theme="QIcon::ThemeIcon::GoDown"/>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Orientation::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
       </item>
       <item>
        <widget class="QTableView" name="tableView_obj">
@@ -560,13 +590,19 @@ li.checked::marker { content: &quot;\2612&quot;; }
       </item>
      </layout>
     </item>
-    <item>
+    <item row="1" column="0">
      <widget class="QTextEdit" name="textEdit_3">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
+      </property>
+      <property name="toolTip">
+       <string/>
+      </property>
+      <property name="whatsThis">
+       <string/>
       </property>
       <property name="sizeAdjustPolicy">
        <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents</enum>
@@ -585,6 +621,19 @@ li.checked::marker { content: &quot;\2612&quot;; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;最適化する目的関数を選んでください。&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;※ Femtet のパラメトリック解析ダイアログで目的関数を定義してください。&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;※ &lt;span style=&quot; font-weight:700;&quot;&gt;最適化実行前に既存のスイープテーブルを削除してください。&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QCommandLinkButton" name="commandLinkButton">
+      <property name="text">
+       <string>パラメトリック解析の使い方を確認する（インターネットリンク）</string>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>20</width>
+        <height>20</height>
+       </size>
       </property>
      </widget>
     </item>
@@ -769,8 +818,8 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <slot>update_problem()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>93</x>
-     <y>213</y>
+     <x>94</x>
+     <y>184</y>
     </hint>
     <hint type="destinationlabel">
      <x>64</x>
@@ -785,8 +834,8 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <slot>build_script()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>99</x>
-     <y>91</y>
+     <x>46</x>
+     <y>82</y>
     </hint>
     <hint type="destinationlabel">
      <x>165</x>
@@ -821,8 +870,8 @@ li.checked::marker { content: &quot;\2612&quot;; }
      <y>424</y>
     </hint>
     <hint type="destinationlabel">
-     <x>99</x>
-     <y>91</y>
+     <x>90</x>
+     <y>70</y>
     </hint>
    </hints>
   </connection>
@@ -833,8 +882,8 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <slot>check_save_button_should_enabled()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>99</x>
-     <y>91</y>
+     <x>90</x>
+     <y>82</y>
     </hint>
     <hint type="destinationlabel">
      <x>343</x>
@@ -906,6 +955,22 @@ li.checked::marker { content: &quot;\2612&quot;; }
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>commandLinkButton</sender>
+   <signal>clicked()</signal>
+   <receiver>Wizard</receiver>
+   <slot>show_how_to_setting_parametric()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>170</x>
+     <y>393</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>112</x>
+     <y>24</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <signal>process_loaded()</signal>
@@ -921,5 +986,6 @@ li.checked::marker { content: &quot;\2612&quot;; }
   <slot>show_cns_dialog()</slot>
   <slot>show_cns_dialog_edit()</slot>
   <slot>remove_cns()</slot>
+  <slot>show_how_to_setting_parametric()</slot>
  </slots>
 </ui>

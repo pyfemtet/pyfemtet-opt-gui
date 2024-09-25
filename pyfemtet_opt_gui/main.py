@@ -386,6 +386,15 @@ class MainWizard(QWizard):
         cns_model: CnsModel = proxy_model.sourceModel()
         cns_model.remove_constraint(row)
 
+    def show_how_to_setting_parametric(self):
+        import webbrowser
+        version_string = _p.Femtet.Version
+        major, minor, *_ = version_string.split('.')
+        if int(major) < 2024:
+            major = 2024
+            minor = 0
+        webbrowser.open(f'https://www.muratasoftware.com/products/mainhelp/mainhelp{major}_{minor}/desktop/ParametricAnalysis/ResultOutputSettings.html')
+
 
 # noinspection PyAttributeOutsideInit
 class OptimizationWorker(QThread):

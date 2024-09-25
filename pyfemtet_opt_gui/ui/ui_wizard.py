@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'wizardYdDFmT.ui'
+## Form generated from reading UI file 'wizardICFQMm.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.7.1
+## Created by: Qt User Interface Compiler version 6.7.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -16,11 +16,11 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QAbstractItemView, QAbstractScrollArea, QApplication, QCheckBox,
-    QFormLayout, QFrame, QGridLayout, QHBoxLayout,
-    QHeaderView, QLabel, QPlainTextEdit, QPushButton,
-    QSizePolicy, QSpacerItem, QTableView, QTextEdit,
-    QTreeView, QVBoxLayout, QWidget, QWizard,
-    QWizardPage)
+    QCommandLinkButton, QFormLayout, QFrame, QGridLayout,
+    QHBoxLayout, QHeaderView, QLabel, QPlainTextEdit,
+    QPushButton, QSizePolicy, QSpacerItem, QTableView,
+    QTextEdit, QTreeView, QVBoxLayout, QWidget,
+    QWizard, QWizardPage)
 
 class Ui_Wizard(object):
     def setupUi(self, Wizard):
@@ -257,15 +257,28 @@ class Ui_Wizard(object):
         Wizard.addPage(self.wizardPage4_cns)
         self.wizardPage5_obj = QWizardPage()
         self.wizardPage5_obj.setObjectName(u"wizardPage5_obj")
-        self.verticalLayout_3 = QVBoxLayout(self.wizardPage5_obj)
-        self.verticalLayout_3.setObjectName(u"verticalLayout_3")
+        self.gridLayout_4 = QGridLayout(self.wizardPage5_obj)
+        self.gridLayout_4.setObjectName(u"gridLayout_4")
         self.horizontalLayout_3 = QHBoxLayout()
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
+        self.verticalLayout_7 = QVBoxLayout()
+        self.verticalLayout_7.setObjectName(u"verticalLayout_7")
+        self.verticalSpacer_4 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.verticalLayout_7.addItem(self.verticalSpacer_4)
+
         self.pushButton_load_obj = QPushButton(self.wizardPage5_obj)
         self.pushButton_load_obj.setObjectName(u"pushButton_load_obj")
         self.pushButton_load_obj.setIcon(icon)
 
-        self.horizontalLayout_3.addWidget(self.pushButton_load_obj)
+        self.verticalLayout_7.addWidget(self.pushButton_load_obj)
+
+        self.verticalSpacer_3 = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.verticalLayout_7.addItem(self.verticalSpacer_3)
+
+
+        self.horizontalLayout_3.addLayout(self.verticalLayout_7)
 
         self.tableView_obj = QTableView(self.wizardPage5_obj)
         self.tableView_obj.setObjectName(u"tableView_obj")
@@ -281,7 +294,7 @@ class Ui_Wizard(object):
         self.horizontalLayout_3.addWidget(self.tableView_obj)
 
 
-        self.verticalLayout_3.addLayout(self.horizontalLayout_3)
+        self.gridLayout_4.addLayout(self.horizontalLayout_3, 0, 0, 1, 1)
 
         self.textEdit_3 = QTextEdit(self.wizardPage5_obj)
         self.textEdit_3.setObjectName(u"textEdit_3")
@@ -290,7 +303,13 @@ class Ui_Wizard(object):
         self.textEdit_3.setSizeAdjustPolicy(QAbstractScrollArea.SizeAdjustPolicy.AdjustToContents)
         self.textEdit_3.setReadOnly(True)
 
-        self.verticalLayout_3.addWidget(self.textEdit_3)
+        self.gridLayout_4.addWidget(self.textEdit_3, 1, 0, 1, 1)
+
+        self.commandLinkButton = QCommandLinkButton(self.wizardPage5_obj)
+        self.commandLinkButton.setObjectName(u"commandLinkButton")
+        self.commandLinkButton.setIconSize(QSize(20, 20))
+
+        self.gridLayout_4.addWidget(self.commandLinkButton, 2, 0, 1, 1)
 
         Wizard.addPage(self.wizardPage5_obj)
         self.wizardPage6_run = QWizardPage()
@@ -381,6 +400,7 @@ class Ui_Wizard(object):
         self.pushButton_2.clicked.connect(Wizard.show_cns_dialog)
         self.pushButton_3.clicked.connect(Wizard.show_cns_dialog_edit)
         self.pushButton.clicked.connect(Wizard.remove_cns)
+        self.commandLinkButton.clicked.connect(Wizard.show_how_to_setting_parametric)
 
         QMetaObject.connectSlotsByName(Wizard)
     # setupUi
@@ -491,6 +511,12 @@ class Ui_Wizard(object):
                         "ang=JA style='word-wrap:break-word;text-justify-trim:punctuation'>  <div class=WordSection1 style='layout-grid:18.0pt'>  <!-- \u73fe\u5728\u306e\u30da\u30fc\u30b8\u306b\u306f style='color:#0987D5' \u3068 <b><i> \u3092\u8a2d\u5b9a\u3059\u308b --> <table class=MsoNormalTable border=0 cellspacing=0 cellpadding=0 width=\"83%\"  style='width:83.32%;border-collapse:collapse'>  <tr>   <td width=\"16%\" valign=top style='width:19.98%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><span style='color:#7F7F7F'>\u30e2\u30c7\u30eb\u6307\u5b9a</span></p>   </td>   <td width=\"16%\" valign=top style='width:20.0%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><span style='color:#7F7F7F'>\u5909\u6570\u6307\u5b9a</span></p>   </td>   <td width=\"16%\" valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><span style='color:#7F7F7F'>\u62d8\u675f\u6307\u5b9a</span></p>   </td>   <td width=\"16%\" valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal> <b><i> <span sty"
                         "le='color:#0987D5'>\u76ee\u7684\u6307\u5b9a</span> </i></b> </p>   </td>   <td width=\"16%\" valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><span style='color:#7F7F7F'>\u5b9f\u884c\u8a2d\u5b9a</span></p>   </td>   <td width=\"16%\" valign=top style='width:19.96%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><span style='color:#7F7F7F'>\u78ba\u8a8d</span></p>   </td>  </tr> </table>  <p class=MsoNormal><span lang=EN-US>&nbsp;</span></p>  </div>  </body>  </html> ", None))
         self.pushButton_load_obj.setText(QCoreApplication.translate("Wizard", u"Load", None))
+#if QT_CONFIG(tooltip)
+        self.textEdit_3.setToolTip("")
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(whatsthis)
+        self.textEdit_3.setWhatsThis("")
+#endif // QT_CONFIG(whatsthis)
         self.textEdit_3.setHtml(QCoreApplication.translate("Wizard", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><meta charset=\"utf-8\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
@@ -502,6 +528,7 @@ class Ui_Wizard(object):
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">\u203b Femtet \u306e\u30d1\u30e9\u30e1\u30c8\u30ea\u30c3\u30af\u89e3\u6790\u30c0\u30a4\u30a2\u30ed\u30b0\u3067\u76ee\u7684\u95a2\u6570\u3092\u5b9a\u7fa9\u3057\u3066"
                         "\u304f\u3060\u3055\u3044\u3002</p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">\u203b <span style=\" font-weight:700;\">\u6700\u9069\u5316\u5b9f\u884c\u524d\u306b\u65e2\u5b58\u306e\u30b9\u30a4\u30fc\u30d7\u30c6\u30fc\u30d6\u30eb\u3092\u524a\u9664\u3057\u3066\u304f\u3060\u3055\u3044\u3002</span></p></body></html>", None))
+        self.commandLinkButton.setText(QCoreApplication.translate("Wizard", u"\u30d1\u30e9\u30e1\u30c8\u30ea\u30c3\u30af\u89e3\u6790\u306e\u4f7f\u3044\u65b9\u3092\u78ba\u8a8d\u3059\u308b\uff08\u30a4\u30f3\u30bf\u30fc\u30cd\u30c3\u30c8\u30ea\u30f3\u30af\uff09", None))
         self.wizardPage6_run.setSubTitle(QCoreApplication.translate("Wizard", u"<html>  <head> <meta http-equiv=Content-Type content=\"text/html; charset=shift_jis\"> <meta name=Generator content=\"Microsoft Word 15 (filtered)\"> <style> <!--  /* Font Definitions */  @font-face 	{font-family:\"Cambria Math\"; 	panose-1:2 4 5 3 5 4 6 3 2 4;} @font-face 	{font-family:\u6e38\u660e\u671d; 	panose-1:2 2 4 0 0 0 0 0 0 0;} @font-face 	{font-family:\"\uff2d\uff33 \uff30\u30b4\u30b7\u30c3\u30af\"; 	panose-1:2 11 6 0 7 2 5 8 2 4;} @font-face 	{font-family:\"\\@\u6e38\u660e\u671d\";} @font-face 	{font-family:\"\\@\uff2d\uff33 \uff30\u30b4\u30b7\u30c3\u30af\";}  /* Style Definitions */  p.MsoNormal, li.MsoNormal, div.MsoNormal 	{margin:0mm; 	text-align:justify; 	text-justify:inter-ideograph; 	font-size:10.5pt; 	font-family:\"\u6e38\u660e\u671d\",serif;} .MsoChpDefault 	{font-size:10.0pt; 	font-family:\"\u6e38\u660e\u671d\",serif;} @page WordSection1 	{size:595.3pt 841.9pt; 	margin:99.25pt 30.0mm 30.0mm 30.0mm; 	layout-grid:18.0pt;} div.WordSection1 	{page:WordSection1;} --> </style>  </head>  <body l"
                         "ang=JA style='word-wrap:break-word;text-justify-trim:punctuation'>  <div class=WordSection1 style='layout-grid:18.0pt'>  <!-- \u73fe\u5728\u306e\u30da\u30fc\u30b8\u306b\u306f style='color:#0987D5' \u3068 <b><i> \u3092\u8a2d\u5b9a\u3059\u308b --> <table class=MsoNormalTable border=0 cellspacing=0 cellpadding=0 width=\"83%\"  style='width:83.32%;border-collapse:collapse'>  <tr>   <td width=\"16%\" valign=top style='width:19.98%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><span style='color:#7F7F7F'>\u30e2\u30c7\u30eb\u6307\u5b9a</span></p>   </td>   <td width=\"16%\" valign=top style='width:20.0%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><span style='color:#7F7F7F'>\u5909\u6570\u6307\u5b9a</span></p>   </td>   <td width=\"16%\" valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><span style='color:#7F7F7F'>\u62d8\u675f\u6307\u5b9a</span></p>   </td>   <td width=\"16%\" valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><span style='colo"
                         "r:#7F7F7F'>\u76ee\u7684\u6307\u5b9a</span></p>   </td>   <td width=\"16%\" valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal> <b><i> <span style='color:#0987D5'>\u5b9f\u884c\u8a2d\u5b9a</span> </i></b> </p>   </td>   <td width=\"16%\" valign=top style='width:19.96%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><span style='color:#7F7F7F'>\u78ba\u8a8d</span></p>   </td>  </tr> </table>  <p class=MsoNormal><span lang=EN-US>&nbsp;</span></p>  </div>  </body>  </html> ", None))
