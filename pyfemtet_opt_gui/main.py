@@ -393,7 +393,18 @@ class MainWizard(QWizard):
         if int(major) < 2024:
             major = 2024
             minor = 0
-        webbrowser.open(f'https://www.muratasoftware.com/products/mainhelp/mainhelp{major}_{minor}/desktop/ParametricAnalysis/ResultOutputSettings.html')
+        url = f'https://www.muratasoftware.com/products/mainhelp/mainhelp{major}_{minor}/desktop/ParametricAnalysis/ResultOutputSettings.html'
+        webbrowser.open(url)
+
+    def show_femtet_help_variables(self):
+        import webbrowser
+        version_string = _p.Femtet.Version
+        major, minor, *_ = version_string.split('.')
+        if int(major) < 2024:
+            major = 2024
+            minor = 0
+        url = f'https://www.muratasoftware.com/products/mainhelp/mainhelp{major}_{minor}/desktop/ProjectCreation/VariableTree.htm'
+        webbrowser.open(url)
 
 
 # noinspection PyAttributeOutsideInit

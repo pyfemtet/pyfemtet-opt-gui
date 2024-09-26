@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'wizardICFQMm.ui'
+## Form generated from reading UI file 'wizardmlrTKp.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.7.2
 ##
@@ -194,6 +194,11 @@ class Ui_Wizard(object):
         self.textEdit_5.setReadOnly(True)
 
         self.verticalLayout_2.addWidget(self.textEdit_5)
+
+        self.commandLinkButton_2 = QCommandLinkButton(self.wizardPage3_param)
+        self.commandLinkButton_2.setObjectName(u"commandLinkButton_2")
+
+        self.verticalLayout_2.addWidget(self.commandLinkButton_2)
 
         Wizard.addPage(self.wizardPage3_param)
         self.wizardPage4_cns = QWizardPage()
@@ -401,6 +406,7 @@ class Ui_Wizard(object):
         self.pushButton_3.clicked.connect(Wizard.show_cns_dialog_edit)
         self.pushButton.clicked.connect(Wizard.remove_cns)
         self.commandLinkButton.clicked.connect(Wizard.show_how_to_setting_parametric)
+        self.commandLinkButton_2.clicked.connect(Wizard.show_femtet_help_variables)
 
         QMetaObject.connectSlotsByName(Wizard)
     # setupUi
@@ -430,7 +436,7 @@ class Ui_Wizard(object):
 "</style></head><body style=\" font-family:'Yu Gothic UI'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">\u6700\u9069\u5316\u3092\u884c\u3046\u305f\u3081\u306e\u30b9\u30af\u30ea\u30d7\u30c8\u306e\u8a2d\u5b9a\u3092\u884c\u3044\u307e\u3059\u3002<br />\u6700\u521d\u306b\u3001Femtet \u306b\u63a5\u7d9a\u3057\u3066\u6700\u9069\u5316\u3092\u884c\u3046\u89e3\u6790\u30e2\u30c7\u30eb\u3092\u6c7a\u3081\u307e\u3059\u3002<br />\u30dc\u30bf\u30f3\u3092\u62bc\u3059\u3068 Fetmet \u3068\u306e\u81ea\u52d5\u63a5\u7d9a\u304c"
                         "\u59cb\u307e\u308a\u307e\u3059\u3002</p></body></html>", None))
-        self.checkBox_openSampleFemprj.setText(QCoreApplication.translate("Wizard", u"\u30b5\u30f3\u30d7\u30eb\u30d5\u30a1\u30a4\u30eb\u3092\u958b\u304f", None))
+        self.checkBox_openSampleFemprj.setText(QCoreApplication.translate("Wizard", u"\u63a5\u7d9a\u6642\u306b\u30b5\u30f3\u30d7\u30eb\u30d5\u30a1\u30a4\u30eb\u3092\u958b\u304f", None))
         self.wizardPage2_model.setSubTitle(QCoreApplication.translate("Wizard", u"<html>  <head> <meta http-equiv=Content-Type content=\"text/html; charset=shift_jis\"> <meta name=Generator content=\"Microsoft Word 15 (filtered)\"> <style> <!--  /* Font Definitions */  @font-face 	{font-family:\"Cambria Math\"; 	panose-1:2 4 5 3 5 4 6 3 2 4;} @font-face 	{font-family:\u6e38\u660e\u671d; 	panose-1:2 2 4 0 0 0 0 0 0 0;} @font-face 	{font-family:\"\uff2d\uff33 \uff30\u30b4\u30b7\u30c3\u30af\"; 	panose-1:2 11 6 0 7 2 5 8 2 4;} @font-face 	{font-family:\"\\@\u6e38\u660e\u671d\";} @font-face 	{font-family:\"\\@\uff2d\uff33 \uff30\u30b4\u30b7\u30c3\u30af\";}  /* Style Definitions */  p.MsoNormal, li.MsoNormal, div.MsoNormal 	{margin:0mm; 	text-align:justify; 	text-justify:inter-ideograph; 	font-size:10.5pt; 	font-family:\"\u6e38\u660e\u671d\",serif;} .MsoChpDefault 	{font-size:10.0pt; 	font-family:\"\u6e38\u660e\u671d\",serif;} @page WordSection1 	{size:595.3pt 841.9pt; 	margin:99.25pt 30.0mm 30.0mm 30.0mm; 	layout-grid:18.0pt;} div.WordSection1 	{page:WordSection1;} --> </style>  </head>  <body l"
                         "ang=JA style='word-wrap:break-word;text-justify-trim:punctuation'>  <div class=WordSection1 style='layout-grid:18.0pt'>  <!-- \u73fe\u5728\u306e\u30da\u30fc\u30b8\u306b\u306f style='color:#0987D5' \u3068 <b><i> \u3092\u8a2d\u5b9a\u3059\u308b --> <table class=MsoNormalTable border=0 cellspacing=0 cellpadding=0 width=\"83%\"  style='width:83.32%;border-collapse:collapse'>  <tr>   <td width=\"16%\" valign=top style='width:19.98%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal> <b><i> <span style='color:#0987D5'>\u30e2\u30c7\u30eb\u6307\u5b9a</span> </i></b> </p>   </td>   <td width=\"16%\" valign=top style='width:20.0%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><span style='color:#7F7F7F'>\u5909\u6570\u6307\u5b9a</span></p>   </td>   <td width=\"16%\" valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><span style='color:#7F7F7F'>\u62d8\u675f\u6307\u5b9a</span></p>   </td>   <td width=\"16%\" valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal"
                         "><span style='color:#7F7F7F'>\u76ee\u7684\u6307\u5b9a</span></p>   </td>   <td width=\"16%\" valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><span style='color:#7F7F7F'>\u5b9f\u884c\u8a2d\u5b9a</span></p>   </td>   <td width=\"16%\" valign=top style='width:19.96%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><span style='color:#7F7F7F'>\u78ba\u8a8d</span></p>   </td>  </tr> </table>  <p class=MsoNormal><span lang=EN-US>&nbsp;</span></p>  </div>  </body>  </html> ", None))
@@ -482,6 +488,7 @@ class Ui_Wizard(object):
 "<p style=\" margin-top:6px; margin-bottom:6px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">\u521d\u671f\u5024\u3001\u4e0b\u9650\u3001\u4e0a\u9650\u3092\u8a2d\u5b9a\u30fb\u78ba\u8a8d\u3057\u3066\u304f\u3060\u3055"
                         "\u3044\u3002</p>\n"
 "<p style=\" margin-top:6px; margin-bottom:6px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">\u300cTest\u300d \u30dc\u30bf\u30f3\u3092\u62bc\u3059\u3068\u3001test \u5217\u306e\u30d1\u30e9\u30e1\u30fc\u30bf\u3092 Femtet \u306b\u8ee2\u9001\u3057\u3001\u30e2\u30c7\u30eb\u306e\u518d\u69cb\u7bc9\u3092\u884c\u3044\u307e\u3059\u3002</p></body></html>", None))
+        self.commandLinkButton_2.setText(QCoreApplication.translate("Wizard", u"\u5909\u6570 \u306e\u4f7f\u3044\u65b9\u3092\u78ba\u8a8d\u3059\u308b\uff08\u30a4\u30f3\u30bf\u30fc\u30cd\u30c3\u30c8\u30ea\u30f3\u30af\uff09", None))
         self.wizardPage4_cns.setSubTitle(QCoreApplication.translate("Wizard", u"<html>  <head> <meta http-equiv=Content-Type content=\"text/html; charset=shift_jis\"> <meta name=Generator content=\"Microsoft Word 15 (filtered)\"> <style> <!--  /* Font Definitions */  @font-face 	{font-family:\"Cambria Math\"; 	panose-1:2 4 5 3 5 4 6 3 2 4;} @font-face 	{font-family:\u6e38\u660e\u671d; 	panose-1:2 2 4 0 0 0 0 0 0 0;} @font-face 	{font-family:\"\uff2d\uff33 \uff30\u30b4\u30b7\u30c3\u30af\"; 	panose-1:2 11 6 0 7 2 5 8 2 4;} @font-face 	{font-family:\"\\@\u6e38\u660e\u671d\";} @font-face 	{font-family:\"\\@\uff2d\uff33 \uff30\u30b4\u30b7\u30c3\u30af\";}  /* Style Definitions */  p.MsoNormal, li.MsoNormal, div.MsoNormal 	{margin:0mm; 	text-align:justify; 	text-justify:inter-ideograph; 	font-size:10.5pt; 	font-family:\"\u6e38\u660e\u671d\",serif;} .MsoChpDefault 	{font-size:10.0pt; 	font-family:\"\u6e38\u660e\u671d\",serif;} @page WordSection1 	{size:595.3pt 841.9pt; 	margin:99.25pt 30.0mm 30.0mm 30.0mm; 	layout-grid:18.0pt;} div.WordSection1 	{page:WordSection1;} --> </style>  </head>  <body l"
                         "ang=JA style='word-wrap:break-word;text-justify-trim:punctuation'>  <div class=WordSection1 style='layout-grid:18.0pt'>  <!-- \u73fe\u5728\u306e\u30da\u30fc\u30b8\u306b\u306f style='color:#0987D5' \u3068 <b><i> \u3092\u8a2d\u5b9a\u3059\u308b --> <table class=MsoNormalTable border=0 cellspacing=0 cellpadding=0 width=\"83%\"  style='width:83.32%;border-collapse:collapse'>  <tr>   <td width=\"16%\" valign=top style='width:19.98%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><span style='color:#7F7F7F'>\u30e2\u30c7\u30eb\u6307\u5b9a</span></p>   </td>   <td width=\"16%\" valign=top style='width:20.0%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><span style='color:#7F7F7F'>\u5909\u6570\u6307\u5b9a</span></p>   </td>   <td width=\"16%\" valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal> <b><i> <span style='color:#0987D5'>\u62d8\u675f\u6307\u5b9a</span> </i></b> </p>   </td>   <td width=\"16%\" valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal"
                         "><span style='color:#7F7F7F'>\u76ee\u7684\u6307\u5b9a</span></p>   </td>   <td width=\"16%\" valign=top style='width:20.02%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><span style='color:#7F7F7F'>\u5b9f\u884c\u8a2d\u5b9a</span></p>   </td>   <td width=\"16%\" valign=top style='width:19.96%;padding:0mm 5.4pt 0mm 5.4pt'>   <p class=MsoNormal><span style='color:#7F7F7F'>\u78ba\u8a8d</span></p>   </td>  </tr> </table>  <p class=MsoNormal><span lang=EN-US>&nbsp;</span></p>  </div>  </body>  </html> ", None))

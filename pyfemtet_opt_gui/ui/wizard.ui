@@ -142,7 +142,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
     <item row="2" column="1">
      <widget class="QCheckBox" name="checkBox_openSampleFemprj">
       <property name="text">
-       <string>サンプルファイルを開く</string>
+       <string>接続時にサンプルファイルを開く</string>
       </property>
      </widget>
     </item>
@@ -389,6 +389,13 @@ li.checked::marker { content: &quot;\2612&quot;; }
 &lt;p style=&quot; margin-top:6px; margin-bottom:6px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;最適化の際に調整するパラメータを選択してください。&lt;/p&gt;
 &lt;p style=&quot; margin-top:6px; margin-bottom:6px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;初期値、下限、上限を設定・確認してください。&lt;/p&gt;
 &lt;p style=&quot; margin-top:6px; margin-bottom:6px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;「Test」 ボタンを押すと、test 列のパラメータを Femtet に転送し、モデルの再構築を行います。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QCommandLinkButton" name="commandLinkButton_2">
+      <property name="text">
+       <string>変数 の使い方を確認する（インターネットリンク）</string>
       </property>
      </widget>
     </item>
@@ -803,7 +810,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <hints>
     <hint type="sourcelabel">
      <x>93</x>
-     <y>204</y>
+     <y>189</y>
     </hint>
     <hint type="destinationlabel">
      <x>84</x>
@@ -899,7 +906,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
    <hints>
     <hint type="sourcelabel">
      <x>670</x>
-     <y>213</y>
+     <y>189</y>
     </hint>
     <hint type="destinationlabel">
      <x>553</x>
@@ -971,6 +978,22 @@ li.checked::marker { content: &quot;\2612&quot;; }
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>commandLinkButton_2</sender>
+   <signal>clicked()</signal>
+   <receiver>Wizard</receiver>
+   <slot>show_femtet_help_variables()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>118</x>
+     <y>386</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>205</x>
+     <y>36</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <signal>process_loaded()</signal>
@@ -987,5 +1010,6 @@ li.checked::marker { content: &quot;\2612&quot;; }
   <slot>show_cns_dialog_edit()</slot>
   <slot>remove_cns()</slot>
   <slot>show_how_to_setting_parametric()</slot>
+  <slot>show_femtet_help_variables()</slot>
  </slots>
 </ui>
