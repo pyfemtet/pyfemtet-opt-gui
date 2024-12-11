@@ -1,10 +1,10 @@
 from pyfemtet.dispatch_extensions import (
     dispatch_femtet, launch_and_dispatch_femtet, DispatchExtensionException,
     _get_pids, _get_pid)
-from pyfemtet.logger import get_logger
+from pyfemtet.logger import get_module_logger
 from pyfemtet.opt.interface._femtet_parametric import _get_prm_result_names
 
-logger = get_logger('Wiz')
+logger = get_module_logger('opt.GUI', None)
 
 
 __all__ = ['Femtet', 'pid', 'connect_femtet', 'check_femtet_alive', 'logger', 'get_parametric_output_names']

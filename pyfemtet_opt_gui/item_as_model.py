@@ -91,3 +91,10 @@ class MyStandardItemAsTableModelWithoutHeader(QSortFilterProxyModel):
     # get item directory
     def get_item(self, row, col) -> QStandardItem:
         return self.sourceModel().get_item(row, col)
+
+    def get_key_name(self, row: int) -> str:
+        if hasattr(self.sourceModel(), 'get_key_name'):
+            return self.sourceModel().get_key_name(row + 1)  # header ぶん
+        else:
+            from _p import logger
+            logger.error('get_key_name() を持たない itemModel に対して get_key_name() を呼ぼうとしました。GUI の実装に誤りがあります。開発者に報告してください。')

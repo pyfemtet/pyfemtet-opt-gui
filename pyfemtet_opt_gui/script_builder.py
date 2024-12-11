@@ -10,17 +10,25 @@ from pyfemtet_opt_gui.expression_eval import extract_variables
 def get_header(cns_model: CnsModel):
     code = f'''from statistics import mean
 from pyfemtet.opt import FemtetInterface, OptunaOptimizer, FEMOpt
+from pyfemtet.opt.optimizer import PoFBoTorchSampler
+from optuna.samplers import RandomSampler, QMCSampler, NSGAIISampler, TPESampler
+from optuna_integration import BoTorchSampler
 {get_constraint(cns_model)}
 
 def main():'''
     return code
 
 
-def get_femopt(femprj_model: MyStandardItemAsTableModel, obj_model: MyStandardItemAsTableModel):
+def get_femopt(
+        femprj_model: MyStandardItemAsTableModel,
+        obj_model: MyStandardItemAsTableModel,
+        run_model: MyStandardItemAsTableModel,
+):
 
     femprj_path = femprj_model.get_item(0, 2).text()
     model_name = femprj_model.get_item(1, 2).text()
 
+    # FEMInterface
     code = f'''
     # settings to open femtet and objectives
     femprj_path = r"{femprj_path}"
@@ -51,7 +59,36 @@ def get_femopt(femprj_model: MyStandardItemAsTableModel, obj_model: MyStandardIt
     code += f'''
         }},
     )
+'''
 
+    for r in range(run_model.rowCount()):
+        print(f'{r=}')
+        if run_model.get_key_name(r) == 'sampling method':
+            c = run_model.get_col_from_name('value')
+            print(f'{c=}')
+            sampling_method = run_model.get_item(r, c).text()
+            print(f'{sampling_method=}')
+            break
+    else:
+        print(f'ERROR! No algorithm setting.')
+
+    sampler_class = {
+        'PoFBoTorch': 'PoFBoTorchSampler',
+        'BoTorch': 'BoTorchSampler',
+        'TPE': 'TPESampler',
+        'NSGA2': 'NSGAIISampler',
+        'Random': 'RandomSampler',
+        'QMC': 'QMCSampler',
+    }[sampling_method]
+
+    # Optimizer
+    code += f'''
+    opt = OptunaOptimizer(
+        sampler_class={sampler_class},
+    )
+'''
+
+    code += '''
     femopt = FEMOpt(fem=fem)
 '''
     return code
@@ -191,6 +228,9 @@ def get_optimize(run_model: MyStandardItemAsTableModel):
                 code += f'''
         {arg_name}={arg_value},'''
 
+        elif run_model.get_item(row, 1).text() == 'sampling method':
+            pass
+
         else:
             arg_name = run_model.get_item(row, 1).text()
             arg_value = run_model.get_item(row, 2).text()
@@ -215,7 +255,7 @@ def build_script_main(model: ProblemItemModel, path: str, with_run=False):
     code = ''
 
     code += get_header(model.cns_model)
-    code += get_femopt(model.femprj_model, model.obj_model)
+    code += get_femopt(model.femprj_model, model.obj_model, model.run_model)
     code += get_add_parameter(model.prm_model)
     code += get_add_constraint(model.cns_model)
     code += get_optimize(model.run_model)

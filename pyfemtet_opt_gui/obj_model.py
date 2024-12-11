@@ -31,7 +31,7 @@ class ObjTableDelegate(QStyledItemDelegate):
         col_name = self._model.get_col_name(col)
         if col_name == '  direction  ':
             # コンボボックスにデータを設定
-            value = index.model().data(index, Qt.EditRole)
+            value = index.model().data(index, Qt.ItemDataRole.EditRole)
             editor.setCurrentText(value)
         else:
             super().setEditorData(editor, index)
@@ -41,31 +41,31 @@ class ObjTableDelegate(QStyledItemDelegate):
         col_name = self._model.get_col_name(col)
         if col_name == '  direction  ':
             # コンボボックスのデータをモデルに設定
-            model.setData(index, editor.currentText(), Qt.EditRole)
+            model.setData(index, editor.currentText(), Qt.ItemDataRole.EditRole)
         else:
             super().setModelData(editor, model, index)
 
-    # def paint(self, painter, option, index):
-    #     col, row = index.column(), index.row()
-    #     col_name = self._model.get_col_name(col)
-    #     if col_name == '  direction  ':
-    #         # index...proxyindex
-    #         # _model...original
-    #         value = self._model.get_item(index.row()+1, index.column()).text()
-    #         combo = QComboBox()
-    #         combo.addItems([value])
-    #         combo.setCurrentText(value)
-    #         combo.setFrame(False)
-    #
-    #         painter.save()
-    #
-    #         painter.translate(option.rect.topLeft())
-    #         combo.resize(option.rect.size())
-    #         combo.render(painter, QPoint())
-    #
-    #         painter.restore()
-    #     else:
-    #         super().paint(painter, option, index)
+    def paint(self, painter, option, index):
+        col, row = index.column(), index.row()
+        col_name = self._model.get_col_name(col)
+        if col_name == '  direction  ':
+            # index...proxyindex
+            # _model...original
+            value = self._model.get_item(index.row()+1, index.column()).text()
+            combo = QComboBox()
+            combo.addItems([value])
+            combo.setCurrentText(value)
+            combo.setFrame(False)
+
+            painter.save()
+
+            painter.translate(option.rect.topLeft())
+            combo.resize(option.rect.size())
+            combo.render(painter, QPoint())
+
+            painter.restore()
+        else:
+            super().paint(painter, option, index)
 
 
 class ObjModel(MyStandardItemAsTableModel):
@@ -179,7 +179,7 @@ class ObjModel(MyStandardItemAsTableModel):
             dir_col = self.get_col_from_name('  direction  ')
             dir_index = self.createIndex(row, dir_col)
             if self.data(dir_index) in ['minimize', 'maximize']:
-                return ~Qt.ItemIsEnabled
+                return ~Qt.ItemFlag.ItemIsEnabled
 
             # elif direction is "Set to...", (set to).replace((ignored), '') and float only
             elif self.data(dir_index) == 'Set to...':
@@ -190,18 +190,18 @@ class ObjModel(MyStandardItemAsTableModel):
         use_item = self.get_item(row, use_col)
         if use_item.checkState() == Qt.CheckState.Unchecked:
             if col_name != 'use':
-                return ~Qt.ItemIsEnabled
+                return ~Qt.ItemFlag.ItemIsEnabled
 
         # use / name is uneditable
         if col_name in ['use', 'name']:
-            flags = Qt.ItemIsEnabled | Qt.ItemIsSelectable
+            flags = Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable
             if col_name == 'use':
-                flags = flags | Qt.ItemIsUserCheckable
+                flags = flags | Qt.ItemFlag.ItemIsUserCheckable
             return flags
 
         return super().flags(index)
 
-    def setData(self, index, value, role=Qt.EditRole) -> bool:
+    def setData(self, index, value, role=Qt.ItemDataRole.EditRole) -> bool:
         if not index.isValid(): return super().setData(index, value, role)
 
         col, row = index.column(), index.row()

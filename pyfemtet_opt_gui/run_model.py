@@ -1,10 +1,74 @@
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QPoint
 from PySide6.QtGui import QStandardItem
+from PySide6.QtWidgets import QStyledItemDelegate, QComboBox
 
 from pyfemtet_opt_gui.item_as_model import MyStandardItemAsTableModel, _isnumeric
 
 
 import pyfemtet_opt_gui._p as _p
+
+
+class RunConfigTableDelegate(QStyledItemDelegate):
+
+    def __init__(self, model: 'RunModel'):
+        super().__init__()
+        self._model: 'RunModel' = model
+
+    def createEditor(self, parent, option, index):
+        col, row = index.column(), index.row()
+        col_name = self._model.get_col_name(col)
+        key_name = self._model.get_key_name(row)
+        if col_name == 'value' and key_name == 'sampling method':
+            # コンボボックスエディタを作成
+            comboBox = QComboBox(parent)
+            comboBox.addItems(['PoFBoTorch', 'TPE', 'NSGA2', 'Random', 'QMC'])
+            comboBox.setFrame(False)
+            return comboBox
+        return super().createEditor(parent, option, index)
+
+    def setEditorData(self, editor, index):
+        col, row = index.column(), index.row()
+        col_name = self._model.get_col_name(col)
+        key_name = self._model.get_key_name(row)
+        if col_name == 'value' and key_name == 'sampling method':
+            # コンボボックスにデータを設定
+            value = index.model().data(index, Qt.ItemDataRole.EditRole)
+            editor.setCurrentText(value)
+        else:
+            super().setEditorData(editor, index)
+
+    def setModelData(self, editor, model, index):
+        col, row = index.column(), index.row()
+        col_name = self._model.get_col_name(col)
+        key_name = self._model.get_key_name(row)
+        if col_name == 'value' and key_name == 'sampling method':
+            # コンボボックスのデータをモデルに設定
+            model.setData(index, editor.currentText(), Qt.ItemDataRole.EditRole)
+        else:
+            super().setModelData(editor, model, index)
+
+    def paint(self, painter, option, index):
+        col, row = index.column(), index.row()
+        col_name = self._model.get_col_name(col)
+        key_name = self._model.get_key_name(row)
+        if col_name == 'value' and key_name == 'sampling method':
+            # index...proxyindex
+            # _model...original
+            value = self._model.get_item(index.row()+1, index.column()).text()
+            combo = QComboBox()
+            combo.addItems([value])
+            combo.setCurrentText(value)
+            combo.setFrame(False)
+
+            painter.save()
+
+            painter.translate(option.rect.topLeft())
+            combo.resize(option.rect.size())
+            combo.render(painter, QPoint())
+
+            painter.restore()
+        else:
+            super().paint(painter, option, index)
 
 
 class RunModel(MyStandardItemAsTableModel):
@@ -91,6 +155,21 @@ class RunModel(MyStandardItemAsTableModel):
         item = QStandardItem('指定数の Femtet プロセスを使用して並列計算します。並列数分のライセンスが必要です。')
         self._item.setChild(3, 3, item)
 
+        # ===== algorithm =====
+        # use
+        row = 4
+        item = QStandardItem()
+        self._item.setChild(row, 0, item)
+        # item
+        item = QStandardItem('sampling method')
+        self._item.setChild(row, 1, item)
+        # value
+        item = QStandardItem('PoFBoTorch')
+        self._item.setChild(row, 2, item)
+        # description
+        item = QStandardItem('サンプリングアルゴリズムを指定します。')
+        self._item.setChild(row, 3, item)
+
         # notify to end editing to the abstract model
         self.endResetModel()
 
@@ -127,7 +206,7 @@ class RunModel(MyStandardItemAsTableModel):
 
         return super().flags(index)
 
-    def setData(self, index, value, role=Qt.EditRole) -> bool:
+    def setData(self, index, value, role=Qt.ItemDataRole.EditRole) -> bool:
         if not index.isValid(): return super().setData(index, value, role)
 
         col, row = index.column(), index.row()

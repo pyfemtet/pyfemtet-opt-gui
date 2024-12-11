@@ -10,6 +10,7 @@ from pyfemtet_opt_gui.ui.ui_detailed_wizard import Ui_DetailedWizard
 from pyfemtet_opt_gui.item_as_model import MyStandardItemAsTableModelWithoutHeader
 from pyfemtet_opt_gui.problem_model import ProblemItemModel, CustomProxyModel
 from pyfemtet_opt_gui.obj_model import ObjTableDelegate
+from pyfemtet_opt_gui.run_model import RunConfigTableDelegate
 
 from pyfemtet_opt_gui.script_builder import build_script_main
 
@@ -40,6 +41,8 @@ class MainWizard(QWizard):
         proxy_model = MyStandardItemAsTableModelWithoutHeader(model)
         proxy_model.setSourceModel(model)
         self._ui.tableView_run.setModel(proxy_model)
+        delegate = RunConfigTableDelegate(proxy_model)
+        self._ui.tableView_run.setItemDelegate(delegate)
 
         # disable next button if checker returns False
         self._ui.wizardPage1_launch.isComplete = self.check_femtet_alive
@@ -397,12 +400,21 @@ class MainWizard(QWizard):
         webbrowser.open(url)
 
     def show_femtet_help_variables(self):
-        import webbrowser
+        from packaging.version import Version
         version_string = _p.Femtet.Version
         major, minor, *_ = version_string.split('.')
-        if int(major) < 2024:
+
+        # 2024 未満ならば 2024.0 のヘルプを表示
+        if Version(f'{major}.{minor}') < Version('2024.0'):
             major = 2024
             minor = 0
+
+        # まだ 2024.1 のヘルプは web 公開されていないので 2024.0 のヘルプを表示
+        elif Version(f'{major}.{minor}') >= Version('2024.1'):
+            major = 2024
+            minor = 0
+
+        import webbrowser
         url = f'https://www.muratasoftware.com/products/mainhelp/mainhelp{major}_{minor}/desktop/ProjectCreation/VariableTree.htm'
         webbrowser.open(url)
 
