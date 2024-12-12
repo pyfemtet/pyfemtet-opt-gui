@@ -63,7 +63,7 @@ def get_femopt(
 
     for r in range(run_model.rowCount()):
         print(f'{r=}')
-        if run_model.get_key_name(r) == 'sampling method':
+        if run_model.get_key_name(r) == 'アルゴリズム':
             c = run_model.get_col_from_name('value')
             print(f'{c=}')
             sampling_method = run_model.get_item(r, c).text()
@@ -228,7 +228,7 @@ def get_optimize(run_model: MyStandardItemAsTableModel):
                 code += f'''
         {arg_name}={arg_value},'''
 
-        elif run_model.get_item(row, 1).text() == 'sampling method':
+        elif run_model.get_item(row, 1).text() == 'アルゴリズム':
             pass
 
         else:

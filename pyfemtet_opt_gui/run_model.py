@@ -18,7 +18,7 @@ class RunConfigTableDelegate(QStyledItemDelegate):
         col, row = index.column(), index.row()
         col_name = self._model.get_col_name(col)
         key_name = self._model.get_key_name(row)
-        if col_name == 'value' and key_name == 'sampling method':
+        if col_name == 'value' and key_name == 'アルゴリズム':
             # コンボボックスエディタを作成
             comboBox = QComboBox(parent)
             comboBox.addItems(['PoFBoTorch', 'TPE', 'NSGA2', 'Random', 'QMC'])
@@ -30,7 +30,7 @@ class RunConfigTableDelegate(QStyledItemDelegate):
         col, row = index.column(), index.row()
         col_name = self._model.get_col_name(col)
         key_name = self._model.get_key_name(row)
-        if col_name == 'value' and key_name == 'sampling method':
+        if col_name == 'value' and key_name == 'アルゴリズム':
             # コンボボックスにデータを設定
             value = index.model().data(index, Qt.ItemDataRole.EditRole)
             editor.setCurrentText(value)
@@ -41,7 +41,7 @@ class RunConfigTableDelegate(QStyledItemDelegate):
         col, row = index.column(), index.row()
         col_name = self._model.get_col_name(col)
         key_name = self._model.get_key_name(row)
-        if col_name == 'value' and key_name == 'sampling method':
+        if col_name == 'value' and key_name == 'アルゴリズム':
             # コンボボックスのデータをモデルに設定
             model.setData(index, editor.currentText(), Qt.ItemDataRole.EditRole)
         else:
@@ -51,7 +51,7 @@ class RunConfigTableDelegate(QStyledItemDelegate):
         col, row = index.column(), index.row()
         col_name = self._model.get_col_name(col)
         key_name = self._model.get_key_name(row)
-        if col_name == 'value' and key_name == 'sampling method':
+        if col_name == 'value' and key_name == 'アルゴリズム':
             # index...proxyindex
             # _model...original
             value = self._model.get_item(index.row()+1, index.column()).text()
@@ -161,7 +161,7 @@ class RunModel(MyStandardItemAsTableModel):
         item = QStandardItem()
         self._item.setChild(row, 0, item)
         # item
-        item = QStandardItem('sampling method')
+        item = QStandardItem('アルゴリズム')
         self._item.setChild(row, 1, item)
         # value
         item = QStandardItem('PoFBoTorch')
