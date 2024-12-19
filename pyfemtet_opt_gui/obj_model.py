@@ -18,7 +18,7 @@ class ObjTableDelegate(QStyledItemDelegate):
     def createEditor(self, parent, option, index):
         col, row = index.column(), index.row()
         col_name = self._model.get_col_name(col)
-        if col_name == '  direction  ':
+        if col_name == '    direction    ':
             # コンボボックスエディタを作成
             comboBox = QComboBox(parent)
             comboBox.addItems(['maximize', 'minimize', 'Set to...'])
@@ -29,7 +29,7 @@ class ObjTableDelegate(QStyledItemDelegate):
     def setEditorData(self, editor, index):
         col, row = index.column(), index.row()
         col_name = self._model.get_col_name(col)
-        if col_name == '  direction  ':
+        if col_name == '    direction    ':
             # コンボボックスにデータを設定
             value = index.model().data(index, Qt.ItemDataRole.EditRole)
             editor.setCurrentText(value)
@@ -39,7 +39,7 @@ class ObjTableDelegate(QStyledItemDelegate):
     def setModelData(self, editor, model, index):
         col, row = index.column(), index.row()
         col_name = self._model.get_col_name(col)
-        if col_name == '  direction  ':
+        if col_name == '    direction    ':
             # コンボボックスのデータをモデルに設定
             model.setData(index, editor.currentText(), Qt.ItemDataRole.EditRole)
         else:
@@ -48,7 +48,7 @@ class ObjTableDelegate(QStyledItemDelegate):
     def paint(self, painter, option, index):
         col, row = index.column(), index.row()
         col_name = self._model.get_col_name(col)
-        if col_name == '  direction  ':
+        if col_name == '    direction    ':
             # index...proxyindex
             # _model...original
             value = self._model.get_item(index.row()+1, index.column()).text()
@@ -82,7 +82,7 @@ class ObjModel(MyStandardItemAsTableModel):
     # use / name is uneditable
 
     """
-    HEADER = ['use', 'name', '  direction  ', 'set to']  # require margin to paint combobox to objective table, but its resizemode is ResizeToContent so setMargin doesn't work.
+    HEADER = ['use', 'name', '    direction    ', 'set to']  # require margin to paint combobox to objective table, but its resizemode is ResizeToContent so setMargin doesn't work.
 
     def __init__(self, table_item: QStandardItem, root: QStandardItem, parent=None):
         super().__init__(table_item, root, parent)
@@ -176,7 +176,7 @@ class ObjModel(MyStandardItemAsTableModel):
 
         if col_name == 'set to':
             # if direction is "Maximize" or "Minimize", (set to)+=(ignored) and disable
-            dir_col = self.get_col_from_name('  direction  ')
+            dir_col = self.get_col_from_name('    direction    ')
             dir_index = self.createIndex(row, dir_col)
             if self.data(dir_index) in ['minimize', 'maximize']:
                 return ~Qt.ItemFlag.ItemIsEnabled
@@ -208,7 +208,7 @@ class ObjModel(MyStandardItemAsTableModel):
         col_name = self.get_col_name(col)
 
         # when direction is changed, change 'Set to...'.
-        if col_name == '  direction  ':
+        if col_name == '    direction    ':
             IGNORE_PREFIX = '(ignore) '
 
             setto_col = self.get_col_from_name('set to')
@@ -231,7 +231,7 @@ class ObjModel(MyStandardItemAsTableModel):
         # set_to must be numeric if direction is 'Set to...'
         if col_name == 'set to':
 
-            dir_col = self.get_col_from_name('  direction  ')
+            dir_col = self.get_col_from_name('    direction    ')
             dir_index = self.createIndex(row, dir_col)
             dir_value = self.data(dir_index)
 
@@ -284,7 +284,7 @@ class ObjModel(MyStandardItemAsTableModel):
             use: Qt.CheckState = table.child(r, self.get_col_from_name('use')).checkState()
 
             # direction
-            direction: str = table.child(r, self.get_col_from_name('  direction  ')).text()
+            direction: str = table.child(r, self.get_col_from_name('    direction    ')).text()
 
             # set to
             set_to: str = table.child(r, self.get_col_from_name('set to')).text()

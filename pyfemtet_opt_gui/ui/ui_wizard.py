@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'wizardBaOpSY.ui'
+## Form generated from reading UI file 'wizardWXcOjw.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.7.2
 ##
@@ -288,7 +288,6 @@ class Ui_Wizard(object):
         self.tableView_obj = QTableView(self.wizardPage5_obj)
         self.tableView_obj.setObjectName(u"tableView_obj")
         self.tableView_obj.setFrameShape(QFrame.Shape.Panel)
-        self.tableView_obj.setEditTriggers(QAbstractItemView.EditTrigger.AllEditTriggers)
         self.tableView_obj.setVerticalScrollMode(QAbstractItemView.ScrollMode.ScrollPerItem)
         self.tableView_obj.setHorizontalScrollMode(QAbstractItemView.ScrollMode.ScrollPerPixel)
         self.tableView_obj.horizontalHeader().setCascadingSectionResizes(True)

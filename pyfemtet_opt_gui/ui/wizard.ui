@@ -572,9 +572,6 @@ li.checked::marker { content: &quot;\2612&quot;; }
         <property name="frameShape">
          <enum>QFrame::Shape::Panel</enum>
         </property>
-        <property name="editTriggers">
-         <set>QAbstractItemView::EditTrigger::AllEditTriggers</set>
-        </property>
         <property name="verticalScrollMode">
          <enum>QAbstractItemView::ScrollMode::ScrollPerItem</enum>
         </property>

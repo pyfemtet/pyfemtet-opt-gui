@@ -9,14 +9,15 @@ from pyfemtet_opt_gui.ui.ui_detailed_wizard import Ui_DetailedWizard
 
 from pyfemtet_opt_gui.item_as_model import MyStandardItemAsTableModelWithoutHeader
 from pyfemtet_opt_gui.problem_model import ProblemItemModel, CustomProxyModel
-from pyfemtet_opt_gui.obj_model import ObjTableDelegate
+from pyfemtet_opt_gui.obj_model import ObjTableDelegate, ObjModel
 from pyfemtet_opt_gui.run_model import RunConfigTableDelegate
+from pyfemtet_opt_gui.prm_model import PrmModel
 
 from pyfemtet_opt_gui.script_builder import build_script_main
 
 from pyfemtet_opt_gui.ui.return_code import ReturnCode, should_stop
 
-from pyfemtet_opt_gui.prm_model import PrmModel
+from pyfemtet_opt_gui.util import start_edit_specific_column
 
 import pyfemtet_opt_gui._p as _p  # must be same folder and cannot import via `from` keyword.
 
@@ -32,6 +33,26 @@ class MainWizard(QWizard):
         self.worker = OptimizationWorker()
         self.worker.finished.connect(self.optimization_finished)
         self._ui: Ui_DetailedWizard = None
+
+    def setup_view(self):
+        self._ui.tableView_obj.clicked.connect(
+            # self.ui.tableView_obj.edit
+            lambda *args: start_edit_specific_column(
+                self._ui.tableView_obj.edit,
+                '    direction    ',
+                *args,
+            )
+        )
+
+        self._ui.tableView_run.clicked.connect(
+            # self.ui.tableView_obj.edit
+            lambda *args: start_edit_specific_column(
+                self._ui.tableView_run.edit,
+                'value',
+                *args,
+            )
+        )
+
 
     def set_ui(self, ui):
         self._ui = ui
@@ -110,7 +131,7 @@ class MainWizard(QWizard):
 
         else:
             # not connected
-            if len(_p._get_pids('Femtet.exe')) == 0:
+            if not _p.femtet_exists:
                 # no Femtet exist
                 button.setText('Femtet を起動して接続します。\n少し時間がかかります...')
             else:
@@ -121,8 +142,10 @@ class MainWizard(QWizard):
             # try to connect
             if _p.connect_femtet():
                 # successfully connected to femtet
-                _p.logger.info(f'Connected! (pid: {_p.pid})')  # TODO: show dialog
+                _p.logger.info(f'接続されました！ (pid: {_p.pid})')  # TODO: show dialog
                 # update model
+                button.setText('PyFemtet に Femtet の\n情報を取り込んでいます...')
+                button.repaint()
                 self.update_problem(show_warning=False)
 
             else:
@@ -437,6 +460,7 @@ class OptimizationWorker(QThread):
 
 def main():
     app = QApplication(sys.argv)
+    app.setStyle('fusion')
 
     g_problem: ProblemItemModel = ProblemItemModel()
 
@@ -451,6 +475,8 @@ def main():
 
     wizard.set_ui(ui_wizard)  # ui を登録
     wizard.update_problem(show_warning=False)  # ui へのモデルの登録
+
+    wizard.setup_view()
 
     wizard.show()  # ビューの表示
     sys.exit(app.exec())  # アプリケーションの実行

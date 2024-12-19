@@ -2,7 +2,7 @@ import ast
 import statistics  # mean
 
 from typing import Callable
-from pyfemtet.opt import AbstractOptimizer
+# from pyfemtet.opt import AbstractOptimizer
 
 
 __all__ = ['create_formula', 'DummyOptimizer', 'ExpressionEvalError', 'extract_variables']
@@ -113,7 +113,7 @@ def extract_variables(expression):
     return extractor.variables - extractor.functions
 
 
-def create_formula(expression: str, var_names: list[str] = None) -> Callable[[CFemtet, AbstractOptimizer], float]:
+def create_formula(expression: str, var_names: list[str] = None) -> Callable[[CFemtet, "AbstractOptimizer"], float]:
     """Create formula from expression string using AST for safe evaluation.
 
     Raises:
@@ -138,7 +138,7 @@ def create_formula(expression: str, var_names: list[str] = None) -> Callable[[CF
             pass
 
     # Ensure the parsed tree only contains safe nodes
-    def fun(Femtet: CFemtet, opt: AbstractOptimizer) -> float:
+    def fun(Femtet: CFemtet, opt: "AbstractOptimizer") -> float:
         # Extract variables from the optimizer's params
         # local_vars = {k: opt.get_parameter()[k] for k in opt.get_parameter()}
         local_vars = opt.get_parameter()

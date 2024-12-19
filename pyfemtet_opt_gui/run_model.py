@@ -47,6 +47,18 @@ class RunConfigTableDelegate(QStyledItemDelegate):
         else:
             super().setModelData(editor, model, index)
 
+    def sizeHint(self, option, index):
+        col, row = index.column(), index.row()
+        col_name = self._model.get_col_name(col)
+        key_name = self._model.get_key_name(row)
+        if col_name == 'value' and key_name == 'アルゴリズム':
+            size = super().sizeHint(option, index)
+            size.setWidth(24 + size.width())
+            return size
+
+        else:
+            return super().sizeHint(option, index)
+
     def paint(self, painter, option, index):
         col, row = index.column(), index.row()
         col_name = self._model.get_col_name(col)

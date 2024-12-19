@@ -1,10 +1,14 @@
-from pyfemtet.dispatch_extensions import (
-    dispatch_femtet, launch_and_dispatch_femtet, DispatchExtensionException,
-    _get_pids, _get_pid)
-from pyfemtet.logger import get_module_logger
-from pyfemtet.opt.interface._femtet_parametric import _get_prm_result_names
 
-logger = get_module_logger('opt.GUI', None)
+import sys
+import logging
+
+from time import time, sleep
+from concurrent.futures import ThreadPoolExecutor
+
+logger = logging.getLogger('GUI')
+if __name__ == '__main__':
+    logger.addHandler(logging.StreamHandler(sys.stdout))
+logger.setLevel(logging.INFO)
 
 
 __all__ = ['Femtet', 'pid', 'connect_femtet', 'check_femtet_alive', 'logger', 'get_parametric_output_names']
@@ -13,35 +17,95 @@ Femtet = None
 pid = 0
 
 
+import win32gui
+import win32process
+import psutil
+
+
+def _get_hwnds(pid):
+    """Proces ID から window handle を取得します."""
+    def callback(hwnd, _hwnds):
+        if win32gui.IsWindowVisible(hwnd) and win32gui.IsWindowEnabled(hwnd):
+            _, found_pid = win32process.GetWindowThreadProcessId(hwnd)
+            if found_pid == pid:
+                _hwnds.append(hwnd)
+        return True
+    hwnds = []
+    win32gui.EnumWindows(callback, hwnds)
+    return hwnds
+
+
+def _get_pid(hwnd):
+    """Window handle から process ID を取得します."""
+    if hwnd > 0:
+        _, pid = win32process.GetWindowThreadProcessId(hwnd)
+    else:
+        pid = 0
+    return pid
+
+
+def _get_pids(process_name):
+    """Process のイメージ名から実行中の process ID を取得します."""
+    pids = [p.info["pid"] for p in psutil.process_iter(attrs=["pid", "name"]) if p.info["name"] == process_name]
+    return pids
+
+
+def femtet_exists():
+    return len(_get_pids('Femtet.exe')) > 0
+
+
 def connect_femtet():
     global Femtet, pid
 
-    # check existing femtet
-    pids = _get_pids('Femtet.exe')
+    # logger.setLevel(logging.DEBUG)
 
-    try:
+    if not check_femtet_alive():
+        logger.debug('Femtet is not alive. Try to (re)connect Femtet.')
 
-        # launch new Femtet if no Femtet
-        if len(pids) == 0:
-            Femtet, pid = launch_and_dispatch_femtet(
-                strictly_pid_specify=False
-            )
+        from femtetutils import util
+        from win32com.client import Dispatch
 
-        # try to connect existing Femtet if exists
-        else:
-            Femtet, pid = dispatch_femtet()
-
-        # if ome problem has occurred, do version check
-        if pid <= 0:
+        succeed = util.auto_execute_femtet(wait_second=15)
+        if not succeed:
+            logger.error('Failed to launch Femtet successfully.')
             return False
 
-        if ...:  # Femtet.Version >= 2023.1
+        Femtet = Dispatch('FemtetMacro.Femtet')
+
+        logger.debug('Femtet has launched. wait to establish connection...')
+        timeout = 15  # sec
+        executor = ThreadPoolExecutor(max_workers=1, )
+        future = executor.submit(wait_femtet_connected, *(Femtet, timeout, ))
+        return_code = future.result()
+
+        if return_code == 0:
+            logger.debug('Connection successfully established.')
+            pid = _get_pid(Femtet.hWnd)
             return True
 
+        else:
+            logger.error(f'Failed to connect Femtet in {timeout} sec.')
+            return False
 
-    except DispatchExtensionException as e:
+    else:
+        logger.debug(f'Connection is already established.')
+        return True
 
-        return False
+
+def wait_femtet_connected(Femtet, timeout=15):
+
+    start = time()
+    while time() - start < timeout:
+        pid = _get_pid(Femtet.hWnd)
+        if pid > 0:
+            break
+
+        else:
+            sleep(1)
+    else:
+        return 1  # TimeoutError
+
+    return 0  # Succeed
 
 
 def check_femtet_alive() -> bool:
@@ -65,6 +129,8 @@ def check_femtet_alive() -> bool:
 
 
 def get_parametric_output_names():
+    from pyfemtet.opt.interface._femtet_parametric import _get_prm_result_names
+
     return _get_prm_result_names(Femtet)
 
 
