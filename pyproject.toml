@@ -12,8 +12,8 @@ pyfemtet-opt = 'pyfemtet_opt_gui.main:main'
 
 [tool.poetry.dependencies]
 python = ">=3.11, <3.13"
-pyside6 = "^6.7.1"
-pyfemtet = "^0.7.0"
+pyside6 = "~6.7.1"
+pyfemtet = "^0.8.0"
 
 [tool.poetry-dynamic-versioning]
 enable = true
