@@ -19,28 +19,32 @@ import sys
 
 from pyfemtet_opt_gui_2.ui.ui_WizardPage_obj import Ui_WizardPage_obj
 
-from pyfemtet_opt_gui_2.common.common import *
+from pyfemtet_opt_gui_2.common.qt_util import *
+from pyfemtet_opt_gui_2.common.pyfemtet_model_bases import *
+from pyfemtet_opt_gui_2.common.return_msg import ReturnMsg, show_return_msg
+from pyfemtet_opt_gui_2.femtet.femtet import get_femtet, get_obj_names, open_help
 
 ICON_PATH = r'pyfemtet-opt-gui\pyfemtet_opt_gui_2\assets\icon\arrow.svg'
 
 # ===== model =====
 OBJ_MODEL = None
+_WITH_DUMMY = False
 
 
 def get_obj_model() -> 'ObjectiveTableItemModel':
     global OBJ_MODEL
     if OBJ_MODEL is None:
-        OBJ_MODEL = ObjectiveTableItemModel()
+        OBJ_MODEL = ObjectiveTableItemModel(_with_dummy=_WITH_DUMMY)
     return OBJ_MODEL
 
 
 # ===== constants =====
 class ObjectiveColumnNames(enum.StrEnum):
-    use = 'use'
-    name = 'name'
-    data = 'data',
-    direction = 'direction',
-    target_value = 'target',
+    use = CommonItemColumnName.use
+    name = '名前'
+    direction = '最適化の目標',
+    target_value = '目標値',
+    note = '備考',
 
 
 class ObjectiveDirection(enum.StrEnum):  # python >= 3.11
@@ -50,7 +54,7 @@ class ObjectiveDirection(enum.StrEnum):  # python >= 3.11
 
 
 # ===== qt objects =====
-class ObjectiveItemDelegate(StyledItemDelegateWithHeaderSearch):
+class ObjectiveItemDelegate(QStyledItemDelegate):
 
     def create_combobox(self, parent, default_value=None):
         cb = QComboBox(parent)
@@ -60,16 +64,23 @@ class ObjectiveItemDelegate(StyledItemDelegateWithHeaderSearch):
         cb.setFrame(False)
         return cb
 
+    def update_model(self, text, index):
+        with EditModel(index.model()):
+            index.model().setData(index, text, Qt.ItemDataRole.DisplayRole)
+
     def createEditor(self, parent, option, index):
-        if self.horizontal_header_data_is(index, ObjectiveColumnNames.direction):
+        if get_internal_header_data(index) == ObjectiveColumnNames.direction:
+            # combobox の作成
             cb = self.create_combobox(parent, default_value=index.model().data(index, Qt.ItemDataRole.DisplayRole))
+            # combobox の選択を変更したらセルの値も変更して
+            # combobox のあるセルに基づいて振る舞いが変わる
+            # セルの振る舞いを即時変えるようにする
+            cb.currentTextChanged.connect(lambda text: self.update_model(text, index))
+            # combobox が作成されたら即時メニューを展開する
             QTimer.singleShot(0, cb.showPopup)
             return cb
 
-        elif self.horizontal_header_data_is(index, ObjectiveColumnNames.use):
-            return None
-
-        elif self.horizontal_header_data_is(index, ObjectiveColumnNames.target_value):
+        elif get_internal_header_data(index) == ObjectiveColumnNames.target_value:
             editor: QLineEdit = super().createEditor(parent, option, index)
             double_validator = QDoubleValidator()
             double_validator.setRange(-1e10, 1e10, 2)
@@ -80,7 +91,7 @@ class ObjectiveItemDelegate(StyledItemDelegateWithHeaderSearch):
             return super().createEditor(parent, option, index)
 
     def sizeHint(self, option, index):
-        if self.horizontal_header_data_is(index, ObjectiveColumnNames.direction):
+        if get_internal_header_data(index) == ObjectiveColumnNames.direction:
             size = super().sizeHint(option, index)
             size.setWidth(24 + size.width())
             return size
@@ -88,7 +99,7 @@ class ObjectiveItemDelegate(StyledItemDelegateWithHeaderSearch):
             return super().sizeHint(option, index)
 
     def paint(self, painter, option, index):
-        if self.horizontal_header_data_is(index, ObjectiveColumnNames.direction):
+        if get_internal_header_data(index) == ObjectiveColumnNames.direction:
             cb = QtWidgets.QStyleOptionComboBox()
             # noinspection PyUnresolvedReferences
             cb.rect = option.rect
@@ -100,7 +111,7 @@ class ObjectiveItemDelegate(StyledItemDelegateWithHeaderSearch):
             super().paint(painter, option, index)
 
     def setEditorData(self, editor, index):
-        if self.horizontal_header_data_is(index, ObjectiveColumnNames.direction):
+        if get_internal_header_data(index) == ObjectiveColumnNames.direction:
             editor: QComboBox
             value = index.model().data(index, Qt.ItemDataRole.DisplayRole)
             editor.setCurrentText(value)
@@ -109,9 +120,10 @@ class ObjectiveItemDelegate(StyledItemDelegateWithHeaderSearch):
             super().setEditorData(editor, index)
 
     def setModelData(self, editor, model, index):
-        if self.horizontal_header_data_is(index, ObjectiveColumnNames.direction):
+        if get_internal_header_data(index) == ObjectiveColumnNames.direction:
             editor: QComboBox
-            model.setData(index, editor.currentText(), Qt.ItemDataRole.DisplayRole)
+            with EditModel(model):
+                model.setData(index, editor.currentText(), Qt.ItemDataRole.DisplayRole)
 
         else:
             super().setModelData(editor, model, index)
@@ -121,26 +133,22 @@ class ObjectiveTableItemModel(StandardItemModelWithHeaderSearch):
 
     def __init__(self, parent=None, _with_dummy=True):
         super().__init__(parent)
-        if _with_dummy or (__name__ == '__main__'):
+
+        self.setup_header_data()
+        if _with_dummy:
             self.__set_dummy_data()
 
-    def __set_dummy_data(self):
-        rows = 3
-        columns = len(ObjectiveColumnNames)
-
+    def setup_header_data(self):
         with EditModel(self):
-            self.setRowCount(rows + 1)  # header row for treeview
-            self.setColumnCount(columns)
-
-            # header
+            self.setColumnCount(len(ObjectiveColumnNames))
             for c, prop in enumerate(ObjectiveColumnNames):
+                # headerData
                 self.setHeaderData(
                     _section := c,
                     _orientation := Qt.Orientation.Horizontal,
                     _value := prop,
                     _role := Qt.ItemDataRole.DisplayRole
                 )
-
                 self.setHeaderData(
                     _section := c,
                     _orientation := Qt.Orientation.Horizontal,
@@ -148,11 +156,19 @@ class ObjectiveTableItemModel(StandardItemModelWithHeaderSearch):
                     _role := Qt.ItemDataRole.UserRole,
                 )
 
-            # header row
+            # first row == header row for treeview
+            self.setRowCount(1)
             for c, prop in enumerate(ObjectiveColumnNames):
                 item = QStandardItem()
                 item.setText(prop)
                 self.setItem(0, c, item)
+
+    def __set_dummy_data(self):
+        rows = 3
+        columns = len(ObjectiveColumnNames)
+
+        with EditModel(self):
+            self.setRowCount(rows + 1)  # header row for treeview
 
             # table
             for r in range(1, rows+1):
@@ -190,7 +206,7 @@ class ObjectiveTableItemModel(StandardItemModelWithHeaderSearch):
         r = index.row()
 
         # target_value 列は direction 列の値に基づいて Disable にする
-        if horizontal_header_data_is(index, ObjectiveColumnNames.target_value):
+        if get_internal_header_data(index) == ObjectiveColumnNames.target_value:
             c = self.get_column_by_header_data(ObjectiveColumnNames.direction)
             if self.item(r, c).text() != ObjectiveDirection.specific_value:
                 return super().flags(index) & ~Qt.ItemFlag.ItemIsEnabled
@@ -198,46 +214,44 @@ class ObjectiveTableItemModel(StandardItemModelWithHeaderSearch):
         return super().flags(index)
 
     def load_from_femtet(self):
-        from pyfemtet_opt_gui_2.femtet.femtet import get_femtet, get_prm_result_names
-        Femtet = get_femtet()
-        names = get_prm_result_names(Femtet)
+        obj_names, ret_msg = get_obj_names()
 
-        rows = len(names)
-        columns = len(ObjectiveColumnNames)
+        if ret_msg != ReturnMsg.no_message:
+            show_return_msg(ret_msg)
+
+        rows = len(obj_names)
 
         with EditModel(self):
             self.setRowCount(rows + 1)  # header row for treeview
-            self.setColumnCount(columns)
-
-            # header
-            for c, prop in enumerate(ObjectiveColumnNames):
-                self.setHeaderData(
-                    _section := c,
-                    _orientation := Qt.Orientation.Horizontal,
-                    _value := prop,
-                    _role := Qt.ItemDataRole.DisplayRole
-                )
-
-                self.setHeaderData(
-                    _section := c,
-                    _orientation := Qt.Orientation.Horizontal,
-                    _value := prop,
-                    _role := Qt.ItemDataRole.UserRole,
-                )
-
-            # header row
-            for c, prop in enumerate(ObjectiveColumnNames):
-                item = QStandardItem()
-                item.setText(prop)
-                self.setItem(0, c, item)
 
             # table
-            for r in range(1, rows + 1):
-                for c in range(columns):
-                    item = QStandardItem()
+            for r, obj_name in zip(range(1, rows + 1), obj_names):
+
+                c = self.get_column_by_header_data(ObjectiveColumnNames.use)
+                item = QStandardItem()
+                item.setCheckable(True)
+                item.setCheckState(Qt.CheckState.Checked)
+                item.setEditable(False)
+                self.setItem(r, c, item)
+
+                c = self.get_column_by_header_data(ObjectiveColumnNames.name)
+                item = QStandardItem()
+                item.setText(obj_name)
+                item.setEditable(False)
+                self.setItem(r, c, item)
+
+                c = self.get_column_by_header_data(ObjectiveColumnNames.direction)
+                item = QStandardItem()
+                item.setText(ObjectiveDirection.minimize)
+                self.setItem(r, c, item)
+
+                c = self.get_column_by_header_data(ObjectiveColumnNames.target_value)
+                item = QStandardItem()
+                item.setText('0')
+                self.setItem(r, c, item)
 
 
-class ObjectiveItemModelWithoutHeader(StandardItemModelWithoutHeader):
+class ObjectiveItemModelWithoutFirstRow(StandardItemModelWithoutFirstRow):
     pass
 
 
@@ -245,7 +259,7 @@ class ObjectiveWizardPage(QWizardPage):
 
     ui: Ui_WizardPage_obj
     source_model: ObjectiveTableItemModel
-    proxy_model: ObjectiveItemModelWithoutHeader
+    proxy_model: ObjectiveItemModelWithoutFirstRow
     delegate: ObjectiveItemDelegate
 
     def __init__(self, parent=None):
@@ -258,12 +272,20 @@ class ObjectiveWizardPage(QWizardPage):
     def setup_ui(self):
         self.ui = Ui_WizardPage_obj()
         self.ui.setupUi(self)
+        self.ui.commandLinkButton.clicked.connect(
+            lambda *args: open_help('ParametricAnalysis/ParametricAnalysis.htm')
+        )
 
     def setup_view(self):
-        self.ui.tableView_obj.clicked.connect(
-            # self.ui.tableView_obj.edit
+
+        view = self.ui.tableView
+
+        # direction 列のみシングルクリックでコンボボックスが
+        # 開くようにシングルクリックで edit モードに入るよう
+        # にする
+        view.clicked.connect(
             lambda *args, **kwargs: start_edit_specific_column(
-                self.ui.tableView_obj.edit,
+                self.ui.tableView.edit,
                 ObjectiveColumnNames.direction,
                 *args,
                 **kwargs
@@ -272,15 +294,18 @@ class ObjectiveWizardPage(QWizardPage):
 
     def setup_model(self):
         self.source_model = get_obj_model()
-        self.proxy_model = StandardItemModelWithoutHeader()
+        self.proxy_model = StandardItemModelWithoutFirstRow()
         self.proxy_model.setSourceModel(self.source_model)
-        self.proxy_model.dataChanged.connect(lambda *args: resize_column(self.ui.tableView_obj, *args))
-        self.ui.tableView_obj.setModel(self.proxy_model)
+        self.proxy_model.dataChanged.connect(
+            lambda *args: resize_column(self.ui.tableView, *args)
+        )
+        self.ui.tableView.setModel(self.proxy_model)
         self.resize_column()
+        self.ui.pushButton.clicked.connect(self.source_model.load_from_femtet)
 
     def setup_delegate(self):
         self.delegate = ObjectiveItemDelegate()
-        self.ui.tableView_obj.setItemDelegate(self.delegate)
+        self.ui.tableView.setItemDelegate(self.delegate)
         self.resize_column()
 
     def resize_column(self):
@@ -288,10 +313,15 @@ class ObjectiveWizardPage(QWizardPage):
         for r in range(self.source_model.rowCount()):
             for c in range(self.source_model.columnCount()):
                 items.append(self.source_model.item(r, c))
-        resize_column(self.ui.tableView_obj, *items)
+        resize_column(self.ui.tableView, *items)
 
 
 if __name__ == '__main__':
+    _WITH_DUMMY = True  # comment out to prevent debug
+    from pyfemtet_opt_gui_2.femtet.mock import get_femtet, get_obj_names  # comment out to prevent debug
+
+    get_femtet()
+
     app = QApplication()
     app.setStyle('fusion')
 

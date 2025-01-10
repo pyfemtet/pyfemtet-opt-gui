@@ -10,11 +10,10 @@ from PySide6.QtGui import *
 # noinspection PyUnresolvedReferences
 from PySide6.QtWidgets import *
 
-import enum
-
-from pyfemtet_opt_gui_2.common.common import *
+from pyfemtet_opt_gui_2.common.qt_util import *
+from pyfemtet_opt_gui_2.common.pyfemtet_model_bases import *
+from pyfemtet_opt_gui_2.models.objectives.obj import get_obj_model
 from pyfemtet_opt_gui_2.ui.ui_WizardPage_confirm import Ui_WizardPage
-from pyfemtet_opt_gui_2.obj.obj import ObjectiveTableItemModel, get_obj_model
 
 SUB_MODELS = None
 PROBLEM_MODEL = None
@@ -38,7 +37,7 @@ def get_problem_model() -> 'ProblemTableItemModel':
 
 
 # ===== objects =====
-class ProblemTableItemModel(StandardItemModelWithHeaderSearch):
+class ProblemTableItemModel(StandardItemModelWithEnhancedFirstRow):
 
     sub_models: dict[str, QStandardItemModel]
 
@@ -64,7 +63,7 @@ class ProblemItemModelWithoutUseUnchecked(SortFilterProxyModelOfStandardItemMode
 
     def filterAcceptsRow(self, source_row: int, source_parent: QModelIndex):
 
-        # level-0 item. show anyway.
+        # root item. show anyway.
         if not source_parent.isValid():
             return True
 
@@ -79,12 +78,7 @@ class ProblemItemModelWithoutUseUnchecked(SortFilterProxyModelOfStandardItemMode
         sub_model_row = source_row
 
         # then get the index of `use` cell
-        for c in range(sub_model.columnCount()):
-            index = sub_model.index(sub_model_row, c)
-            if horizontal_header_data_is(index, 'use'):
-                break
-        else:
-            raise RuntimeError('Internal Error!')
+        index = sub_model.get_column_by_header_data(CommonItemColumnName.use, sub_model_row)
 
         # check checkable
         is_checkable = sub_model.itemFromIndex(index).isCheckable()
@@ -126,7 +120,10 @@ class ConfirmWizardPage(QWizardPage):
 
 if __name__ == '__main__':
     import sys
-    from pyfemtet_opt_gui_2.obj.obj import ObjectiveWizardPage
+    from pyfemtet_opt_gui_2.models.obj.obj import ObjectiveWizardPage
+    from pyfemtet_opt_gui_2.femtet.femtet import get_femtet
+
+    get_femtet()
 
     app = QApplication()
     app.setStyle('fusion')

@@ -11,8 +11,8 @@ from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 
 from pyfemtet_opt_gui_2.ui.ui_Wizard_main import Ui_Wizard
-from pyfemtet_opt_gui_2.obj.obj import ObjectiveWizardPage
-from pyfemtet_opt_gui_2.problem.problem import ConfirmWizardPage
+from pyfemtet_opt_gui_2.models.objectives.obj import ObjectiveWizardPage
+from pyfemtet_opt_gui_2.models.problem.problem import ConfirmWizardPage
 
 import sys
 
