@@ -1,4 +1,3 @@
-from threading import Thread
 import ctypes
 import subprocess
 import webbrowser
@@ -9,6 +8,7 @@ import win32process
 
 from pyfemtet_opt_gui_2.logger import get_logger
 from pyfemtet_opt_gui_2.common.return_msg import ReturnMsg
+from pyfemtet_opt_gui_2.common.expression_processor import Expression
 
 logger = get_logger('Femtet')
 
@@ -16,6 +16,7 @@ logger = get_logger('Femtet')
 # global variables per process
 _Femtet: 'CDispatch' = None
 _dll: 'ctypes.LibraryLoader._dll' = None
+CONNECTION_TIMEOUT = 15
 
 __all__ = [
     'get_femtet',
@@ -27,7 +28,7 @@ __all__ = [
 
 
 # ===== Femtet process & object handling =====
-def get_femtet():
+def get_femtet() -> tuple[CDispatch | None, ReturnMsg]:
     global _Femtet
 
     should_restart_femtet = False
@@ -43,17 +44,20 @@ def get_femtet():
     # Femtet を再起動する
     if should_restart_femtet:
         logger.info('Femtet を起動しています。')
-        util.auto_execute_femtet()
 
-        # Femtet と再接続する (Dispatch は重ね掛け OK)
-        logger.info('Femtet との接続を確立しています。')
+        # 内部で Dispatch 実行も行うので
+        # その可否も含め接続成功判定が可能
+        succeeded = util.auto_execute_femtet(wait_second=CONNECTION_TIMEOUT)
         _Femtet = Dispatch('FemtetMacro.Femtet')
-        # 返答が正常になるまで待つ
-        t = Thread(target=_wait_femtet_connected)
-        t.start()
-        t.join()
 
-    return _Femtet
+    else:
+        succeeded = True
+
+    if succeeded:
+        return _Femtet, ReturnMsg.no_message
+
+    else:
+        return None, ReturnMsg.Error.femtet_connection_failed
 
 
 def _get_pid_from_hwnd(hwnd):
@@ -94,27 +98,17 @@ def get_connection_state() -> ReturnMsg:
 
     # Dispatch オブジェクトは存在するが
     # メソッドにアクセスできない場合
+    # (makepy できていない？)
     except Exception:
+        return ReturnMsg.Error.femtet_access_error
+
+    # メソッドにアクセスできるが
+    # hwnd が 0 である状態
+    if hwnd == 0:
         return ReturnMsg.Error.femtet_access_error
 
     # Femtet is now alive
     return ReturnMsg.no_message
-
-
-def _wait_femtet_connected(timeout=30):
-    from time import time, sleep
-
-    start = time()
-    while time() - start < timeout:
-        hwnd = _Femtet.hWnd
-        if hwnd > 0:
-            break
-        else:
-            sleep(0.5)
-    else:
-        raise TimeoutError(f'Cannot connect to Femtet in {timeout} sec.')
-
-    return hwnd
 
 
 # ===== ParametricIF handling =====
@@ -162,29 +156,36 @@ def get_obj_names() -> tuple[list, ReturnMsg]:
 
 if __name__ == '__main__':
     # get Femtet
-    Femtet_ = get_femtet()
+    Femtet_, ret_msg = get_femtet()
+    if ret_msg != ReturnMsg.no_message:
+        print(ret_msg)
+        print(get_connection_state())
+        from sys import exit
+        exit()
 
-    # get obj_names
-    obj_names, ret_msg = get_obj_names()
+    else:
+        # get obj_names
+        obj_names, ret_msg = get_obj_names()
 
-    print(ret_msg)
-    print(obj_names)
+        print(ret_msg)
+        print(obj_names)
 
 
 # ===== Parameter =====
-def get_variables() -> tuple[dict[str, str | float], ReturnMsg]:
+def get_variables() -> tuple[dict[str, Expression], ReturnMsg]:
     out = dict()
 
     # check Femtet Connection
     ret = get_connection_state()
     if ret != ReturnMsg.no_message:
-        return out, ret
+        return {}, ret
 
     # implementation check
-    if not hasattr(_Femtet, 'GetVariableNames_py') \
-    or not hasattr(_Femtet, 'GetVariableExpression'):
-        ret = ReturnMsg.Error.femtet_macro_version_old
-        return out, ret
+    if (
+            not hasattr(_Femtet, 'GetVariableNames_py')
+            or not hasattr(_Femtet, 'GetVariableExpression')
+    ):
+        return {}, ReturnMsg.Error.femtet_macro_version_old
 
     # get variables
     variable_names = _Femtet.GetVariableNames_py()  # equals or later than 2023.1.1
@@ -196,13 +197,10 @@ def get_variables() -> tuple[dict[str, str | float], ReturnMsg]:
     # succeeded
     for var_name in variable_names:
         expression: str = _Femtet.GetVariableExpression(var_name)
-
-        # check number or expression
         try:
-            value = float(expression)
-            out[var_name] = value
-        except ValueError:
-            out[var_name] = expression
+            out[var_name] = Expression(expression)
+        except Exception:
+            return {}, ReturnMsg.Error.cannot_recognize_as_an_expression
 
     return out, ReturnMsg.no_message
 

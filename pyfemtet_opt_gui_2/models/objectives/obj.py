@@ -16,26 +16,36 @@ from PySide6 import QtWidgets, QtCore, QtGui
 
 import enum
 import sys
+from contextlib import nullcontext
 
 from pyfemtet_opt_gui_2.ui.ui_WizardPage_obj import Ui_WizardPage_obj
 
 from pyfemtet_opt_gui_2.common.qt_util import *
 from pyfemtet_opt_gui_2.common.pyfemtet_model_bases import *
-from pyfemtet_opt_gui_2.common.return_msg import ReturnMsg, show_return_msg
-from pyfemtet_opt_gui_2.femtet.femtet import get_femtet, get_obj_names, open_help
+from pyfemtet_opt_gui_2.common.return_msg import *
+from pyfemtet_opt_gui_2.femtet.femtet import *
 
-ICON_PATH = r'pyfemtet-opt-gui\pyfemtet_opt_gui_2\assets\icon\arrow.svg'
 
 # ===== model =====
 OBJ_MODEL = None
 _WITH_DUMMY = False
 
 
-def get_obj_model() -> 'ObjectiveTableItemModel':
+def get_obj_model(parent=None, _with_dummy=None) -> 'ObjectiveTableItemModel':
     global OBJ_MODEL
     if OBJ_MODEL is None:
-        OBJ_MODEL = ObjectiveTableItemModel(_with_dummy=_WITH_DUMMY)
+        OBJ_MODEL = ObjectiveTableItemModel(
+            parent=parent,
+            _with_dummy=_with_dummy if _with_dummy is not None else _WITH_DUMMY,
+        )
     return OBJ_MODEL
+
+
+def get_obj_model_for_problem(parent, _with_dummy=None):
+    model = get_obj_model(parent, _with_dummy)
+    model_for_problem = ObjectiveItemModelForProblemTableView()
+    model_for_problem.setSourceModel(model)
+    return model_for_problem
 
 
 # ===== constants =====
@@ -129,77 +139,9 @@ class ObjectiveItemDelegate(QStyledItemDelegate):
             super().setModelData(editor, model, index)
 
 
-class ObjectiveTableItemModel(StandardItemModelWithHeaderSearch):
+class ObjectiveTableItemModel(StandardItemModelWithHeader):
 
-    def __init__(self, parent=None, _with_dummy=True):
-        super().__init__(parent)
-
-        self.setup_header_data()
-        if _with_dummy:
-            self.__set_dummy_data()
-
-    def setup_header_data(self):
-        with EditModel(self):
-            self.setColumnCount(len(ObjectiveColumnNames))
-            for c, prop in enumerate(ObjectiveColumnNames):
-                # headerData
-                self.setHeaderData(
-                    _section := c,
-                    _orientation := Qt.Orientation.Horizontal,
-                    _value := prop,
-                    _role := Qt.ItemDataRole.DisplayRole
-                )
-                self.setHeaderData(
-                    _section := c,
-                    _orientation := Qt.Orientation.Horizontal,
-                    _value := prop,
-                    _role := Qt.ItemDataRole.UserRole,
-                )
-
-            # first row == header row for treeview
-            self.setRowCount(1)
-            for c, prop in enumerate(ObjectiveColumnNames):
-                item = QStandardItem()
-                item.setText(prop)
-                self.setItem(0, c, item)
-
-    def __set_dummy_data(self):
-        rows = 3
-        columns = len(ObjectiveColumnNames)
-
-        with EditModel(self):
-            self.setRowCount(rows + 1)  # header row for treeview
-
-            # table
-            for r in range(1, rows+1):
-                for c in range(columns):
-                    item = QStandardItem()
-                    # NOTE: The default implementation treats Qt::EditRole and Qt::DisplayRole as referring to the same data.
-                    # item.setData(f'text{r}{c}', role=Qt.ItemDataRole.EditRole)
-                    item.setData(f'text{r}{c}', role=Qt.ItemDataRole.DisplayRole)
-                    item.setData(f'tooltip of {r}{c}', role=Qt.ItemDataRole.ToolTipRole)
-                    item.setData(f'WhatsThis of {r}{c}', role=Qt.ItemDataRole.WhatsThisRole)
-                    # item.setData(QSize(w=10, h=19), role=Qt.ItemDataRole.SizeHintRole)  # 悪い
-                    item.setData(f'internal_text{r}{c}', role=Qt.ItemDataRole.UserRole)
-                    # item.setText(f'text{r}{c}')
-
-                    if c == 1 or c == 2:
-                        icon = QIcon(ICON_PATH)  # Cannot read .ico file, but can .svg file?
-                        item.setIcon(icon)
-
-                    if c == 0 or c == 2:
-                        item.setCheckable(True)
-                        item.setCheckState(Qt.CheckState.Checked)
-
-                    if c == 2:
-                        # current_text = item.text()
-                        current_text = item.data(Qt.ItemDataRole.DisplayRole)
-                        item.setText(current_text + '\n2 line')
-
-                    if c == 3:
-                        item.setText(ObjectiveDirection.minimize)
-
-                    self.setItem(r, c, item)
+    ColumnNames = ObjectiveColumnNames
 
     def flags(self, index):
 
@@ -213,42 +155,110 @@ class ObjectiveTableItemModel(StandardItemModelWithHeaderSearch):
 
         return super().flags(index)
 
-    def load_from_femtet(self):
+    def load_femtet(self):
+        # parametric if 設定取得
         obj_names, ret_msg = get_obj_names()
+        if not can_continue(ret_msg, parent=self.parent()):
+            return
 
-        if ret_msg != ReturnMsg.no_message:
-            show_return_msg(ret_msg)
+        # 現在の状態を stash
+        stashed_data: dict[str, dict[str, str]] = self.stash_current_table()
 
-        rows = len(obj_names)
-
+        rows = len(obj_names) + 1
         with EditModel(self):
-            self.setRowCount(rows + 1)  # header row for treeview
+            self.setRowCount(rows)  # header row for treeview
 
-            # table
-            for r, obj_name in zip(range(1, rows + 1), obj_names):
+            for r, name in zip(range(1, rows), obj_names):
 
-                c = self.get_column_by_header_data(ObjectiveColumnNames.use)
-                item = QStandardItem()
-                item.setCheckable(True)
-                item.setCheckState(Qt.CheckState.Checked)
-                item.setEditable(False)
-                self.setItem(r, c, item)
+                # ===== use =====
+                with nullcontext():
+                    item = QStandardItem()
+                    item.setCheckable(True)
+                    item.setEditable(False)
 
-                c = self.get_column_by_header_data(ObjectiveColumnNames.name)
-                item = QStandardItem()
-                item.setText(obj_name)
-                item.setEditable(False)
-                self.setItem(r, c, item)
+                    # stashed data の中に obj_name があればそれを復元
+                    if name in stashed_data.keys():
+                        self.set_data_from_stash(
+                            item, name, self.ColumnNames.use, stashed_data
+                        )
 
-                c = self.get_column_by_header_data(ObjectiveColumnNames.direction)
-                item = QStandardItem()
-                item.setText(ObjectiveDirection.minimize)
-                self.setItem(r, c, item)
+                    # デフォルトは True
+                    else:
+                        item.setCheckState(Qt.CheckState.Checked)
 
-                c = self.get_column_by_header_data(ObjectiveColumnNames.target_value)
-                item = QStandardItem()
-                item.setText('0')
-                self.setItem(r, c, item)
+                    # item を作成
+                    c = self.get_column_by_header_data(self.ColumnNames.use)
+                    self.setItem(r, c, item)
+
+
+                # ===== name =====
+                with nullcontext():
+                    # これは stash を復元する必要がない
+                    item = QStandardItem()
+                    item.setText(name.replace('/', '\n/'))
+                    item.setEditable(False)
+                    c = self.get_column_by_header_data(self.ColumnNames.name)
+                    self.setItem(r, c, item)
+
+
+                # ===== direction =====
+                with nullcontext():
+                    item = QStandardItem()
+
+                    # stashed data の中に obj_name があればそれを復元
+                    if name in stashed_data.keys():
+                        self.set_data_from_stash(
+                            item, name, self.ColumnNames.direction, stashed_data
+                        )
+
+                    # デフォルトは minimize
+                    else:
+                        value = ObjectiveDirection.minimize
+                        item.setText(value)
+
+                    c = self.get_column_by_header_data(self.ColumnNames.direction)
+                    self.setItem(r, c, item)
+
+
+                # ===== target_value =====
+                with nullcontext():
+                    item = QStandardItem()
+
+                    # stashed data の中に obj_name があればそれを復元
+                    if name in stashed_data.keys():
+                        self.set_data_from_stash(
+                            item, name, self.ColumnNames.target_value, stashed_data
+                        )
+
+                    # デフォルトは 0
+                    else:
+                        item.setText('0')
+
+                    c = self.get_column_by_header_data(self.ColumnNames.target_value)
+                    self.setItem(r, c, item)
+
+
+                # ===== note =====
+                with nullcontext():
+                    item = QStandardItem()
+
+                    # stashed data の中に obj_name があればそれを復元
+                    if name in stashed_data.keys():
+                        self.set_data_from_stash(
+                            item, name, self.ColumnNames.note, stashed_data
+                        )
+
+                    # デフォルトは空欄
+                    else:
+                        item.setText('')
+
+                    # item 作成
+                    c = self.get_column_by_header_data(self.ColumnNames.note)
+                    self.setItem(r, c, item)
+
+
+class ObjectiveItemModelForProblemTableView(SortFilterProxyModelOfStandardItemModel):
+    pass
 
 
 class ObjectiveItemModelWithoutFirstRow(StandardItemModelWithoutFirstRow):
@@ -262,11 +272,11 @@ class ObjectiveWizardPage(QWizardPage):
     proxy_model: ObjectiveItemModelWithoutFirstRow
     delegate: ObjectiveItemDelegate
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, load_femtet_fun: callable = None):
         super().__init__(parent)
         self.setup_ui()
         self.setup_view()
-        self.setup_model()
+        self.setup_model(load_femtet_fun)
         self.setup_delegate()
 
     def setup_ui(self):
@@ -292,16 +302,20 @@ class ObjectiveWizardPage(QWizardPage):
             )
         )
 
-    def setup_model(self):
-        self.source_model = get_obj_model()
-        self.proxy_model = StandardItemModelWithoutFirstRow()
+    def setup_model(self, load_femtet_fun):
+        self.source_model = get_obj_model(self)
+        self.proxy_model = ObjectiveItemModelWithoutFirstRow()
         self.proxy_model.setSourceModel(self.source_model)
         self.proxy_model.dataChanged.connect(
             lambda *args: resize_column(self.ui.tableView, *args)
         )
         self.ui.tableView.setModel(self.proxy_model)
         self.resize_column()
-        self.ui.pushButton.clicked.connect(self.source_model.load_from_femtet)
+        self.ui.pushButton.clicked.connect(
+            (lambda *args: self.source_model.load_femtet())
+            if load_femtet_fun is None else
+            (lambda *_: load_femtet_fun())
+        )
 
     def setup_delegate(self):
         self.delegate = ObjectiveItemDelegate()
@@ -317,8 +331,8 @@ class ObjectiveWizardPage(QWizardPage):
 
 
 if __name__ == '__main__':
-    _WITH_DUMMY = True  # comment out to prevent debug
-    from pyfemtet_opt_gui_2.femtet.mock import get_femtet, get_obj_names  # comment out to prevent debug
+    # _WITH_DUMMY = True  # comment out to prevent debug
+    # from pyfemtet_opt_gui_2.femtet.mock import get_femtet, get_obj_names  # comment out to prevent debug
 
     get_femtet()
 

@@ -14,31 +14,51 @@ from PySide6.QtWidgets import *
 import enum
 
 
+__all__ = [
+    'ReturnMsg',
+    'show_return_msg',
+    'can_continue'
+]
+
+
 class ReturnMsg:
-    no_message = ''
+    no_message = None
 
     class Info(enum.StrEnum):
         _test = 'This is a test information.'
 
     class Warn(enum.StrEnum):
         _test = 'This is a test warning message.'
+        update_lb_automatically = '値と下限の関係が正しくなくなったため、下限を更新します。'
+        update_ub_automatically = '値と上限の関係が正しくなくなったため、上限を更新します。'
 
     class Error(enum.StrEnum):
         _test = 'This is a test Error message.'
+        femtet_connection_failed = 'Femtet との接続がタイムアウトしました。'
         femtet_not_found = 'Femtet のプロセスがありません。'
         femtet_connection_not_yet = 'まだ Femtet と接続されていません。'
         femtet_access_error = 'Femtet にアクセスできません。'
         femtet_macro_version_old = 'Femtet 本体または最後に実行された「マクロ機能の有効化」のバージョンが古いです。'
         evaluated_expression_not_float = '式が計算できないか、計算結果に実数以外の数が含まれています'  # 句読点なし
+        cannot_open_sample_femprj = 'サンプルファイルのオープンに失敗しました'
+        inconsistent_lb_ub = '上下限の大小関係が正しくありません。'
+        inconsistent_value_ub = '値と上限の大小関係が正しくありません。'
+        inconsistent_value_lb = '値と下限の大小関係が正しくありません。'
+        cannot_recognize_as_an_expression = '文字式の認識に失敗しました。'
+        not_a_number = '数値または数式の認識に失敗しました。'
 
 
 # ReturnMsg を受け取ってダイアログ表示し
 # OK かどうかを返す関数
 def show_return_msg(
         return_msg: ReturnMsg,
-        parent=None,
-        with_cancel_button=False
+        parent: QWidget,
+        with_cancel_button=False,
+        additional_message=None,
 ) -> bool:
+
+    if return_msg == ReturnMsg.no_message:
+        return True
 
     if isinstance(return_msg, ReturnMsg.Info):
         mb = QMessageBox.information
@@ -55,17 +75,60 @@ def show_return_msg(
     else:
         raise NotImplementedError
 
+    if additional_message is None:
+        display_msg = return_msg
+
+    else:
+        display_msg = f'{return_msg}\n{additional_message}'
 
     if with_cancel_button:
-        pressed = mb(parent, title, return_msg, QMessageBox.StandardButton.Ok, QMessageBox.StandardButton.Cancel)
+        pressed = mb(parent, title, display_msg, QMessageBox.StandardButton.Ok, QMessageBox.StandardButton.Cancel)
         return pressed == QMessageBox.StandardButton.Ok
 
     else:
         # QMessageBox を OK を押さずに Esc や閉じるボタンで閉じると
         # 戻り値が QMessageBox.StandardButton.Cancel になるため
         # cancel の選択肢を与えない場合は必ず True を返すようにする
-        mb(parent, title, return_msg, QMessageBox.StandardButton.Ok)
+        mb(parent, title, display_msg, QMessageBox.StandardButton.Ok)
         return True
+
+
+# ReturnMsg を受け取ってダイアログを表示した後
+# 内部処理を進めてよいかどうかを返す関数
+def can_continue(
+        return_msg: ReturnMsg,
+        parent: QWidget,
+        with_cancel_button='auto',
+        no_dialog_if_info=False,
+        additional_message=None,
+) -> bool:
+    """
+    return_msg is None -> return True
+    return_msg is Info -> return True
+    return_msg is Warn -> return True if accepted
+    return_msg is Error -> return False
+    """
+    if return_msg == ReturnMsg.no_message:
+        return True
+
+    if isinstance(return_msg, ReturnMsg.Info):
+        if not no_dialog_if_info:
+            if with_cancel_button == 'auto':
+                with_cancel_button = False
+            show_return_msg(return_msg, parent, with_cancel_button, additional_message)
+        return True
+
+    elif isinstance(return_msg, ReturnMsg.Warn):
+        if with_cancel_button == 'auto':
+            with_cancel_button = True
+        accepted = show_return_msg(return_msg, parent, with_cancel_button, additional_message)
+        return accepted
+
+    elif isinstance(return_msg, ReturnMsg.Error):
+        if with_cancel_button == 'auto':
+            with_cancel_button = False
+        show_return_msg(return_msg, parent, with_cancel_button, additional_message)
+        return False
 
 
 # basic behavior
@@ -107,7 +170,7 @@ if __name__ == '__main__':
             button.clicked.connect(self.button_clicked)
             self.setCentralWidget(button)
 
-        def button_clicked(self, s):
+        def button_clicked(self, _):
 
             return_msg = some_fun()
 
