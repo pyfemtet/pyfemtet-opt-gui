@@ -195,7 +195,7 @@ class ObjectiveTableItemModel(StandardItemModelWithHeader):
                 with nullcontext():
                     # これは stash を復元する必要がない
                     item = QStandardItem()
-                    item.setText(name.replace('/', '\n/'))
+                    item.setText(name)
                     item.setEditable(False)
                     c = self.get_column_by_header_data(self.ColumnNames.name)
                     self.setItem(r, c, item)

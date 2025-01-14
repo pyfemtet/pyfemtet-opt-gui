@@ -14,14 +14,9 @@ from pyfemtet_opt_gui_2.femtet.femtet import *
 from pyfemtet_opt_gui_2.common.return_msg import *
 
 from pyfemtet_opt_gui_2.ui.ui_Wizard_main import Ui_Wizard
-from pyfemtet_opt_gui_2.models.variables.var import VariableWizardPage, VariableItemModel, get_var_model
-from pyfemtet_opt_gui_2.models.objectives.obj import ObjectiveWizardPage, ObjectiveTableItemModel, get_obj_model
-from pyfemtet_opt_gui_2.models.problem.problem import ConfirmWizardPage, ProblemTableItemModel, get_problem_model
-
-# import pyfemtet_opt_gui_2.models.variables.var
-# import pyfemtet_opt_gui_2.models.objectives.obj
-# import pyfemtet_opt_gui_2.models.problem.problem
-
+from pyfemtet_opt_gui_2.models.variables.var import VariableWizardPage
+from pyfemtet_opt_gui_2.models.objectives.obj import ObjectiveWizardPage
+from pyfemtet_opt_gui_2.models.problem.problem import ConfirmWizardPage
 
 import os
 import sys

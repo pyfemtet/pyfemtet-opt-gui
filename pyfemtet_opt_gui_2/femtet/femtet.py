@@ -150,7 +150,7 @@ def get_obj_names() -> tuple[list, ReturnMsg]:
         result = dll.GetPrmResultName(i)
         obj_name = result.decode('mbcs')
         # objective value function
-        out.append(obj_name)
+        out.append(obj_name.replace(' / ', '\n'))
     return out, ReturnMsg.no_message
 
 
