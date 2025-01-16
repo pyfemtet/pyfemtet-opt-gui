@@ -18,7 +18,6 @@ from PySide6.QtGui import *
 # noinspection PyUnresolvedReferences
 from PySide6 import QtWidgets, QtCore, QtGui
 
-
 __all__ = [
     'get_enhanced_font',
     'EditModel',
@@ -28,6 +27,7 @@ __all__ = [
     'StandardItemModelWithHeaderSearch',
     'start_edit_specific_column',
     'resize_column',
+    'DelegateWithCombobox',
 ]
 
 
@@ -44,17 +44,36 @@ def get_enhanced_font():
 
 # モデル編集を Start, End するためのコンテキストマネージャ
 class EditModel:
-
     model: QAbstractItemModel
 
-    def __init__(self, model: QAbstractItemModel):
+    def __init__(self, model: QAbstractItemModel, index: QModelIndex = None, roles: list[Qt.ItemDataRole] = None):
         self.model = model
+        self.index = index
+        self.roles = roles if roles is not None else []
 
     def __enter__(self):
-        self.model.beginResetModel()
+        # beginResetModel-endResetModel を使うと
+        # その間別の処理が model にアクセスすると
+        # アプリケーションがクラッシュするらしい
+        # ので dataChanged を emit する方式に変更
+        # self.model.beginResetModel()
+        pass
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        self.model.endResetModel()
+        # self.model.endResetModel()
+
+        if self.index is None:
+            index_1 = self.model.index(0, 0)
+            index_2 = self.model.index(self.model.rowCount() - 1, self.model.columnCount() - 1)
+        else:
+            index_1 = index_2 = self.index
+
+        # https://doc.qt.io/qt-6/qabstractitemmodel.html#dataChanged
+        # index_1: 変更範囲の開始 index
+        # index_2: 変更範囲の終了 index
+        # roles: list[int]: 変更範囲で変更された itemDataRole のリスト。
+        #     空リストを渡せば全て変更されたとみなす。
+        self.model.dataChanged.emit(index_1, index_2, self.roles)
 
 
 # QSortFilterProxyModel の入力補完を QStandardItemModel に
@@ -64,6 +83,79 @@ class SortFilterProxyModelOfStandardItemModel(QSortFilterProxyModel):
         s = super().sourceModel()
         assert isinstance(s, QStandardItemModel)
         return s
+
+
+# Combobox を作成する機能を備えた Delegate
+class DelegateWithCombobox(QStyledItemDelegate):
+
+    target_indices: set[QModelIndex]
+
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.target_indices = set()
+
+    def update_model(self, index, text):
+        model = index.model()
+        with EditModel(model):
+            model.setData(index, text, Qt.ItemDataRole.DisplayRole)
+
+    def create_combobox(
+            self,
+            parent: QWidget,
+            index: QModelIndex,
+            choices: list[str],
+            default=None
+    ) -> QWidget:
+
+        # 本来の setModelData を prevent するために
+        self.target_indices.add(index)
+
+        # default value の validate
+        if default is None:
+            default = choices[0]
+
+        # combobox 作成
+        cb = QComboBox(parent)
+        cb.addItems(choices)
+        cb.setCurrentText(default)
+        cb.setFrame(False)
+
+        # combobox の選択を変更したらセルの値も変更して
+        # combobox のあるセルに基づいて振る舞いが変わる
+        # セルのふるまいを即時変えるようにする
+        cb.currentTextChanged.connect(
+            lambda text: self.update_model(index, text)
+        )
+
+        # combobox が作成されたら（つまり編集状態になったら）
+        # 即時メニューを展開する
+        QTimer.singleShot(0, cb.showPopup)
+
+        return cb
+
+    def setEditorData(self, editor, index):
+        if index in self.target_indices:
+            return
+        else:
+            super().setEditorData(editor, index)
+
+    def setModelData(self, editor, model, index):
+        if index in self.target_indices:
+            return
+        else:
+            super().setModelData(editor, model, index)
+
+    def get_combobox_size_hint(self, option, index) -> QSize:
+        size = super().sizeHint(option, index)
+        size.setWidth(24 + size.width())  # combobox の下三角マークの幅
+        return size
+
+    def paint_as_combobox(self, painter, option, index):
+        cb: QtWidgets.QStyleOptionComboBox = QStyleOptionComboBox()
+        cb.rect = option.rect
+        cb.currentText = index.model().data(index, Qt.ItemDataRole.DisplayRole)
+        QtWidgets.QApplication.style().drawComplexControl(QtWidgets.QStyle.ComplexControl.CC_ComboBox, cb, painter)
+        QtWidgets.QApplication.style().drawControl(QtWidgets.QStyle.ControlElement.CE_ComboBoxLabel, cb, painter)
 
 
 # header の UserDataRole を前提とした QStandardItemModel

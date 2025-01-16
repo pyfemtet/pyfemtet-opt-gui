@@ -23,18 +23,21 @@ from pyfemtet_opt_gui_2.common.expression_processor import *
 # noinspection PyUnresolvedReferences
 from pyfemtet_opt_gui_2.femtet.femtet import *
 
-import enum
+from pyfemtet_opt_gui_2.models.config.algorithm.base import (
+    QAbstractAlgorithmItemModel,
+    AbstractAlgorithmConfig,
+    AbstractAlgorithmConfigItem,
+    QAlgorithmStandardItem,
+)
 
-from pyfemtet_opt_gui_2.models.config.algorithm.base import AbstractAlgorithmItemModel, AbstractAlgorithmConfig, AbstractAlgorithmConfigItem
+import enum
 
 
 # （アルゴリズムごとの）設定項目
 class RandomAlgorithmConfig(AbstractAlgorithmConfig):
-
     name = 'Random'
 
     class Items(enum.Enum):
-
         @enum.member
         class Seed(AbstractAlgorithmConfigItem):
             name = 'seed 値'
@@ -54,14 +57,14 @@ class RandomAlgorithmDelegate(QStyledItemDelegate):
 
         # `Seed` 行の `value` 列かどうか
         return (
-            column_data == RandomAlgorithmItemModel.ColumnNames.value
-            and row_data == RandomAlgorithmConfig.Items.Seed.value.name
+                column_data == QRandomAlgorithmItemModel.ColumnNames.value
+                and row_data == RandomAlgorithmConfig.Items.Seed.value.name
         )
 
     def createEditor(self, parent, option, index):
 
         if self.is_seed_value(index):
-            editor: QLineEdit = super().createEditor(parent, option, index)
+            editor: QLineEdit = QLineEdit(parent=parent)
             return editor
 
         else:
@@ -86,33 +89,48 @@ class RandomAlgorithmDelegate(QStyledItemDelegate):
 
 
 # （アルゴリズムごとの）設定項目の ItemModel
-class RandomAlgorithmItemModel(AbstractAlgorithmItemModel):
+class QRandomAlgorithmItemModel(QAbstractAlgorithmItemModel):
     AlgorithmConfig: RandomAlgorithmConfig = RandomAlgorithmConfig()
 
     def get_delegate(self):
         return RandomAlgorithmDelegate()
 
 
+# シングルトンパターン
+
+_MODEL: QRandomAlgorithmItemModel = None
+_ITEM: QAlgorithmStandardItem = None
+
+
+def get_random_algorithm_config_item(parent) -> QAlgorithmStandardItem:
+    global _MODEL, _ITEM
+
+    if _MODEL is None:
+        _MODEL = QRandomAlgorithmItemModel(parent)
+
+    if _ITEM is None:
+        _ITEM = QAlgorithmStandardItem(RandomAlgorithmConfig.name, _MODEL)
+
+    return _ITEM
+
+
 if __name__ == '__main__':
-    app = QApplication()
+    debug_app = QApplication()
 
-    model = RandomAlgorithmItemModel()
+    debug_model = QRandomAlgorithmItemModel()
 
-    view = QTreeView()
-    view.setModel(model)
+    debug_view = QTreeView()
+    debug_view.setModel(debug_model)
 
-    delegate = RandomAlgorithmDelegate()
-    view.setItemDelegate(delegate)
+    debug_delegate = RandomAlgorithmDelegate()
+    debug_view.setItemDelegate(debug_delegate)
 
-    layout = QGridLayout()
-    layout.addWidget(view)
+    debug_layout = QGridLayout()
+    debug_layout.addWidget(debug_view)
 
-    window = QDialog()
-    window.setLayout(layout)
+    debug_window = QDialog()
+    debug_window.setLayout(debug_layout)
 
-    window.show()
+    debug_window.show()
 
-    app.exec()
-
-
-
+    debug_app.exec()

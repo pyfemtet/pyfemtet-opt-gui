@@ -13,7 +13,6 @@ from PySide6.QtGui import *
 # noinspection PyUnresolvedReferences
 from PySide6 import QtWidgets, QtCore, QtGui
 
-
 import enum
 import sys
 from contextlib import nullcontext
@@ -26,11 +25,21 @@ from pyfemtet_opt_gui_2.common.return_msg import *
 from pyfemtet_opt_gui_2.common.expression_processor import *
 from pyfemtet_opt_gui_2.femtet.femtet import *
 
-from pyfemtet_opt_gui_2.models.config.algorithm.base import AlgorithmQStandardItem, AbstractAlgorithmItemModel
-from pyfemtet_opt_gui_2.models.config.algorithm.algorithm_random import RandomAlgorithmItemModel, RandomAlgorithmConfig
+from pyfemtet_opt_gui_2.models.config.algorithm.base import (
+    QAlgorithmStandardItem,
+    QAbstractAlgorithmItemModel,
+    AbstractAlgorithmConfig,
+    get_abstract_algorithm_config_item,
+)
+
+from pyfemtet_opt_gui_2.models.config.algorithm.algorithm_random import (
+    QRandomAlgorithmItemModel,
+    get_random_algorithm_config_item,
+    RandomAlgorithmConfig,
+)
 
 DEFAULT_ALGORITHM_CONFIG = RandomAlgorithmConfig
-
+Q_DEFAULT_ALGORITHM_CONFIG_ITEM_FACTORY = get_random_algorithm_config_item
 
 # ===== model =====
 _CONFIG_MODEL = None
@@ -56,21 +65,39 @@ def get_config_model_for_problem(parent, _with_dummy=None):
 
 
 # ===== constants =====
-class ItemColumnNames(enum.StrEnum):
+
+# 設定項目のヘッダー
+class ConfigHeaderNames(enum.StrEnum):
     # use = CommonItemColumnName.use  # 不要、かつ Algorithm とも一貫して見やすい
     name = '項目'
     value = '設定値'
     note = '備考'
 
 
+# 設定項目のベース
 class AbstractConfigItem:
     name = ...
     default = ''
     note = ''
 
 
-class ItemRowNames(enum.Enum):
+# 設定項目のうちアルゴリズムに関する項目
+# 複雑なので切り出し
+class Algorithm(AbstractConfigItem):
+    name = '最適化アルゴリズム'
+    default = DEFAULT_ALGORITHM_CONFIG.name
+    choices = [
+        AbstractAlgorithmConfig.name,
+        RandomAlgorithmConfig.name,
+    ]
+    corresponding_data = [
+        get_abstract_algorithm_config_item,
+        get_random_algorithm_config_item,
+    ]
 
+
+# 設定項目の実装
+class ConfigItemClassEnum(enum.Enum):
     @enum.member
     class n_trials(AbstractConfigItem):
         name = '解析実行回数'
@@ -84,20 +111,18 @@ class ItemRowNames(enum.Enum):
         note = ''
 
     @enum.member
-    class algorithm(AbstractConfigItem):
-        name = '最適化アルゴリズム'
-        default = DEFAULT_ALGORITHM_CONFIG.name
+    class algorithm(Algorithm):
+        pass
 
 
 # ===== Models =====
-# Delegate
-class ConfigTreeViewDelegate(QStyledItemDelegate):
 
-    # FIXME: あとで抽象化する
+# Delegate
+class ConfigTreeViewDelegate(DelegateWithCombobox):
     partial_model: StandardItemModelWithHeader
     partial_model_delegate: QStyledItemDelegate
 
-    def set_partial_model_delegate(self, partial_model: AbstractAlgorithmItemModel):
+    def set_partial_model_delegate(self, partial_model: QAbstractAlgorithmItemModel):
         self.partial_model = partial_model
         self.partial_model_delegate = partial_model.get_delegate()
 
@@ -135,21 +160,22 @@ class ConfigTreeViewDelegate(QStyledItemDelegate):
 
         # partial model があればまずそれを処理する
         if self.is_partial_model_item(index):
-            editor = self.partial_model_delegate.createEditor(
-                parent,
-                option,
-                self.get_partial_model_index(index)
-            )
-            return editor
+            index_ = self.get_partial_model_index(index)
+            return self.partial_model_delegate.createEditor(parent, option, index_)
 
         else:
             # 「最適化アルゴリズム」の「設定値」ならばコンボボックスを作成
             if (
-                    get_internal_header_data(index, Qt.Orientation.Vertical) == ItemRowNames.algorithm.value.name
-                    and get_internal_header_data(index, Qt.Orientation.Horizontal) == ItemColumnNames.value
+                    get_internal_header_data(index, Qt.Orientation.Vertical) == ConfigItemClassEnum.algorithm.value.name
+                    and get_internal_header_data(index, Qt.Orientation.Horizontal) == ConfigHeaderNames.value
             ):
-                editor: QComboBox = QComboBox()
-                print(editor)
+                editor = self.create_combobox(
+                    parent,
+                    index,
+                    choices=Algorithm.choices,
+                    default=DEFAULT_ALGORITHM_CONFIG.name,
+                )
+
                 return editor
 
             return super().createEditor(parent, option, index)
@@ -159,42 +185,44 @@ class ConfigTreeViewDelegate(QStyledItemDelegate):
         # model: <__main__.ConfigItemModelForIndividualView(0x21a839c70b0) at 0x0000021A975893C0>
 
         if self.is_partial_model_item(index):
-            self.partial_model_delegate.setModelData(
-                editor,
-                self.partial_model,  # The change is cloned by signal-slot system.
-                self.get_partial_model_index(index)
-            )
+            # The change is cloned by signal-slot system.
+            index_ = self.get_partial_model_index(index)
+            self.partial_model_delegate.setModelData(editor, self.partial_model, index_)
 
         else:
             super().setModelData(editor, model, index)
 
     def setEditorData(self, editor, index) -> None:
-        print(editor)
         super().setEditorData(editor, index)
 
     def paint(self, painter, option, index) -> None:
+        if (
+                get_internal_header_data(index, Qt.Orientation.Vertical) == ConfigItemClassEnum.algorithm.value.name
+                and get_internal_header_data(index, Qt.Orientation.Horizontal) == ConfigHeaderNames.value
+        ):
+            return self.paint_as_combobox(painter, option, index)
+
         super().paint(painter, option, index)
 
     def sizeHint(self, option, index):
+        if (
+                get_internal_header_data(index, Qt.Orientation.Vertical) == ConfigItemClassEnum.algorithm.value.name
+                and get_internal_header_data(index, Qt.Orientation.Horizontal) == ConfigHeaderNames.value
+        ):
+            return self.get_combobox_size_hint(option, index)
+
         return super().sizeHint(option, index)
 
 
 # 大元の ItemModel
 class ConfigItemModel(StandardItemModelWithHeader):
-
-    ColumnNames = ItemColumnNames
-    RowNames = [enum_item.value.name for enum_item in ItemRowNames]
+    ColumnNames = ConfigHeaderNames
+    RowNames = [enum_item.value.name for enum_item in ConfigItemClassEnum]
+    q_algorithm_item: QAlgorithmStandardItem
 
     def __init__(self, parent=None, _with_dummy=True):
 
-        # setup child items (TODO: あとでリファクタリングする)
-        # model = AbstractAlgorithmItemModel(parent, _with_dummy)
-        model: AbstractAlgorithmItemModel = RandomAlgorithmItemModel(parent, _with_dummy)
-
-        self.algorithm_config: StandardItemModelAsQStandardItem = \
-            AlgorithmQStandardItem(model.name, model)
-
-        self.algorithm_config.setEditable(False)
+        self.q_algorithm_item = Q_DEFAULT_ALGORITHM_CONFIG_ITEM_FACTORY(parent)
 
         super().__init__(parent, _with_dummy)
 
@@ -207,7 +235,9 @@ class ConfigItemModel(StandardItemModelWithHeader):
 
         with EditModel(self):
             self.setRowCount(1 + rows)
-            self.setColumnCount(max(columns, self.algorithm_config.columnCount()))
+            self.setColumnCount(
+                max(columns, self.q_algorithm_item.columnCount())
+            )
 
             # ツリー構造の作成
             item01 = QStandardItem(get_internal_header_data(self.index(0, 0)))
@@ -226,22 +256,41 @@ class ConfigItemModel(StandardItemModelWithHeader):
             self.setItem(1, 1, item12)
             self.setItem(2, 0, item21)
             self.setItem(2, 1, item22)
-            self.setItem(3, 0, self.algorithm_config)
+            self.setItem(3, 0, self.q_algorithm_item)
+
+    def setup_algorithm(self):
+        rows = len(self.RowNames)
+        columns = len(self.ColumnNames)
+
+        # algorithm config table
+        with EditModel(self):
+            self.setRowCount(1 + rows)
+            self.setColumnCount(max(columns, self.q_algorithm_item.columnCount()))
+
+            # get algorithm row
+            r = self.get_row_by_header_data(value=(_enum_item := ConfigItemClassEnum.algorithm).value.name)
+
+            # TreeView で child が表示されるのは c==0 のみ
+            c = 0
+
+            # overwrite existing item by algorithm config
+            self.q_algorithm_item.setText(ConfigItemClassEnum.algorithm.value.name)
+
+            # apply change
+            self.setItem(r, c, self.q_algorithm_item)
 
     def setup_model(self):
         rows = len(self.RowNames)
         columns = len(self.ColumnNames)
 
         with EditModel(self):
-
             self.setRowCount(1 + rows)
-            self.setColumnCount(max(columns, self.algorithm_config.columnCount()))
+            self.setColumnCount(max(columns, self.q_algorithm_item.columnCount()))
 
             # whole table
             item_cls: AbstractConfigItem
-            item_cls_list: list[AbstractConfigItem] = [enum_item.value for enum_item in ItemRowNames]
-            for r, item_cls in zip(range(1, len(ItemRowNames) + 1), item_cls_list):
-
+            item_cls_list: list[AbstractConfigItem] = [enum_item.value for enum_item in ConfigItemClassEnum]
+            for r, item_cls in zip(range(1, len(ConfigItemClassEnum) + 1), item_cls_list):
                 name = item_cls.name
                 value = item_cls.default
                 note = item_cls.note
@@ -270,24 +319,13 @@ class ConfigItemModel(StandardItemModelWithHeader):
                     item.setText(str(note))
                     self.setItem(r, c, item)
 
-            # algorithm config table
-            with nullcontext():
-                # get algorithm row
-                r = self.get_row_by_header_data(value=(_enum_item := ItemRowNames.algorithm).value.name)
-
-                # TreeView で child が表示されるのは c==0 のみ
-                c = 0
-
-                # overwrite existing item by algorithm config
-                self.algorithm_config.setText(ItemRowNames.algorithm.value.name)
-                self.setItem(r, c, self.algorithm_config)
+        self.setup_algorithm()
 
 
 # 一覧 Problem ページに表示される StandardItemModelAsStandardItem 用 ItemModel
 class ConfigItemModelForProblem(SortFilterProxyModelOfStandardItemModel):
 
     def filterAcceptsColumn(self, source_column: int, source_parent: QModelIndex):
-
         # note を非表示
         source_model: ConfigItemModel = self.sourceModel()
         if source_column == get_column_by_header_data(
@@ -307,7 +345,7 @@ class ConfigItemModelForIndividualView(StandardItemModelWithoutFirstRow):
 class ConfigWizardPage(QWizardPage):
     ui: Ui_WizardPage
     source_model: ConfigItemModel
-    proxy_model: ConfigItemModelForProblem
+    proxy_model: ConfigItemModelForIndividualView
     delegate: ConfigTreeViewDelegate
 
     def __init__(self, parent=None):
@@ -325,25 +363,36 @@ class ConfigWizardPage(QWizardPage):
         self.source_model = get_config_model(self)
         self.proxy_model = ConfigItemModelForIndividualView(self)
         self.proxy_model.setSourceModel(self.source_model)
-        self.ui.treeView.setModel(self.proxy_model)
-        self.resize_column()
 
     def setup_view(self):
         view = self.ui.treeView
+        view.setModel(self.proxy_model)
         # view.expandAll()  # 初めから Algorithm の設定項目が全部見えたら鬱陶しい
+
+        # direction 列のみシングルクリックでコンボボックスが
+        # 開くようにシングルクリックで edit モードに入るよう
+        # にする
+        view.clicked.connect(
+            lambda *args, **kwargs: start_edit_specific_column(
+                self.ui.treeView.edit,
+                ConfigHeaderNames.value,
+                *args,
+            )
+        )
+
         for c in range(view.model().columnCount()):
             view.resizeColumnToContents(c)
         view.model().dataChanged.connect(lambda *args: resize_column(view, *args))
 
     def setup_delegate(self):
         # TreeView に対して適用する delegate
-        self.delegate = ConfigTreeViewDelegate()
+        self.delegate = ConfigTreeViewDelegate(self)
 
         # StandardItemModelAsQStandardItem を使って
         # TreeView に表示する ItemModel の一部にした
-        # AbstractAlgorithmItemModel に対応する delegate を
+        # QAbstractAlgorithmItemModel に対応する delegate を
         # 上記 delegate に適用（上書き）する
-        algorithm_item_model: AbstractAlgorithmItemModel = self.source_model.algorithm_config.source_model
+        algorithm_item_model: QAbstractAlgorithmItemModel = self.source_model.q_algorithm_item.source_model
         self.delegate.set_partial_model_delegate(algorithm_item_model)
         self.ui.treeView.setItemDelegate(self.delegate)
         self.resize_column()
@@ -354,7 +403,6 @@ class ConfigWizardPage(QWizardPage):
             for c in range(self.source_model.columnCount()):
                 items.append(self.source_model.item(r, c))
         resize_column(self.ui.treeView, *items)
-
 
 
 if __name__ == '__main__':
@@ -368,4 +416,3 @@ if __name__ == '__main__':
     page_obj.show()
 
     sys.exit(app.exec())
-

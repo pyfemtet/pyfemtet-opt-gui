@@ -203,15 +203,15 @@ class StandardItemModelWithEnhancedFirstRow(StandardItemModelWithHeaderSearch):
 # 各 StandardItem を各ページの TableView に表示するために使う
 class StandardItemModelAsQStandardItem(QStandardItem):
 
-    source_model: StandardItemModelWithHeaderSearch
+    source_model: QStandardItemModel
     proxy_model: SortFilterProxyModelOfStandardItemModel
 
     def __init__(
             self,
             text: str,
-            model: StandardItemModelWithHeaderSearch | SortFilterProxyModelOfStandardItemModel
+            model: QStandardItemModel | SortFilterProxyModelOfStandardItemModel
     ):
-        if isinstance(model, StandardItemModelWithHeaderSearch):
+        if isinstance(model, QStandardItemModel):
             self.source_model = model
             self.proxy_model = SortFilterProxyModelOfStandardItemModel()
             self.proxy_model.setSourceModel(model)

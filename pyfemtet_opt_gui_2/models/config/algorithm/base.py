@@ -28,11 +28,12 @@ from abc import ABC
 
 
 # （共通の）Treeview に表示するための Algorithm の ItemModelAsItem
-class AlgorithmQStandardItem(StandardItemModelAsQStandardItem):
+class QAlgorithmStandardItem(StandardItemModelAsQStandardItem):
 
     def __init__(self, text: str, model: StandardItemModelWithHeaderSearch | SortFilterProxyModelOfStandardItemModel):
         super().__init__(text, model)
         self.setEditable(False)
+        self.name = text
 
 
 # （共通の）アルゴリズムの設定の HeaderData
@@ -43,6 +44,7 @@ class AlgorithmItemModelColumnNames(enum.StrEnum):
 
 
 # ===== ここから下のクラスを継承する =====
+
 # （アルゴリズムごとの）設定項目のベース
 class AbstractAlgorithmConfigItem(ABC):
     name = '何かの設定項目'
@@ -50,13 +52,11 @@ class AbstractAlgorithmConfigItem(ABC):
     note = '設定項目の備考'
 
 
-# （アルゴリズムごとの）設定
+# （アルゴリズムごとの）設定全体
 class AbstractAlgorithmConfig:
-
     name = 'Abstract Algorithm'
 
     class Items(enum.Enum):
-
         # abstract class
         @enum.member
         class FloatItem(AbstractAlgorithmConfigItem):
@@ -78,8 +78,7 @@ class AbstractAlgorithmConfig:
 
 
 # （アルゴリズムごとの）設定項目の ItemModel
-class AbstractAlgorithmItemModel(StandardItemModelWithHeader):
-
+class QAbstractAlgorithmItemModel(StandardItemModelWithHeader):
     with_first_row = False
     ColumnNames = AlgorithmItemModelColumnNames
 
@@ -142,20 +141,38 @@ class AbstractAlgorithmItemModel(StandardItemModelWithHeader):
         return QStyledItemDelegate()
 
 
+# シングルトンパターン
+
+_MODEL: QAbstractAlgorithmItemModel = None
+_ITEM: QAlgorithmStandardItem = None
+
+
+def get_abstract_algorithm_config_item(parent) -> QAlgorithmStandardItem:
+    global _MODEL, _ITEM
+
+    if _MODEL is None:
+        _MODEL = QAbstractAlgorithmItemModel(parent)
+
+    if _ITEM is None:
+        _ITEM = QAlgorithmStandardItem(AbstractAlgorithmConfig.name, _MODEL)
+
+    return _ITEM
+
+
 if __name__ == '__main__':
-    app = QApplication()
+    debug_app = QApplication()
 
-    model = AbstractAlgorithmItemModel()
+    debug_model = QAbstractAlgorithmItemModel()
 
-    view = QTreeView()
-    view.setModel(model)
+    debug_view = QTreeView()
+    debug_view.setModel(debug_model)
 
-    layout = QGridLayout()
-    layout.addWidget(view)
+    debug_layout = QGridLayout()
+    debug_layout.addWidget(debug_view)
 
-    window = QDialog()
-    window.setLayout(layout)
+    debug_window = QDialog()
+    debug_window.setLayout(debug_layout)
 
-    window.show()
+    debug_window.show()
 
-    app.exec()
+    debug_app.exec()
