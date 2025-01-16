@@ -17,7 +17,7 @@
    <item row="0" column="0">
     <widget class="QPushButton" name="pushButton">
      <property name="text">
-      <string>[F➡] sync</string>
+      <string>[F➡] Load</string>
      </property>
     </widget>
    </item>

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'WizardPage_objQiBzQa.ui'
+## Form generated from reading UI file 'WizardPage_objuJcTCY.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.7.2
 ##
@@ -67,7 +67,7 @@ class Ui_WizardPage_obj(object):
 
     def retranslateUi(self, WizardPage_obj):
         WizardPage_obj.setWindowTitle(QCoreApplication.translate("WizardPage_obj", u"WizardPage", None))
-        self.pushButton.setText(QCoreApplication.translate("WizardPage_obj", u"[F\u27a1] sync", None))
+        self.pushButton.setText(QCoreApplication.translate("WizardPage_obj", u"[F\u27a1] Load", None))
 #if QT_CONFIG(tooltip)
         self.textEdit.setToolTip("")
 #endif // QT_CONFIG(tooltip)

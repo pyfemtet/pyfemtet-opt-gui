@@ -70,7 +70,7 @@ class SortFilterProxyModelOfStandardItemModel(QSortFilterProxyModel):
 # ======================================================
 
 # index の位置に対応する UserRole の headerData を取得
-def get_internal_header_data(index, orientation=Qt.Orientation.Horizontal):
+def get_internal_header_data(index: QModelIndex, orientation=Qt.Orientation.Horizontal):
     if orientation == Qt.Orientation.Horizontal:
         return index.model().headerData(
             _section := index.column(),
@@ -109,11 +109,37 @@ def get_column_by_header_data(model: QStandardItemModel, value, r=None) -> int |
                            f'is not found.')
 
 
+def get_row_by_header_data(model: QStandardItemModel, value, c=None) -> int | QModelIndex:
+    # return index or int
+    if c is None:
+        c = 0  # dummy
+        return_index = False
+    else:
+        return_index = True
+
+    # search the value
+    for r in range(model.rowCount()):
+        index = model.index(r, c)
+        if get_internal_header_data(index, orientation=Qt.Orientation.Vertical) == value:
+            if return_index:
+                return index
+            else:
+                return r
+
+    # not found
+    else:
+        raise RuntimeError(f'Internal Error! The header data {value} '
+                           f'is not found.')
+
+
 # header ユーティリティを有する関数
 class StandardItemModelWithHeaderSearch(QStandardItemModel):
 
     def get_column_by_header_data(self, value, r=None) -> int | QModelIndex:
         return get_column_by_header_data(self, value, r)
+
+    def get_row_by_header_data(self, value, c=None) -> int | QModelIndex:
+        return get_row_by_header_data(self, value, c)
 
 
 # QTableView の振る舞いの微調整

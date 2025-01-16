@@ -38,17 +38,22 @@ class CommonItemColumnName(enum.StrEnum):
 
 class StandardItemModelWithHeader(StandardItemModelWithHeaderSearch):
 
+    with_first_row = True
     ColumnNames = CommonItemColumnName
 
-    def __init__(self, parent=None, _with_dummy=True):
+    def __init__(self, parent=None, _with_dummy=True, with_first_row=True):
         super().__init__(parent)
 
+        self.with_first_row = with_first_row
         self.setup_header_data(self.ColumnNames)
+
         if _with_dummy:
             self._set_dummy_data()
 
     def setup_header_data(self, HeaderNames: type[enum.StrEnum]):
+
         with EditModel(self):
+
             self.setColumnCount(len(HeaderNames))
             for c, name in enumerate(HeaderNames):
                 # displayData
@@ -66,13 +71,37 @@ class StandardItemModelWithHeader(StandardItemModelWithHeaderSearch):
                     _role := Qt.ItemDataRole.UserRole,
                 )
 
-            # first row == header row for treeview
-            # likely to same as displayData
-            self.setRowCount(1)
-            for c, name in enumerate(HeaderNames):
-                item = QStandardItem()
-                item.setText(name)
-                self.setItem(0, c, item)
+            if self.with_first_row:
+                # first row == header row for treeview
+                # likely to same as displayData
+                self.setRowCount(1)
+                for c, name in enumerate(HeaderNames):
+                    item = QStandardItem()
+                    item.setText(name)
+                    self.setItem(0, c, item)
+
+        if hasattr(self, 'RowNames'):
+            self.setup_vertical_header_data(self.RowNames)
+
+    def setup_vertical_header_data(self, HeaderNames: type[enum.StrEnum]):
+
+        if self.with_first_row:
+            start = 1
+            row = len(HeaderNames) + 1
+        else:
+            start = 0
+            row = len(HeaderNames)
+
+        with EditModel(self):
+            self.setRowCount(row)
+            for r, name in zip(range(start, row), HeaderNames):
+                # headerData
+                self.setHeaderData(
+                    _section := r,
+                    _orientation := Qt.Orientation.Vertical,
+                    _value := name,
+                    _role := Qt.ItemDataRole.UserRole,
+                )
 
     def set_data_from_stash(self, item, name, header_data, stashed_data):
         data: dict[Qt.ItemDataRole, Any] = stashed_data[name][header_data]
@@ -108,9 +137,9 @@ class StandardItemModelWithHeader(StandardItemModelWithHeaderSearch):
 
         return out
 
-    def _set_dummy_data(self):
-        rows = 3
-        columns = len(self.ColumnNames)
+    def _set_dummy_data(self, n_rows=None):
+        rows = len(self.ColumnNames)
+        columns = len(self.ColumnNames) if n_rows is None else n_rows
 
         with EditModel(self):
             self.setRowCount(rows + 1)  # header row for treeview
@@ -147,8 +176,9 @@ class StandardItemModelWithHeader(StandardItemModelWithHeaderSearch):
 # 各ページで使う、一行目を隠す ProxyModel
 class StandardItemModelWithoutFirstRow(SortFilterProxyModelOfStandardItemModel):
     def filterAcceptsRow(self, source_row, source_parent) -> bool:
-        if source_row == 0:
-            return False
+        if not source_parent.isValid():
+            if source_row == 0:
+                return False
         return True
 
 
@@ -206,9 +236,49 @@ class StandardItemModelAsQStandardItem(QStandardItem):
     def do_clone(self, *args):
         for arg in args:
             if isinstance(arg, QModelIndex):
-                data = self.proxy_model.itemData(arg)
+
+                proxy_index: QModelIndex = arg
+
+                # prepare new item
                 item = QStandardItem()
+
+                # get source item
+                source_index = self.proxy_model.mapToSource(proxy_index)
+                source_item = self.proxy_model.sourceModel().itemFromIndex(source_index)
+
+                # clone itemData
+                data = self.proxy_model.itemData(proxy_index)
                 for role, value in data.items():
                     item.setData(value, role)
+
+                # clone other properties
+                item.setEditable(source_item.isEditable())
+                item.setCheckable(source_item.isCheckable())
+                item.setEnabled(source_item.isEnabled())
+                item.setSelectable(source_item.isSelectable())
+                item.setDragEnabled(source_item.isDragEnabled())
+                item.setAutoTristate(source_item.isAutoTristate())
+                item.setDropEnabled(source_item.isDropEnabled())
+                item.setUserTristate(source_item.isUserTristate())
+
+                # do clone
                 r, c = arg.row(), arg.column()
                 self.setChild(r, c, item)
+
+    # StandardItemModelAsQStandardItem は
+    # 大元の ItemModel が変更されるたび
+    # self の Item を更新する仕組みなので
+    # この Item を参照する ItemModel を通じて
+    # Item が変更された場合その変更は
+    # 大元の ItemModel に反映されない。
+    # そうしたい場合は、下記の clone_back を使う。
+    # def clone_back(index: QModelIndex):  # index of `model_2` containing `as_item`
+    #     model: QStandardItemModel  # 大元のモデル
+    #     as_item: StandardItemModelAsQStandardItem  # 大元のモデルの as_item
+    #     as_item.proxy_model.dataChanged.disconnect(as_item.do_clone)
+    #     with EditModel(model):
+    #         index_ = model.index(index.row(), index.column())
+    #         model.setData(index_, as_item.model().data(index))
+    #     self.algorithm_config.proxy_model.dataChanged.connect(self.algorithm_config.do_clone)
+    #
+    # model_2.dataChanged.connect(copy_back)
