@@ -41,7 +41,6 @@ def get_problem_model(parent=None) -> 'ProblemTableItemModel':
 
 # ===== objects =====
 class ProblemTableItemModel(StandardItemModelWithEnhancedFirstRow):
-
     sub_models: dict[str, QStandardItemModel]
 
     def __init__(self, parent=None):
@@ -52,17 +51,21 @@ class ProblemTableItemModel(StandardItemModelWithEnhancedFirstRow):
         with EditModel(self):
             for i, (key, model) in enumerate(self.sub_models.items()):
                 item = StandardItemModelAsQStandardItem(key, model)
+
                 self.root.setChild(i, 0, item)
                 self.root.setColumnCount(max(
                     self.root.columnCount(),
                     item.columnCount()
                 ))
 
+    def data(self, index, role=...):
+        return super().data(index, role)
+
     def flags(self, index):
         return super().flags(index) & ~Qt.ItemFlag.ItemIsEditable & ~Qt.ItemFlag.ItemIsUserCheckable
 
 
-class ProblemItemModelWithoutUseUnchecked(SortFilterProxyModelOfStandardItemModel):
+class QProblemItemModelWithoutUseUnchecked(QSortFilterProxyModelOfStandardItemModel):
 
     def filterAcceptsRow(self, source_row: int, source_parent: QModelIndex):
 
@@ -99,7 +102,7 @@ class ProblemItemModelWithoutUseUnchecked(SortFilterProxyModelOfStandardItemMode
 class ConfirmWizardPage(QWizardPage):
     ui: Ui_WizardPage
     source_model: ProblemTableItemModel
-    proxy_model: ProblemItemModelWithoutUseUnchecked
+    proxy_model: QProblemItemModelWithoutUseUnchecked
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -113,7 +116,7 @@ class ConfirmWizardPage(QWizardPage):
 
     def setup_model(self):
         self.source_model = get_problem_model(parent=self)
-        self.proxy_model = ProblemItemModelWithoutUseUnchecked()
+        self.proxy_model = QProblemItemModelWithoutUseUnchecked()
         self.proxy_model.setSourceModel(self.source_model)
         self.ui.treeView.setModel(self.proxy_model)
 

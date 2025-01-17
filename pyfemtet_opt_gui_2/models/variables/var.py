@@ -45,7 +45,7 @@ def get_var_model(parent, _with_dummy=None) -> 'VariableItemModel':
 
 def get_var_model_for_problem(parent, _with_dummy=None):
     var_model = get_var_model(parent, _with_dummy)
-    var_model_for_problem = VariableItemModelForProblem()
+    var_model_for_problem = QVariableItemModelForProblem()
     var_model_for_problem.setSourceModel(var_model)
     return var_model_for_problem
 
@@ -392,7 +392,7 @@ class VariableItemModelForTableView(StandardItemModelWithoutFirstRow):
 
 
 # 一覧 Problem ページに表示される StandardItemModelAsStandardItem 用 ItemModel
-class VariableItemModelForProblem(SortFilterProxyModelOfStandardItemModel):
+class QVariableItemModelForProblem(QSortFilterProxyModelOfStandardItemModel):
 
     def filterAcceptsColumn(self, source_column: int, source_parent: QModelIndex):
 

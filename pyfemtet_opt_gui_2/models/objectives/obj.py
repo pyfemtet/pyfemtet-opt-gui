@@ -43,7 +43,7 @@ def get_obj_model(parent=None, _with_dummy=None) -> 'ObjectiveTableItemModel':
 
 def get_obj_model_for_problem(parent, _with_dummy=None):
     model = get_obj_model(parent, _with_dummy)
-    model_for_problem = ObjectiveItemModelForProblemTableView()
+    model_for_problem = QObjectiveItemModelForProblemTableView()
     model_for_problem.setSourceModel(model)
     return model_for_problem
 
@@ -257,7 +257,7 @@ class ObjectiveTableItemModel(StandardItemModelWithHeader):
                     self.setItem(r, c, item)
 
 
-class ObjectiveItemModelForProblemTableView(SortFilterProxyModelOfStandardItemModel):
+class QObjectiveItemModelForProblemTableView(QSortFilterProxyModelOfStandardItemModel):
     pass
 
 

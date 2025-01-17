@@ -18,7 +18,6 @@ from pyfemtet_opt_gui_2.common.qt_util import *
 import enum
 from typing import Any
 
-
 __all__ = [
     'CommonItemColumnName',
     'StandardItemModelWithoutFirstRow',
@@ -36,21 +35,26 @@ class CommonItemColumnName(enum.StrEnum):
     name = '名前'
 
 
+# QStandardItemModel に自動でクラスメンバーに応じた
+# header data をつけるためのクラス
 class StandardItemModelWithHeader(StandardItemModelWithHeaderSearch):
-
-    with_first_row = True
+    with_first_row = True  # True なら一行目を header と同じにする
     ColumnNames = CommonItemColumnName
+    RowNames = None
 
     def __init__(self, parent=None, _with_dummy=True, with_first_row=True):
         super().__init__(parent)
 
         self.with_first_row = with_first_row
-        self.setup_header_data(self.ColumnNames)
+        self.setup_header_data()
+        self.setup_vertical_header_data()
 
         if _with_dummy:
             self._set_dummy_data()
 
-    def setup_header_data(self, HeaderNames: type[enum.StrEnum]):
+    def setup_header_data(self):
+
+        HeaderNames = self.ColumnNames
 
         with EditModel(self):
 
@@ -80,10 +84,12 @@ class StandardItemModelWithHeader(StandardItemModelWithHeaderSearch):
                     item.setText(name)
                     self.setItem(0, c, item)
 
-        if hasattr(self, 'RowNames'):
-            self.setup_vertical_header_data(self.RowNames)
+    def setup_vertical_header_data(self):
 
-    def setup_vertical_header_data(self, HeaderNames: type[enum.StrEnum]):
+        if self.RowNames is None:
+            return
+
+        HeaderNames = self.RowNames
 
         if self.with_first_row:
             start = 1
@@ -102,11 +108,6 @@ class StandardItemModelWithHeader(StandardItemModelWithHeaderSearch):
                     _value := name,
                     _role := Qt.ItemDataRole.UserRole,
                 )
-
-    def set_data_from_stash(self, item, name, header_data, stashed_data):
-        data: dict[Qt.ItemDataRole, Any] = stashed_data[name][header_data]
-        for role, value in data.items():
-            item.setData(value, role)
 
     def stash_current_table(self) -> dict[str, dict[str, dict[Qt.ItemDataRole, Any]]]:
         """load 時に既存のデータを上書きする為に stash する
@@ -130,12 +131,27 @@ class StandardItemModelWithHeader(StandardItemModelWithHeaderSearch):
                 data = self.itemData(index)
                 row_information.update({header_name: data})
 
-            # データを収集出来たら obj_name をキーにして
+            # データを収集出来たら obj_name などをキーにして
             # out に追加
-            c = self.get_column_by_header_data(self.ColumnNames.name)
-            out.update({self.item(r, c).text(): row_information})
+            if hasattr(self.ColumnNames, 'name'):
+                c = self.get_column_by_header_data(self.ColumnNames.name)
+                key = self.item(r, c).text()
+
+            # ColumnNames に name というメンバーがなければ
+            # RowNames をキーにする
+            else:
+                index = self.index(r, 0)  # c は無視される
+                key = get_internal_header_data(index, Qt.Orientation.Vertical)
+
+            out.update({key: row_information})
 
         return out
+
+    def set_data_from_stash(self, item, key, header_data, stashed_data):
+        # key は name 列の値 (優先) または internal header
+        data: dict[Qt.ItemDataRole, Any] = stashed_data[key][header_data]
+        for role, value in data.items():
+            item.setData(value, role)
 
     def _set_dummy_data(self, n_rows=None):
         rows = len(self.ColumnNames)
@@ -145,7 +161,7 @@ class StandardItemModelWithHeader(StandardItemModelWithHeaderSearch):
             self.setRowCount(rows + 1)  # header row for treeview
 
             # table
-            for r in range(1, rows+1):
+            for r in range(1, rows + 1):
                 for c in range(columns):
                     item = QStandardItem()
                     # NOTE: The default implementation treats Qt::EditRole and Qt::DisplayRole as referring to the same data.
@@ -174,7 +190,7 @@ class StandardItemModelWithHeader(StandardItemModelWithHeaderSearch):
 
 
 # 各ページで使う、一行目を隠す ProxyModel
-class StandardItemModelWithoutFirstRow(SortFilterProxyModelOfStandardItemModel):
+class StandardItemModelWithoutFirstRow(QSortFilterProxyModelOfStandardItemModel):
     def filterAcceptsRow(self, source_row, source_parent) -> bool:
         if not source_parent.isValid():
             if source_row == 0:
@@ -184,7 +200,6 @@ class StandardItemModelWithoutFirstRow(SortFilterProxyModelOfStandardItemModel):
 
 # 一覧ページで使う、各モデルの一行目を強調する QStandardItemModel
 class StandardItemModelWithEnhancedFirstRow(StandardItemModelWithHeaderSearch):
-
     def data(self, index, role=...):
 
         is_submodel = index.parent().isValid()
@@ -202,20 +217,19 @@ class StandardItemModelWithEnhancedFirstRow(StandardItemModelWithHeaderSearch):
 # QStandardItem を StandardItemModel に変換するクラス
 # 各 StandardItem を各ページの TableView に表示するために使う
 class StandardItemModelAsQStandardItem(QStandardItem):
-
     source_model: QStandardItemModel
-    proxy_model: SortFilterProxyModelOfStandardItemModel
+    proxy_model: QSortFilterProxyModelOfStandardItemModel
 
     def __init__(
             self,
             text: str,
-            model: QStandardItemModel | SortFilterProxyModelOfStandardItemModel
+            model: QStandardItemModel | QSortFilterProxyModelOfStandardItemModel
     ):
         if isinstance(model, QStandardItemModel):
             self.source_model = model
-            self.proxy_model = SortFilterProxyModelOfStandardItemModel()
+            self.proxy_model = QSortFilterProxyModelOfStandardItemModel()
             self.proxy_model.setSourceModel(model)
-        elif isinstance(model, SortFilterProxyModelOfStandardItemModel):
+        elif isinstance(model, QSortFilterProxyModelOfStandardItemModel):
             self.source_model = model.sourceModel()
             self.proxy_model = model
         else:
@@ -265,20 +279,38 @@ class StandardItemModelAsQStandardItem(QStandardItem):
                 r, c = arg.row(), arg.column()
                 self.setChild(r, c, item)
 
-    # StandardItemModelAsQStandardItem は
-    # 大元の ItemModel が変更されるたび
-    # self の Item を更新する仕組みなので
-    # この Item を参照する ItemModel を通じて
-    # Item が変更された場合その変更は
-    # 大元の ItemModel に反映されない。
-    # そうしたい場合は、下記の clone_back を使う。
-    # def clone_back(index: QModelIndex):  # index of `model_2` containing `as_item`
-    #     model: QStandardItemModel  # 大元のモデル
-    #     as_item: StandardItemModelAsQStandardItem  # 大元のモデルの as_item
-    #     as_item.proxy_model.dataChanged.disconnect(as_item.do_clone)
-    #     with EditModel(model):
-    #         index_ = model.index(index.row(), index.column())
-    #         model.setData(index_, as_item.model().data(index))
-    #     self.algorithm_config.proxy_model.dataChanged.connect(self.algorithm_config.do_clone)
-    #
-    # model_2.dataChanged.connect(copy_back)
+    def clone_back(
+            self,
+            top_left: QModelIndex,  # index of some ItemModel containing ItemModelAsItem
+            bottom_right: QModelIndex,
+            roles: list[Qt.ItemDataRole],
+    ):
+        # StandardItemModelAsQStandardItem は
+        # 大元の ItemModel が変更されるたび
+        # self の Item を更新する仕組みなので
+        # この Item を参照する ItemModel を通じて
+        # Item が変更された場合その変更は
+        # 大元の ItemModel に反映されない。
+        # そうしたい場合は、これを使う。
+        # ItemModel の dataChanged に connect して
+        # self を変更する。
+
+        # まず 順方向 clone を切る
+        self.proxy_model.dataChanged.disconnect(self.do_clone)
+
+        # top_left のみ考える
+        index = top_left
+
+        # 貰った変更 index を変換する
+        proxy_index = self.proxy_model.index(index.row(), index.column())
+
+        # どこかの ItemModel による変更を self から
+        # 追って取得する
+        data = self.model().data(index)
+
+        with EditModel(self.proxy_model):
+            # 変更を適用する
+            self.proxy_model.setData(proxy_index, data)
+
+        # 順方向 clone を戻す
+        self.proxy_model.dataChanged.connect(self.do_clone)

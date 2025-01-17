@@ -30,7 +30,7 @@ from abc import ABC
 # （共通の）Treeview に表示するための Algorithm の ItemModelAsItem
 class QAlgorithmStandardItem(StandardItemModelAsQStandardItem):
 
-    def __init__(self, text: str, model: StandardItemModelWithHeaderSearch | SortFilterProxyModelOfStandardItemModel):
+    def __init__(self, text: str, model: StandardItemModelWithHeaderSearch | QSortFilterProxyModelOfStandardItemModel):
         super().__init__(text, model)
         self.setEditable(False)
         self.name = text
@@ -87,7 +87,7 @@ class QAbstractAlgorithmItemModel(StandardItemModelWithHeader):
 
     def __init__(self, parent=None, _with_dummy=True):
         StandardItemModelWithHeaderSearch.__init__(self, parent)
-        self.setup_header_data(self.ColumnNames)
+        self.setup_header_data()
         self.setup_model()
 
     @property
@@ -108,7 +108,6 @@ class QAbstractAlgorithmItemModel(StandardItemModelWithHeader):
 
             item_cls: AbstractAlgorithmConfigItem
             for r, item_cls in enumerate([enum_item.value for enum_item in self.AlgorithmConfig.Items]):
-
                 name = item_cls.name
                 value = item_cls.default
                 note = item_cls.note
@@ -144,19 +143,15 @@ class QAbstractAlgorithmItemModel(StandardItemModelWithHeader):
 # シングルトンパターン
 
 _MODEL: QAbstractAlgorithmItemModel = None
-_ITEM: QAlgorithmStandardItem = None
 
 
-def get_abstract_algorithm_config_item(parent) -> QAlgorithmStandardItem:
-    global _MODEL, _ITEM
+def get_abstract_algorithm_config_model(parent) -> QAbstractAlgorithmItemModel:
+    global _MODEL
 
     if _MODEL is None:
         _MODEL = QAbstractAlgorithmItemModel(parent)
 
-    if _ITEM is None:
-        _ITEM = QAlgorithmStandardItem(AbstractAlgorithmConfig.name, _MODEL)
-
-    return _ITEM
+    return _MODEL
 
 
 if __name__ == '__main__':

@@ -99,19 +99,15 @@ class QRandomAlgorithmItemModel(QAbstractAlgorithmItemModel):
 # シングルトンパターン
 
 _MODEL: QRandomAlgorithmItemModel = None
-_ITEM: QAlgorithmStandardItem = None
 
 
-def get_random_algorithm_config_item(parent) -> QAlgorithmStandardItem:
-    global _MODEL, _ITEM
+def get_random_algorithm_config_model(parent) -> QRandomAlgorithmItemModel:
+    global _MODEL
 
     if _MODEL is None:
         _MODEL = QRandomAlgorithmItemModel(parent)
 
-    if _ITEM is None:
-        _ITEM = QAlgorithmStandardItem(RandomAlgorithmConfig.name, _MODEL)
-
-    return _ITEM
+    return _MODEL
 
 
 if __name__ == '__main__':

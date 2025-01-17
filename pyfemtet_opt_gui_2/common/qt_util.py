@@ -18,21 +18,31 @@ from PySide6.QtGui import *
 # noinspection PyUnresolvedReferences
 from PySide6 import QtWidgets, QtCore, QtGui
 
+import enum
+
 __all__ = [
     'get_enhanced_font',
     'EditModel',
-    'SortFilterProxyModelOfStandardItemModel',
+    'QSortFilterProxyModelOfStandardItemModel',
     'get_internal_header_data',
     'get_column_by_header_data',
     'StandardItemModelWithHeaderSearch',
     'start_edit_specific_column',
     'resize_column',
-    'DelegateWithCombobox',
+    'QStyledItemDelegateWithCombobox',
+    'CustomItemDataRole',
+    'set_treeview_keep_expand_state',
 ]
 
 
 # ちょっとしたもの
 # ======================================================
+
+
+# カスタムアイテムロール
+class CustomItemDataRole(enum.IntEnum):
+    IsExpandedRole = Qt.ItemDataRole.UserRole + 1
+
 
 # bold font の規定値
 def get_enhanced_font():
@@ -46,39 +56,27 @@ def get_enhanced_font():
 class EditModel:
     model: QAbstractItemModel
 
-    def __init__(self, model: QAbstractItemModel, index: QModelIndex = None, roles: list[Qt.ItemDataRole] = None):
+    def __init__(self, model: QAbstractItemModel):
         self.model = model
-        self.index = index
-        self.roles = roles if roles is not None else []
 
     def __enter__(self):
-        # beginResetModel-endResetModel を使うと
-        # その間別の処理が model にアクセスすると
-        # アプリケーションがクラッシュするらしい
-        # ので dataChanged を emit する方式に変更
-        # self.model.beginResetModel()
-        pass
+        self.model.beginResetModel()
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        # self.model.endResetModel()
+        self.model.endResetModel()
 
-        if self.index is None:
-            index_1 = self.model.index(0, 0)
-            index_2 = self.model.index(self.model.rowCount() - 1, self.model.columnCount() - 1)
-        else:
-            index_1 = index_2 = self.index
-
-        # https://doc.qt.io/qt-6/qabstractitemmodel.html#dataChanged
-        # index_1: 変更範囲の開始 index
-        # index_2: 変更範囲の終了 index
-        # roles: list[int]: 変更範囲で変更された itemDataRole のリスト。
-        #     空リストを渡せば全て変更されたとみなす。
-        self.model.dataChanged.emit(index_1, index_2, self.roles)
+        # ===== 取りやめた実装 =====
+        # # https://doc.qt.io/qt-6/qabstractitemmodel.html#dataChanged
+        # # index_1: 変更範囲の開始 index
+        # # index_2: 変更範囲の終了 index
+        # # roles: list[int]: 変更範囲で変更された itemDataRole のリスト。
+        # #     空リストを渡せば全て変更されたとみなす。
+        # self.model.dataChanged.emit(index_1, index_2, self.roles)
 
 
-# QSortFilterProxyModel の入力補完を QStandardItemModel に
-# 対して行うためのラッパー
-class SortFilterProxyModelOfStandardItemModel(QSortFilterProxyModel):
+# QSortFilterProxyModel.sourceModel() の入力補完を
+# QStandardItemModel に対して行うためのラッパー
+class QSortFilterProxyModelOfStandardItemModel(QSortFilterProxyModel):
     def sourceModel(self) -> QStandardItemModel:
         s = super().sourceModel()
         assert isinstance(s, QStandardItemModel)
@@ -86,18 +84,11 @@ class SortFilterProxyModelOfStandardItemModel(QSortFilterProxyModel):
 
 
 # Combobox を作成する機能を備えた Delegate
-class DelegateWithCombobox(QStyledItemDelegate):
-
-    target_indices: set[QModelIndex]
+class QStyledItemDelegateWithCombobox(QStyledItemDelegate):
 
     def __init__(self, parent):
         super().__init__(parent)
-        self.target_indices = set()
-
-    def update_model(self, index, text):
-        model = index.model()
-        with EditModel(model):
-            model.setData(index, text, Qt.ItemDataRole.DisplayRole)
+        self.combobox_target_header_data: dict[str, tuple[str, str]] = dict()
 
     def create_combobox(
             self,
@@ -105,11 +96,7 @@ class DelegateWithCombobox(QStyledItemDelegate):
             index: QModelIndex,
             choices: list[str],
             default=None
-    ) -> QWidget:
-
-        # 本来の setModelData を prevent するために
-        self.target_indices.add(index)
-
+    ) -> QComboBox:
         # default value の validate
         if default is None:
             default = choices[0]
@@ -120,11 +107,14 @@ class DelegateWithCombobox(QStyledItemDelegate):
         cb.setCurrentText(default)
         cb.setFrame(False)
 
-        # combobox の選択を変更したらセルの値も変更して
-        # combobox のあるセルに基づいて振る舞いが変わる
-        # セルのふるまいを即時変えるようにする
+        # combobox の選択を確定したら即時モデルに反映する
+        # (セルの編集状態解除を待たない)
+        def _setModelData(text, editor_: QComboBox, index_):
+            editor_.setCurrentText(text)
+            self.setModelData(editor_, index_.model(), index_)
+
         cb.currentTextChanged.connect(
-            lambda text: self.update_model(index, text)
+            lambda text: _setModelData(text, cb, index)
         )
 
         # combobox が作成されたら（つまり編集状態になったら）
@@ -133,29 +123,108 @@ class DelegateWithCombobox(QStyledItemDelegate):
 
         return cb
 
-    def setEditorData(self, editor, index):
-        if index in self.target_indices:
-            return
-        else:
-            super().setEditorData(editor, index)
+    def is_combobox_target(self, index: QModelIndex, key=None):
+        header_data = get_internal_header_data(index)
+        header_data_v = get_internal_header_data(index, Qt.Orientation.Vertical)
 
-    def setModelData(self, editor, model, index):
-        if index in self.target_indices:
-            return
+        if key is None:
+            # すべてのターゲットにひとつでも該当すれば True
+            for value in self.combobox_target_header_data.values():
+                if (
+                        str(header_data) == str(value[0])
+                        and str(header_data_v) == str(value[1])
+                ):
+                    return True
+
+            # ここまできたら False
+            return False
+
         else:
-            super().setModelData(editor, model, index)
+            # キー指定があればそれと比較
+            value = self.combobox_target_header_data[key]
+            return (
+                    str(header_data) == str(value[0])
+                    and str(header_data_v) == str(value[1])
+            )
+
+    def sizeHint(self, option, index) -> QSize:
+        if self.is_combobox_target(index):
+            return self.get_combobox_size_hint(option, index)
+        else:
+            return super().sizeHint(option, index)
 
     def get_combobox_size_hint(self, option, index) -> QSize:
         size = super().sizeHint(option, index)
         size.setWidth(24 + size.width())  # combobox の下三角マークの幅
         return size
 
-    def paint_as_combobox(self, painter, option, index):
+    def paint(self, painter, option, index) -> None:
+        if self.is_combobox_target(index):
+            return self.paint_as_combobox(painter, option, index)
+        else:
+            super().paint(painter, option, index)
+
+    def paint_as_combobox(self, painter, option, index) -> None:
         cb: QtWidgets.QStyleOptionComboBox = QStyleOptionComboBox()
         cb.rect = option.rect
         cb.currentText = index.model().data(index, Qt.ItemDataRole.DisplayRole)
         QtWidgets.QApplication.style().drawComplexControl(QtWidgets.QStyle.ComplexControl.CC_ComboBox, cb, painter)
         QtWidgets.QApplication.style().drawControl(QtWidgets.QStyle.ControlElement.CE_ComboBoxLabel, cb, painter)
+
+
+# 可能なら Expand State を保持する TreeView ユーティリティ
+def set_treeview_keep_expand_state(view: QTreeView):
+    assert view.model() is not None
+
+    class IndexKeeper:
+
+        def __init__(self):
+            self.save_expand_state()
+
+        def _set_data(self, index, value):
+            view.model().setData(
+                index,
+                value,
+                CustomItemDataRole.IsExpandedRole,
+            )
+
+        def save_expand_state(self):
+            for r in range(view.model().rowCount()):
+                for c in range(view.model().columnCount()):
+                    index = view.model().index(r, c)
+                    value = view.isExpanded(index)
+                    print(value)
+                    self._set_data(index, value)
+
+        def _restore_data(self, index: QModelIndex):
+            expanded = view.model().data(
+                index,
+                CustomItemDataRole.IsExpandedRole,
+            )
+            view.setExpanded(index, expanded or False)
+
+        def restore_expand_state(self):
+            for r in range(view.model().rowCount()):
+                for c in range(view.model().columnCount()):
+                    index = view.model().index(r, c)
+                    self._restore_data(index)
+
+        def check_restore_expand_state(
+                self,
+                _1,
+                _2,
+                roles: list[Qt.ItemDataRole],
+        ):
+            if (CustomItemDataRole.IsExpandedRole in roles) or (len(roles) == 0):
+                self.save_expand_state()
+
+            self.restore_expand_state()
+
+
+    ik = IndexKeeper()
+    view.expanded.connect(ik.save_expand_state)
+    view.collapsed.connect(ik.save_expand_state)
+    view.model().dataChanged.connect(ik.check_restore_expand_state)
 
 
 # header の UserDataRole を前提とした QStandardItemModel
@@ -292,8 +361,8 @@ class _ResizeColumn(object):
 
                 model = index.model()
 
-                if isinstance(model, SortFilterProxyModelOfStandardItemModel):
-                    model: SortFilterProxyModelOfStandardItemModel
+                if isinstance(model, QSortFilterProxyModelOfStandardItemModel):
+                    model: QSortFilterProxyModelOfStandardItemModel
                     source_index = model.mapToSource(index)
                     item = model.sourceModel().itemFromIndex(source_index)
 
