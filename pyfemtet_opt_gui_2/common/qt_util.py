@@ -31,7 +31,8 @@ __all__ = [
     'resize_column',
     'QStyledItemDelegateWithCombobox',
     'CustomItemDataRole',
-    'set_treeview_keep_expand_state',
+    'ExpandStateKeeper',
+    'ResizeColumn',
 ]
 
 
@@ -173,58 +174,63 @@ class QStyledItemDelegateWithCombobox(QStyledItemDelegate):
 
 
 # 可能なら Expand State を保持する TreeView ユーティリティ
-def set_treeview_keep_expand_state(view: QTreeView):
-    assert view.model() is not None
+class ExpandStateKeeper:
 
-    class IndexKeeper:
+    def __init__(self, view):
+        assert isinstance(view, QTreeView)
+        assert view.model() is not None
+        self.view = view
 
-        def __init__(self):
-            self.save_expand_state()
+        self.save_expand_state()
 
-        def _set_data(self, index, value):
-            view.model().setData(
-                index,
-                value,
-                CustomItemDataRole.IsExpandedRole,
-            )
+        view.expanded.connect(self.save_expand_state)
+        view.collapsed.connect(self.save_expand_state)
+        view.model().dataChanged.connect(self.check_restore_expand_state)
+        # view.model().dataChanged.connect(lambda *_: ik.restore_expand_state())
 
-        def save_expand_state(self):
-            for r in range(view.model().rowCount()):
-                for c in range(view.model().columnCount()):
-                    index = view.model().index(r, c)
-                    value = view.isExpanded(index)
-                    print(value)
+
+    def _set_data(self, index, value):
+        self.view.model().setData(
+            index,
+            value,
+            CustomItemDataRole.IsExpandedRole,
+        )
+
+    def save_expand_state(self, index: QModelIndex = None):
+        if index is None:
+            for r in range(self.view.model().rowCount()):
+                for c in range(self.view.model().columnCount()):
+                    index = self.view.model().index(r, c)
+                    value = self.view.isExpanded(index)
                     self._set_data(index, value)
+        else:
+            value = self.view.isExpanded(index)
+            self._set_data(index, value)
 
-        def _restore_data(self, index: QModelIndex):
-            expanded = view.model().data(
-                index,
-                CustomItemDataRole.IsExpandedRole,
-            )
-            view.setExpanded(index, expanded or False)
+    def _restore_data(self, index: QModelIndex):
+        expanded = self.view.model().data(
+            index,
+            CustomItemDataRole.IsExpandedRole,
+        )
+        self.view.setExpanded(index, expanded or False)
 
-        def restore_expand_state(self):
-            for r in range(view.model().rowCount()):
-                for c in range(view.model().columnCount()):
-                    index = view.model().index(r, c)
-                    self._restore_data(index)
+    def restore_expand_state(self):
+        for r in range(self.view.model().rowCount()):
+            for c in range(self.view.model().columnCount()):
+                index = self.view.model().index(r, c)
+                self._restore_data(index)
 
-        def check_restore_expand_state(
-                self,
-                _1,
-                _2,
-                roles: list[Qt.ItemDataRole],
-        ):
-            if (CustomItemDataRole.IsExpandedRole in roles) or (len(roles) == 0):
-                self.save_expand_state()
-
+    def check_restore_expand_state(
+            self,
+            _1,
+            _2,
+            roles: list[Qt.ItemDataRole],
+    ):
+        if CustomItemDataRole.IsExpandedRole in roles:
+            # self.save_expand_state()
+            pass
+        else:
             self.restore_expand_state()
-
-
-    ik = IndexKeeper()
-    view.expanded.connect(ik.save_expand_state)
-    view.collapsed.connect(ik.save_expand_state)
-    view.model().dataChanged.connect(ik.check_restore_expand_state)
 
 
 # header の UserDataRole を前提とした QStandardItemModel
@@ -436,3 +442,124 @@ class _ResizeColumn(object):
 
 # スロットとして使える callable オブジェクト
 resize_column = _ResizeColumn()
+
+
+# dataChanged のスロットとして使える callable クラス
+class ResizeColumn:
+    def __init__(self, view: QAbstractItemView):
+        self.view = view
+
+    def __call__(
+            self,
+            top_left: QModelIndex,
+            bottom_right: QModelIndex,
+            roles: list[Qt.ItemDataRole],
+    ):
+        # DisplayRole が変化するときのみ実行
+        if (Qt.ItemDataRole.DisplayRole in roles) or len(roles) == 0:
+            self.get_callable()(top_left)
+
+    def get_callable(self):
+        if isinstance(self.view, QTreeView):
+            return self.resize_tree_view
+        elif isinstance(self.view, QTableView):
+            return self.resize_table_view
+        else:
+            raise NotImplementedError
+
+    def resize_table_view(self, index: QModelIndex):
+        self.view: QTableView
+
+        model = index.model()
+
+        if isinstance(model, QSortFilterProxyModelOfStandardItemModel):
+            model: QSortFilterProxyModelOfStandardItemModel
+            source_index = model.mapToSource(index)
+            item = model.sourceModel().itemFromIndex(source_index)
+
+        else:
+            model: QStandardItemModel
+            item = model.itemFromIndex(index)
+
+        h = self.calc_required_height(item, self.view)
+        w = self.calc_required_width(item, self.view)
+        size = QSize(w, h)
+        item.setSizeHint(size)
+
+        self.view.resizeColumnsToContents()
+        self.view.resizeRowsToContents()
+
+        # setSectionResizeMode しないと stretchLastSection が無視される
+        for logical_index in range(self.view.horizontalHeader().count()):
+            self.view.horizontalHeader().setSectionResizeMode(
+                logical_index,
+                QtWidgets.QHeaderView.ResizeMode.ResizeToContents  # or Interactive
+            )
+
+    def resize_tree_view(self, _: QModelIndex):
+        self.view: QTreeView
+        model = self.view.model()
+
+        for c in range(model.columnCount()):
+            for r in range(model.rowCount()):
+                index: QModelIndex = model.index(r, c)
+
+                if isinstance(model, QSortFilterProxyModelOfStandardItemModel):
+                    model: QSortFilterProxyModelOfStandardItemModel
+                    source_index = model.mapToSource(index)
+                    item = model.sourceModel().itemFromIndex(source_index)
+
+                else:
+                    model: QStandardItemModel
+                    item = model.itemFromIndex(index)
+
+                h = self.calc_required_height(item, self.view)
+                w = self.calc_required_width(item, self.view)
+                size = QSize(w, h)
+                item.setSizeHint(size)
+
+            self.view.resizeColumnToContents(c)
+
+    @staticmethod
+    def calc_required_width(item: QStandardItem, view: QAbstractItemView):
+        # magic numbers...
+        ICON_SPACE_WIDTH = 24
+        CHECKBOX_SPACE_WIDTH = 24
+        MARGIN = 8
+
+        # fontMetrics to calc the required width of text
+        fm = view.fontMetrics()
+
+        # get the width of required text region
+        text_area_width = fm.size(Qt.TextFlag.TextShowMnemonic, item.text()).width()
+
+        # get the width of icon
+        if item.icon().isNull():
+            icon_width = 0
+        else:
+            # ----- The following code snippets doesn't work as intended... -----
+            # width: int = view.horizontalHeader().sectionSize(item.column())
+            # height: int = view.verticalHeader().sectionSize(item.row())
+            # required_size = QSize(width, height)
+            # icon_size = item.icon().actualSize(required_size)
+            # icon_width = icon_size.width()
+            # logger.debug(f'{icon_width=}')
+            icon_width = ICON_SPACE_WIDTH
+
+        # get the checkable width
+        if item.isCheckable():
+            checkbox_width = CHECKBOX_SPACE_WIDTH
+        else:
+            checkbox_width = 0
+
+        return MARGIN + text_area_width + icon_width + checkbox_width
+
+    @staticmethod
+    def calc_required_height(item: QStandardItem, view: QAbstractItemView):
+        MARGIN = 10
+
+        fm = view.fontMetrics()
+        size: QSize = fm.size(Qt.TextFlag.TextShowMnemonic, item.text())
+        height = size.height()
+
+        return height + MARGIN

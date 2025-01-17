@@ -116,6 +116,7 @@ class ConfigItemClassEnum(enum.Enum):
 # Delegate
 class QConfigTreeViewDelegate(QStyledItemDelegateWithCombobox):
     partial_model: QAbstractAlgorithmItemModel
+    config_model: 'ConfigItemModel'
 
     @property
     def partial_model_delegate(self) -> QStyledItemDelegate:
@@ -123,7 +124,7 @@ class QConfigTreeViewDelegate(QStyledItemDelegateWithCombobox):
 
     @property
     def partial_model(self) -> QAbstractAlgorithmItemModel:
-        return self.config_model.get_current_algorithm_model()
+        return Algorithm.choices[self.config_model.get_current_algorithm_item().text()](self.config_model.parent())
 
     def set_partial_delegate_defined_model(self, config_model: 'ConfigItemModel'):
         self.config_model = config_model
@@ -235,8 +236,8 @@ class ConfigItemModel(StandardItemModelWithHeader):
     # Item を切り替えるべきか判定し切り替えを行う
     def check_update_algorithm(
             self,
-            top_left: QModelIndex,
-            bottom_right: QModelIndex,
+            _top_left: QModelIndex,
+            _bottom_right: QModelIndex,
             roles: list[Qt.ItemDataRole],
     ):
         # DisplayRole でアルゴリズムを判断するので
@@ -360,6 +361,7 @@ class ConfigWizardPage(QWizardPage):
     source_model: ConfigItemModel
     proxy_model: ConfigItemModelForIndividualView
     delegate: QConfigTreeViewDelegate
+    expand_keeper: ExpandStateKeeper
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -382,10 +384,9 @@ class ConfigWizardPage(QWizardPage):
         view.setModel(self.proxy_model)
 
         # モデルが更新されたときもその展開状態を維持するようにする
-        set_treeview_keep_expand_state(view)
+        self.expand_keeper = ExpandStateKeeper(view)
 
-        view.expandAll()  # 初めから Algorithm の設定項目が全部見えたら鬱陶しい
-
+        # view.expandAll()  # 初めから Algorithm の設定項目が全部見えたら鬱陶しい
 
         # direction 列のみシングルクリックでコンボボックスが
         # 開くようにシングルクリックで edit モードに入るよう
@@ -398,9 +399,13 @@ class ConfigWizardPage(QWizardPage):
             )
         )
 
+        # リサイズする
         for c in range(view.model().columnCount()):
             view.resizeColumnToContents(c)
-        view.model().dataChanged.connect(lambda *args: resize_column(view, *args))
+
+        # データ変更時にリサイズするようにする
+        resizer = ResizeColumn(view)
+        view.model().dataChanged.connect(resizer)
 
     def setup_delegate(self):
         # TreeView に対して適用する delegate
