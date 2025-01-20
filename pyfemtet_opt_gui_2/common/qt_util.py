@@ -28,7 +28,6 @@ __all__ = [
     'get_column_by_header_data',
     'StandardItemModelWithHeaderSearch',
     'start_edit_specific_column',
-    'resize_column',
     'QStyledItemDelegateWithCombobox',
     'CustomItemDataRole',
     'ExpandStateKeeper',
@@ -43,6 +42,7 @@ __all__ = [
 # カスタムアイテムロール
 class CustomItemDataRole(enum.IntEnum):
     IsExpandedRole = Qt.ItemDataRole.UserRole + 1
+    WithFirstRowRole = Qt.ItemDataRole.UserRole + 2
 
 
 # bold font の規定値
@@ -344,110 +344,22 @@ def start_edit_specific_column(edit_fun, header_value, *args, **_kwargs):
 # QTableView の要素が変更されるたび列幅を調整する機能群
 # ------------------------------------------------------
 
-# スロットとして使える callable クラス
-class _ResizeColumn(object):
-    def __call__(self, view: QTreeView | QTableView, *args):
-        for arg in args:
-
-            # item
-            if isinstance(arg, QStandardItem):
-                item: QStandardItem = arg
-
-                h = self.calc_required_height(item, view)
-                w = self.calc_required_width(item, view)
-                size = QSize(w, h)
-                item.setSizeHint(size)
-
-                if isinstance(view, QTreeView):
-                    view.resizeColumnToContents(item.index().column())
-
-            # modelindex
-            elif isinstance(arg, QModelIndex):
-                index: QModelIndex = arg
-
-                model = index.model()
-
-                if isinstance(model, QSortFilterProxyModelOfStandardItemModel):
-                    model: QSortFilterProxyModelOfStandardItemModel
-                    source_index = model.mapToSource(index)
-                    item = model.sourceModel().itemFromIndex(source_index)
-
-                else:
-                    model: QStandardItemModel
-                    item = model.itemFromIndex(index)
-
-                h = self.calc_required_height(item, view)
-                w = self.calc_required_width(item, view)
-                size = QSize(w, h)
-                item.setSizeHint(size)
-
-                if isinstance(view, QTreeView):
-                    view.resizeColumnToContents(item.index().column())
-
-        if isinstance(view, QTableView):
-            view.resizeColumnsToContents()
-            view.resizeRowsToContents()
-
-            # setSectionResizeMode しないと stretchLastSection が無視される
-            for logical_index in range(view.horizontalHeader().count()):
-                view.horizontalHeader().setSectionResizeMode(
-                    logical_index,
-                    QtWidgets.QHeaderView.ResizeMode.ResizeToContents  # or Interactive
-                )
-
-    @staticmethod
-    def calc_required_width(item: QStandardItem, view: QAbstractItemView):
-        # magic numbers...
-        ICON_SPACE_WIDTH = 24
-        CHECKBOX_SPACE_WIDTH = 24
-        MARGIN = 8
-
-        # fontMetrics to calc the required width of text
-        fm = view.fontMetrics()
-
-        # get the width of required text region
-        text_area_width = fm.size(Qt.TextFlag.TextShowMnemonic, item.text()).width()
-
-        # get the width of icon
-        if item.icon().isNull():
-            icon_width = 0
-        else:
-            # ----- The following code snippets doesn't work as intended... -----
-            # width: int = view.horizontalHeader().sectionSize(item.column())
-            # height: int = view.verticalHeader().sectionSize(item.row())
-            # required_size = QSize(width, height)
-            # icon_size = item.icon().actualSize(required_size)
-            # icon_width = icon_size.width()
-            # logger.debug(f'{icon_width=}')
-            icon_width = ICON_SPACE_WIDTH
-
-        # get the checkable width
-        if item.isCheckable():
-            checkbox_width = CHECKBOX_SPACE_WIDTH
-        else:
-            checkbox_width = 0
-
-        return MARGIN + text_area_width + icon_width + checkbox_width
-
-    @staticmethod
-    def calc_required_height(item: QStandardItem, view: QAbstractItemView):
-        MARGIN = 10
-
-        fm = view.fontMetrics()
-        size: QSize = fm.size(Qt.TextFlag.TextShowMnemonic, item.text())
-        height = size.height()
-
-        return height + MARGIN
-
-
-# スロットとして使える callable オブジェクト
-resize_column = _ResizeColumn()
-
-
 # dataChanged のスロットとして使える callable クラス
 class ResizeColumn:
+
+    _concrete_method: callable = None
+
     def __init__(self, view: QAbstractItemView):
+
+        if isinstance(view, QTreeView):
+            self._concrete_method = self._resize_tree_view
+        elif isinstance(view, QTableView):
+            self._concrete_method = self._resize_table_view
+        else:
+            raise NotImplementedError
+
         self.view = view
+        self.view.model().dataChanged.connect(self)
 
     def __call__(
             self,
@@ -457,19 +369,16 @@ class ResizeColumn:
     ):
         # DisplayRole が変化するときのみ実行
         if (Qt.ItemDataRole.DisplayRole in roles) or len(roles) == 0:
-            self.get_callable()(top_left)
+            self._concrete_method(top_left)
 
-    def get_callable(self):
-        if isinstance(self.view, QTreeView):
-            return self.resize_tree_view
-        elif isinstance(self.view, QTableView):
-            return self.resize_table_view
-        else:
-            raise NotImplementedError
+    def resize_all_columns(self):
+        model = self.view.model()
+        for c in range(model.columnCount()):
+            for r in range(model.rowCount()):
+                index = model.index(r, c)
+                self(index, None, [Qt.ItemDataRole.DisplayRole])
 
-    def resize_table_view(self, index: QModelIndex):
-        self.view: QTableView
-
+    def _set_size_hint(self, index: QModelIndex):
         model = index.model()
 
         if isinstance(model, QSortFilterProxyModelOfStandardItemModel):
@@ -481,10 +390,15 @@ class ResizeColumn:
             model: QStandardItemModel
             item = model.itemFromIndex(index)
 
-        h = self.calc_required_height(item, self.view)
-        w = self.calc_required_width(item, self.view)
+        h = self._calc_required_height(item, self.view)
+        w = self._calc_required_width(item, self.view)
         size = QSize(w, h)
         item.setSizeHint(size)
+
+    def _resize_table_view(self, index: QModelIndex):
+        self.view: QTableView
+
+        self._set_size_hint(index)
 
         self.view.resizeColumnsToContents()
         self.view.resizeRowsToContents()
@@ -496,32 +410,19 @@ class ResizeColumn:
                 QtWidgets.QHeaderView.ResizeMode.ResizeToContents  # or Interactive
             )
 
-    def resize_tree_view(self, _: QModelIndex):
+    def _resize_tree_view(self, _index: QModelIndex):
         self.view: QTreeView
         model = self.view.model()
 
         for c in range(model.columnCount()):
             for r in range(model.rowCount()):
                 index: QModelIndex = model.index(r, c)
-
-                if isinstance(model, QSortFilterProxyModelOfStandardItemModel):
-                    model: QSortFilterProxyModelOfStandardItemModel
-                    source_index = model.mapToSource(index)
-                    item = model.sourceModel().itemFromIndex(source_index)
-
-                else:
-                    model: QStandardItemModel
-                    item = model.itemFromIndex(index)
-
-                h = self.calc_required_height(item, self.view)
-                w = self.calc_required_width(item, self.view)
-                size = QSize(w, h)
-                item.setSizeHint(size)
+                self._set_size_hint(index)
 
             self.view.resizeColumnToContents(c)
 
     @staticmethod
-    def calc_required_width(item: QStandardItem, view: QAbstractItemView):
+    def _calc_required_width(item: QStandardItem, view: QAbstractItemView):
         # magic numbers...
         ICON_SPACE_WIDTH = 24
         CHECKBOX_SPACE_WIDTH = 24
@@ -555,7 +456,7 @@ class ResizeColumn:
         return MARGIN + text_area_width + icon_width + checkbox_width
 
     @staticmethod
-    def calc_required_height(item: QStandardItem, view: QAbstractItemView):
+    def _calc_required_height(item: QStandardItem, view: QAbstractItemView):
         MARGIN = 10
 
         fm = view.fontMetrics()

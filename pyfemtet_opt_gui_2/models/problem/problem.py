@@ -10,11 +10,12 @@ from PySide6.QtGui import *
 # noinspection PyUnresolvedReferences
 from PySide6.QtWidgets import *
 
+from pyfemtet_opt_gui_2.ui.ui_WizardPage_confirm import Ui_WizardPage
 from pyfemtet_opt_gui_2.common.qt_util import *
 from pyfemtet_opt_gui_2.common.pyfemtet_model_bases import *
 from pyfemtet_opt_gui_2.models.objectives.obj import get_obj_model_for_problem
 from pyfemtet_opt_gui_2.models.variables.var import get_var_model_for_problem
-from pyfemtet_opt_gui_2.ui.ui_WizardPage_confirm import Ui_WizardPage
+from pyfemtet_opt_gui_2.models.config.config import get_config_model_for_problem
 
 SUB_MODELS = None
 PROBLEM_MODEL = None
@@ -28,6 +29,7 @@ def get_sub_models(parent) -> dict[str, QStandardItemModel]:
         SUB_MODELS = dict(
             objectives=get_obj_model_for_problem(parent=parent),
             parameters=get_var_model_for_problem(parent=parent),
+            config=get_config_model_for_problem(parent=parent),
         )
     return SUB_MODELS
 
@@ -49,17 +51,23 @@ class ProblemTableItemModel(StandardItemModelWithEnhancedFirstRow):
         self.sub_models = get_sub_models(parent=parent)
 
         with EditModel(self):
+
+            # 各サブモデルごとに setChild する
             for i, (key, model) in enumerate(self.sub_models.items()):
+
+                # item に変換
                 item = StandardItemModelAsQStandardItem(key, model)
 
+                # setChild
                 self.root.setChild(i, 0, item)
-                self.root.setColumnCount(max(
-                    self.root.columnCount(),
-                    item.columnCount()
-                ))
 
-    def data(self, index, role=...):
-        return super().data(index, role)
+                # カラム数をサブモデルの最大値に設定
+                self.root.setColumnCount(
+                    max(
+                        self.root.columnCount(),
+                        item.columnCount()
+                    )
+                )
 
     def flags(self, index):
         return super().flags(index) & ~Qt.ItemFlag.ItemIsEditable & ~Qt.ItemFlag.ItemIsUserCheckable
@@ -77,11 +85,34 @@ class QProblemItemModelWithoutUseUnchecked(QSortFilterProxyModelOfStandardItemMo
         if source_row == 0:
             return True
 
-        # else, get the submodel and its row
+        # else, get the submodel and its row.
         source_model: ProblemTableItemModel = self.sourceModel()
-        item: StandardItemModelAsQStandardItem = source_model.itemFromIndex(source_parent)
-        sub_proxy_model = item.proxy_model
+
+        # First get the ModelAsItem to get sub-model header information.
+        item = source_model.itemFromIndex(source_parent)
+
+        # If the item is not StandardItemModelAsQStandardItem,
+        # We are processing a child of QStandardItem or
+        # do_cloned nested ModelAsItem (what behaves as a QStandardItem).
+        # Now we cannot access to header data and
+        # 現在のところ孫以降の階層で詳細に制御するべきデータがないので
+        # この場合は super クラスに処理を任せる。
+        # もしここを実装したい場合は ModelAsItem の do_clone の
+        # children の clone の処理の直後に CustomUserRole でも定義
+        # すればいいと思われる。
+        if not isinstance(item, StandardItemModelAsQStandardItem):
+            return super().filterAcceptsRow(source_row, source_parent)
+
+        item: StandardItemModelAsQStandardItem
+        sub_proxy_model = item.proxy_model  # model of ModelAsItem
         sub_proxy_model_row = source_row  # row of item.proxy_model
+        assert isinstance(sub_proxy_model.sourceModel(), StandardItemModelWithHeader)
+        sub_source_model: StandardItemModelWithHeader = sub_proxy_model.sourceModel()
+
+        # If the sub-model doesn't have
+        # `use` header, show it (or not).
+        if CommonItemColumnName.use not in sub_source_model.ColumnNames:
+            return super().filterAcceptsRow(source_row, source_parent)
 
         # then get the index of `use` cell
         sub_proxy_index = get_column_by_header_data(
@@ -103,6 +134,7 @@ class ConfirmWizardPage(QWizardPage):
     ui: Ui_WizardPage
     source_model: ProblemTableItemModel
     proxy_model: QProblemItemModelWithoutUseUnchecked
+    column_resizer: ResizeColumn
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -118,26 +150,31 @@ class ConfirmWizardPage(QWizardPage):
         self.source_model = get_problem_model(parent=self)
         self.proxy_model = QProblemItemModelWithoutUseUnchecked()
         self.proxy_model.setSourceModel(self.source_model)
-        self.ui.treeView.setModel(self.proxy_model)
 
     def setup_view(self):
         view = self.ui.treeView
+        view.setModel(self.proxy_model)
         view.expandAll()
-        for c in range(view.model().columnCount()):
-            view.resizeColumnToContents(c)
-        view.model().dataChanged.connect(lambda *args: resize_column(view, *args))
+
+        self.column_resizer = ResizeColumn(view)
+        self.column_resizer.resize_all_columns()
+
 
 
 if __name__ == '__main__':
     import sys
+    from pyfemtet_opt_gui_2.femtet.femtet import get_femtet
     from pyfemtet_opt_gui_2.models.objectives.obj import ObjectiveWizardPage
     from pyfemtet_opt_gui_2.models.variables.var import VariableWizardPage
-    from pyfemtet_opt_gui_2.femtet.femtet import get_femtet
+    from pyfemtet_opt_gui_2.models.config.config import ConfigWizardPage
 
     get_femtet()
 
     app = QApplication()
     app.setStyle('fusion')
+
+    page_cfg = ConfigWizardPage()
+    page_cfg.show()
 
     page_obj = ObjectiveWizardPage()
     page_obj.show()

@@ -27,7 +27,6 @@ from pyfemtet_opt_gui_2.models.config.algorithm.base import (
     QAbstractAlgorithmItemModel,
     AbstractAlgorithmConfig,
     AbstractAlgorithmConfigItem,
-    QAlgorithmStandardItem,
 )
 
 import enum

@@ -200,14 +200,39 @@ class StandardItemModelWithoutFirstRow(QSortFilterProxyModelOfStandardItemModel)
 
 # 一覧ページで使う、各モデルの一行目を強調する QStandardItemModel
 class StandardItemModelWithEnhancedFirstRow(StandardItemModelWithHeaderSearch):
+
+    def should_enhance(self, index: QModelIndex) -> bool:
+        if not index.isValid():
+            return False
+
+        # CustomItemDataRole.WithFirstRowRole stores
+        # StandardItemModelWithHeader's withFirstRow
+        # or nothing. (if True it / if False or None do nothing)
+
+        # 親がなければ強調の必要なし
+        if not index.parent().isValid():
+            return False
+
+        # WithFirstRowRole が True でなければ
+        # (False か None の可能性がある)
+        # 強調の必要なし
+        if not index.data(CustomItemDataRole.WithFirstRowRole):
+            return False
+
+        # 1 行目でなければ強調の必要なし
+        if index.row() != 0:
+            return False
+
+        return True
+
     def data(self, index, role=...):
 
-        is_submodel = index.parent().isValid()
-
-        if is_submodel:
-            if (index.row() == 0) and (role == Qt.ItemDataRole.FontRole):
+        if role == Qt.ItemDataRole.FontRole:
+            if self.should_enhance(index):
                 return get_enhanced_font()
-            if (index.row() == 0) and (role == Qt.ItemDataRole.BackgroundRole):
+
+        if role == Qt.ItemDataRole.BackgroundRole:
+            if self.should_enhance(index):
                 default_color = QApplication.palette().color(QPalette.ColorRole.Base)
                 return default_color.darker(120)
 
@@ -219,6 +244,7 @@ class StandardItemModelWithEnhancedFirstRow(StandardItemModelWithHeaderSearch):
 class StandardItemModelAsQStandardItem(QStandardItem):
     source_model: QStandardItemModel
     proxy_model: QSortFilterProxyModelOfStandardItemModel
+    _original_model_is_proxy: bool
 
     def __init__(
             self,
@@ -226,12 +252,15 @@ class StandardItemModelAsQStandardItem(QStandardItem):
             model: QStandardItemModel | QSortFilterProxyModelOfStandardItemModel
     ):
         if isinstance(model, QStandardItemModel):
-            self.source_model = model
+            self._original_model_is_proxy = False
+            self._source_model = model
             self.proxy_model = QSortFilterProxyModelOfStandardItemModel()
             self.proxy_model.setSourceModel(model)
+
         elif isinstance(model, QSortFilterProxyModelOfStandardItemModel):
-            self.source_model = model.sourceModel()
+            self._original_model_is_proxy = True
             self.proxy_model = model
+
         else:
             raise NotImplementedError
 
@@ -239,6 +268,14 @@ class StandardItemModelAsQStandardItem(QStandardItem):
         self.setText(text)
         self.do_clone_all()
         self.proxy_model.dataChanged.connect(self.do_clone)
+
+    @property
+    def source_model(self):
+        if self._original_model_is_proxy:
+            return self.proxy_model.sourceModel()
+
+        else:
+            return self._source_model
 
     def do_clone_all(self):
         indices = []
@@ -250,30 +287,44 @@ class StandardItemModelAsQStandardItem(QStandardItem):
     def do_clone(self, *args):
         for arg in args:
             if isinstance(arg, QModelIndex):
-
+                # 与えられているのは self.proxy_model の index
                 proxy_index: QModelIndex = arg
 
-                # prepare new item
-                item = QStandardItem()
+                # 自身の直接の子の変更のみ考慮する。
+                # 孫以降はその ItemAsModel の do_clone で
+                # 処理させるため。
+                # FIXME:
+                #   純 QStandardItem に setChild している場合は
+                #   無視されてしまうので、回避策をここで。
+                if arg.parent().isValid():
+                    return
 
                 # get source item
                 source_index = self.proxy_model.mapToSource(proxy_index)
                 source_item = self.proxy_model.sourceModel().itemFromIndex(source_index)
 
-                # clone itemData
-                data = self.proxy_model.itemData(proxy_index)
-                for role, value in data.items():
-                    item.setData(value, role)
+                # clone item
+                item = source_item.clone()
 
-                # clone other properties
-                item.setEditable(source_item.isEditable())
-                item.setCheckable(source_item.isCheckable())
-                item.setEnabled(source_item.isEnabled())
-                item.setSelectable(source_item.isSelectable())
-                item.setDragEnabled(source_item.isDragEnabled())
-                item.setAutoTristate(source_item.isAutoTristate())
-                item.setDropEnabled(source_item.isDropEnabled())
-                item.setUserTristate(source_item.isUserTristate())
+                # if clone source model is a
+                # StandardItemModelWithHeader,
+                # check `with_first_row` attribute
+                # and set the value to the item's
+                # CustomDataRole.
+                with_first_row = False
+                if isinstance(self.source_model, StandardItemModelWithHeader):
+                    _m: StandardItemModelWithHeader = self.source_model
+                    with_first_row = _m.with_first_row
+                item.setData(with_first_row, CustomItemDataRole.WithFirstRowRole)
+
+                # 直接の子アイテムを clone する
+                # 多分、dataChange の連鎖で勝手に再帰する
+                if source_item.hasChildren():
+                    rows = source_item.rowCount()
+                    columns = source_item.columnCount()
+                    for r in range(rows):
+                        for c in range(columns):
+                            item.setChild(r, c, source_item.child(r, c).clone())
 
                 # do clone
                 r, c = arg.row(), arg.column()
@@ -282,8 +333,8 @@ class StandardItemModelAsQStandardItem(QStandardItem):
     def clone_back(
             self,
             top_left: QModelIndex,  # index of some ItemModel containing ItemModelAsItem
-            bottom_right: QModelIndex,
-            roles: list[Qt.ItemDataRole],
+            _bottom_right: QModelIndex,
+            _roles: list[Qt.ItemDataRole],
     ):
         # StandardItemModelAsQStandardItem は
         # 大元の ItemModel が変更されるたび

@@ -22,18 +22,15 @@ from pyfemtet_opt_gui_2.ui.ui_WizardPage_config import Ui_WizardPage
 from pyfemtet_opt_gui_2.common.qt_util import *
 from pyfemtet_opt_gui_2.common.pyfemtet_model_bases import *
 from pyfemtet_opt_gui_2.common.return_msg import *
-from pyfemtet_opt_gui_2.common.expression_processor import *
-from pyfemtet_opt_gui_2.femtet.femtet import *
 
 from pyfemtet_opt_gui_2.models.config.algorithm.base import (
-    QAlgorithmStandardItem,
     QAbstractAlgorithmItemModel,
     AbstractAlgorithmConfig,
     get_abstract_algorithm_config_model,
+    QAlgorithmItemModelForProblem,
 )
 
 from pyfemtet_opt_gui_2.models.config.algorithm.algorithm_random import (
-    QRandomAlgorithmItemModel,
     get_random_algorithm_config_model,
     RandomAlgorithmConfig,
 )
@@ -43,6 +40,7 @@ Q_DEFAULT_ALGORITHM_CONFIG_ITEM_FACTORY = get_random_algorithm_config_model
 
 # ===== model =====
 _CONFIG_MODEL = None
+_CONFIG_MODEL_FOR_PROBLEM = None
 _WITH_DUMMY = False
 
 
@@ -58,10 +56,17 @@ def get_config_model(parent, _with_dummy=None) -> 'ConfigItemModel':
 
 
 def get_config_model_for_problem(parent, _with_dummy=None):
-    model = get_config_model(parent, _with_dummy)
-    model_as_item = QConfigItemModelForProblem()
-    model_as_item.setSourceModel(model)
-    return model_as_item
+    global _CONFIG_MODEL_FOR_PROBLEM
+    if _CONFIG_MODEL_FOR_PROBLEM is None:
+        assert parent is not None
+        source_model = ConfigItemModel(
+            parent,
+            _WITH_DUMMY if _with_dummy is None else _with_dummy,
+            hide_algorithm_note=True,
+        )
+        _CONFIG_MODEL_FOR_PROBLEM = QConfigItemModelForProblem()
+        _CONFIG_MODEL_FOR_PROBLEM.setSourceModel(source_model)
+    return _CONFIG_MODEL_FOR_PROBLEM
 
 
 # ===== constants =====
@@ -130,18 +135,20 @@ class QConfigTreeViewDelegate(QStyledItemDelegateWithCombobox):
         self.config_model = config_model
 
     def is_partial_model_item(self, index: QModelIndex):
+        """index が partial model の構成要素の item かどうか"""
 
+        # index の親を取得
         model: QSortFilterProxyModelOfStandardItemModel = index.model()
         assert isinstance(model, QSortFilterProxyModelOfStandardItemModel)
-
         item = model.sourceModel().itemFromIndex(model.mapToSource(index.parent()))
 
-        # Is item a StandardItemModelAsQStandardItem or not
+        # 親が ModelAsItem でなければ partial_model の一部ではない
+        # 実装上、親は ModelAsItem にしているはずであるため
         if not isinstance(item, StandardItemModelAsQStandardItem):
             return False
 
-        # If item is StandardItemModelAsQStandardItem,
-        # is the 大元 model a partial_model or not.
+        # 前提として ModelAsItem であれば
+        # source か proxy と一致するはず
         item: StandardItemModelAsQStandardItem
         if (
                 (id(item.source_model) == id(self.partial_model))
@@ -205,8 +212,10 @@ class ConfigItemModel(StandardItemModelWithHeader):
     ColumnNames = ConfigHeaderNames
     RowNames = [enum_item.value.name for enum_item in ConfigItemClassEnum]
 
-    def __init__(self, parent=None, _with_dummy=True):
+    def __init__(self, parent=None, _with_dummy=True, hide_algorithm_note=False):
         super().__init__(parent, _with_dummy)
+
+        self.hide_algorithm_note = hide_algorithm_note
 
         # モデルの全体を構築する
         self.setup_model()
@@ -280,11 +289,36 @@ class ConfigItemModel(StandardItemModelWithHeader):
             item_data: dict = self.itemData(self.index(r, c))
             # print(item_data)  # {0: '最適化アルゴリズム', 13: PySide6.QtCore.QSize(100, 26), 257: True}
 
-            # 指定された algorithm_name の Item を作成
-            algorithm_model = Algorithm().choices[algorithm_name](self.parent())
+            #   ItemModel に紐づかない Item は即座に C++ 内で削除されるが
+            # Python 上では ItemModel.dataChanged.connect(Item.do_clone) が
+            # 生きているので Item の切り替え後 ItemModel に変更があった場合
+            # Python は C++ に古い削除された C++ へのアクセスを試みさせる。
+            #   その際に RuntimeError が出る。
+            #   古い Item は Python のメモリ上にはあるがロジック上は
+            # 使われておらず、切替先の Item では __init__ で別途 dataChanged に
+            # connect しているので動作に問題はないが、気持ち悪いので
+            # Item の切り替え前に古い C++ QStandardItem オブジェクトへの
+            # Connection を切っておく。
+            if hasattr(self, '__algorithm_item__'):
+                self.__algorithm_item__.proxy_model.dataChanged.disconnect(self.__algorithm_item__.do_clone)
+
+            # 指定された algorithm_name の Model を取得
+            if self.hide_algorithm_note:
+                _algorithm_model = Algorithm().choices[algorithm_name](self.parent())
+                algorithm_model = QAlgorithmItemModelForProblem()
+                algorithm_model.setSourceModel(_algorithm_model)
+            else:
+                algorithm_model = Algorithm().choices[algorithm_name](self.parent())
+
+
+            # Model から ModelAsItem を作成
             item = StandardItemModelAsQStandardItem(
                 text=header_data, model=algorithm_model
             )
+
+            # 切替前に disconnect するために新しい item を保持
+            # noinspection PyAttributeOutsideInit
+            self.__algorithm_item__ = item
 
             # Item の置き換え
             self.setItem(r, c, item)
@@ -362,6 +396,7 @@ class ConfigWizardPage(QWizardPage):
     proxy_model: ConfigItemModelForIndividualView
     delegate: QConfigTreeViewDelegate
     expand_keeper: ExpandStateKeeper
+    column_resizer: ResizeColumn
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -399,13 +434,8 @@ class ConfigWizardPage(QWizardPage):
             )
         )
 
-        # リサイズする
-        for c in range(view.model().columnCount()):
-            view.resizeColumnToContents(c)
-
-        # データ変更時にリサイズするようにする
-        resizer = ResizeColumn(view)
-        view.model().dataChanged.connect(resizer)
+        self.column_resizer = ResizeColumn(view)
+        self.column_resizer.resize_all_columns()
 
     def setup_delegate(self):
         # TreeView に対して適用する delegate
@@ -427,14 +457,7 @@ class ConfigWizardPage(QWizardPage):
         # QAbstractAlgorithmItemModel に対応する delegate を
         # 上記 delegate に適用（上書き）する
         self.ui.treeView.setItemDelegate(self.delegate)
-        self.resize_column()
-
-    def resize_column(self):
-        items = []
-        for r in range(self.source_model.rowCount()):
-            for c in range(self.source_model.columnCount()):
-                items.append(self.source_model.item(r, c))
-        resize_column(self.ui.treeView, *items)
+        self.column_resizer.resize_all_columns()
 
 
 if __name__ == '__main__':

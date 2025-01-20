@@ -271,12 +271,13 @@ class ObjectiveWizardPage(QWizardPage):
     source_model: ObjectiveTableItemModel
     proxy_model: ObjectiveItemModelWithoutFirstRow
     delegate: ObjectiveItemDelegate
+    column_resizer: ResizeColumn
 
     def __init__(self, parent=None, load_femtet_fun: callable = None):
         super().__init__(parent)
         self.setup_ui()
-        self.setup_view()
         self.setup_model(load_femtet_fun)
+        self.setup_view()
         self.setup_delegate()
 
     def setup_ui(self):
@@ -286,9 +287,28 @@ class ObjectiveWizardPage(QWizardPage):
             lambda *args: open_help('ParametricAnalysis/ParametricAnalysis.htm')
         )
 
+    def setup_model(self, load_femtet_fun):
+        self.source_model = get_obj_model(self)
+        self.proxy_model = ObjectiveItemModelWithoutFirstRow()
+        self.proxy_model.setSourceModel(self.source_model)
+
+        # ボタンを押したらモデルを更新する
+        self.ui.pushButton.clicked.connect(
+            (lambda *args: self.source_model.load_femtet())
+            if load_femtet_fun is None else
+            (lambda *_: load_femtet_fun())
+        )
+
     def setup_view(self):
 
         view = self.ui.tableView
+
+        # view に model を設定
+        view.setModel(self.proxy_model)
+
+        # 表示データが変わったときに列幅を自動調整
+        # する設定
+        self.column_resizer = ResizeColumn(view)
 
         # direction 列のみシングルクリックでコンボボックスが
         # 開くようにシングルクリックで edit モードに入るよう
@@ -302,20 +322,8 @@ class ObjectiveWizardPage(QWizardPage):
             )
         )
 
-    def setup_model(self, load_femtet_fun):
-        self.source_model = get_obj_model(self)
-        self.proxy_model = ObjectiveItemModelWithoutFirstRow()
-        self.proxy_model.setSourceModel(self.source_model)
-        self.proxy_model.dataChanged.connect(
-            lambda *args: resize_column(self.ui.tableView, *args)
-        )
-        self.ui.tableView.setModel(self.proxy_model)
+        # 一旦列幅を自動調整
         self.resize_column()
-        self.ui.pushButton.clicked.connect(
-            (lambda *args: self.source_model.load_femtet())
-            if load_femtet_fun is None else
-            (lambda *_: load_femtet_fun())
-        )
 
     def setup_delegate(self):
         self.delegate = ObjectiveItemDelegate()
@@ -323,11 +331,7 @@ class ObjectiveWizardPage(QWizardPage):
         self.resize_column()
 
     def resize_column(self):
-        items = []
-        for r in range(self.source_model.rowCount()):
-            for c in range(self.source_model.columnCount()):
-                items.append(self.source_model.item(r, c))
-        resize_column(self.ui.tableView, *items)
+        self.column_resizer.resize_all_columns()
 
 
 if __name__ == '__main__':

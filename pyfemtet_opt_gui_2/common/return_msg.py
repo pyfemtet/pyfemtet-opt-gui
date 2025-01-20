@@ -46,6 +46,7 @@ class ReturnMsg:
         inconsistent_value_lb = '値と下限の大小関係が正しくありません。'
         cannot_recognize_as_an_expression = '文字式の認識に失敗しました。'
         not_a_number = '数値または数式の認識に失敗しました。'
+        femtet_macro_failed = 'Femtet マクロの実行に失敗しました。'
 
 
 # ReturnMsg を受け取ってダイアログ表示し

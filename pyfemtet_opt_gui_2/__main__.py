@@ -16,6 +16,7 @@ from pyfemtet_opt_gui_2.common.return_msg import *
 from pyfemtet_opt_gui_2.ui.ui_Wizard_main import Ui_Wizard
 from pyfemtet_opt_gui_2.models.variables.var import VariableWizardPage
 from pyfemtet_opt_gui_2.models.objectives.obj import ObjectiveWizardPage
+from pyfemtet_opt_gui_2.models.config.config import ConfigWizardPage
 from pyfemtet_opt_gui_2.models.problem.problem import ConfirmWizardPage
 
 import os
@@ -33,6 +34,7 @@ class Main(QWizard):
     ui: Ui_Wizard
     var_page: 'VariableWizardPage'
     obj_page: 'ObjectiveWizardPage'
+    config_page: 'ConfigWizardPage'
     problem_page: 'ConfirmWizardPage'
 
     def __init__(self, parent=None, flags=Qt.WindowType.Window):
@@ -53,10 +55,12 @@ class Main(QWizard):
     def setup_page(self):
         self.var_page = VariableWizardPage(self, load_femtet_fun=self.load_femtet)
         self.obj_page = ObjectiveWizardPage(self, load_femtet_fun=self.load_femtet)
+        self.config_page = ConfigWizardPage(self)
         self.problem_page = ConfirmWizardPage(self)
 
         self.addPage(self.var_page)
         self.addPage(self.obj_page)
+        self.addPage(self.config_page)
         self.addPage(self.problem_page)
 
     def connect_femtet(self):
@@ -104,7 +108,6 @@ class Main(QWizard):
         # button を元に戻す
         button.setEnabled(True)
         button.repaint()
-
 
     def update_connection_state_label(self, connection_message: ConnectionMessage):
         label: QLabel = self.ui.label_connectionState

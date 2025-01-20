@@ -27,6 +27,22 @@ import enum
 from abc import ABC
 
 
+# （共通の）ProblemView に表示するための ModelAsItem に使用するための Model
+# FIXME: うまくいっていないので使っていない。多分 do_clone がループする。
+class QAlgorithmItemModelForProblem(QSortFilterProxyModelOfStandardItemModel):
+
+    def filterAcceptsColumn(self, source_column: int, source_parent: QModelIndex):
+        # note を非表示
+        source_model: QAbstractAlgorithmItemModel = self.sourceModel()
+        if source_column == get_column_by_header_data(
+                source_model,
+                QAbstractAlgorithmItemModel.ColumnNames.note
+        ):
+            return False
+
+        return super().filterAcceptsColumn(source_column, source_parent)
+
+
 # （共通の）Treeview に表示するための Algorithm の ItemModelAsItem
 class QAlgorithmStandardItem(StandardItemModelAsQStandardItem):
 
@@ -88,6 +104,7 @@ class QAbstractAlgorithmItemModel(StandardItemModelWithHeader):
     def __init__(self, parent=None, _with_dummy=True):
         StandardItemModelWithHeaderSearch.__init__(self, parent)
         self.setup_header_data()
+        self.setup_vertical_header_data()
         self.setup_model()
 
     @property

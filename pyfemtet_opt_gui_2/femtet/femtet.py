@@ -4,6 +4,7 @@ import webbrowser
 
 from femtetutils import util
 from win32com.client import Dispatch, CDispatch
+from pythoncom import com_error
 import win32process
 
 from pyfemtet_opt_gui_2.logger import get_logger
@@ -23,6 +24,7 @@ __all__ = [
     'get_connection_state',
     'get_obj_names',
     'get_variables',
+    'apply_variables',
     'open_help',
 ]
 
@@ -203,6 +205,75 @@ def get_variables() -> tuple[dict[str, Expression], ReturnMsg]:
             return {}, ReturnMsg.Error.cannot_recognize_as_an_expression
 
     return out, ReturnMsg.no_message
+
+
+def apply_variables(variables: dict[str, float | str]) -> tuple[ReturnMsg, str | None]:
+
+    # check Femtet Connection
+    ret = get_connection_state()
+    if ret != ReturnMsg.no_message:
+        return ret, None
+
+    # implementation check
+    if not hasattr(_Femtet, 'UpdateVariable'):
+        return ReturnMsg.Error.femtet_macro_version_old, None
+
+    # 型 validation
+    _variables = dict()
+    for var_name, value in variables.items():
+        try:
+            value = float(value)
+            _variables.update({var_name: value})
+        except ValueError:
+            additional_msg = f'変数: {var_name}, 値: {value}'
+            return ReturnMsg.Error.not_a_number, additional_msg
+    variables: dict[str, float] = _variables
+
+    # UpdateVariable に失敗した場合でも
+    # ReExecute と Redraw はしないといけないので
+    # try-except-finally を使う
+    return_msg = ReturnMsg.no_message
+    additional_msg = None
+    try:
+        # variables ごとに処理
+        for var_name, value in variables.items():
+            # float にはすでにしているので Femtet に転送
+            succeeded = _Femtet.UpdateVariable(
+                var_name, value
+            )
+
+            # 実行結果チェック
+            if not succeeded:
+                # com_error が必ず起こる
+                _Femtet.ShowLastError()
+    except com_error as e:
+        return_msg = ReturnMsg.Error.femtet_macro_failed
+        exception_msg = ' '.join([str(a) for a in e.args])
+        additional_msg = (f'マクロ名: `UpdateVariable` '
+                          f'エラーメッセージ: {exception_msg}')
+
+    finally:
+
+        # モデルを再構築
+        # Gaudi にアクセスするだけで失敗する場合もある
+        # ここで失敗したらどうしようもない
+        try:
+            _Femtet.Gaudi.Activate()  # always returns None
+            succeeded = _Femtet.Gaudi.ReExecute()
+            if not succeeded:
+                _Femtet.ShowLastError()
+            _Femtet.Redraw()  # always returns None
+
+
+        except Exception as e:  # com_error or NoAttribute
+            exception_msg = ' '.join([str(a) for a in e.args])
+            additional_msg = (f'マクロ名: ReExecute, '
+                              f'エラーメッセージ: {exception_msg}')
+            return ReturnMsg.Error.femtet_macro_failed, additional_msg
+
+        # except から finally に来ていれば
+        # すでに return_msg が入っている
+        return return_msg, additional_msg
 
 
 if __name__ == '__main__':

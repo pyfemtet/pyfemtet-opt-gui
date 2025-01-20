@@ -384,6 +384,35 @@ class VariableItemModel(StandardItemModelWithHeader):
 
         return super().flags(index)
 
+    def apply_test_values(self):
+        # test 列に登録されている変数を取得
+        c_var_name = self.get_column_by_header_data(
+            self.ColumnNames.name
+        )
+        c_test_value = self.get_column_by_header_data(
+            self.ColumnNames.test_value
+        )
+
+        variables = dict()
+        if self.with_first_row:
+            iterable = range(1, self.rowCount())
+        else:
+            iterable = range(self.rowCount())
+        for r in iterable:
+            var_name = self.item(r, c_var_name).text()
+            value = self.item(r, c_test_value).text()
+            variables.update(
+                {var_name: value}
+            )
+
+        # Femtet に転送
+        return_msg, a_msg = apply_variables(variables)
+        show_return_msg(
+            return_msg=return_msg,
+            parent=self.parent(),
+            additional_message=a_msg,
+        )
+
 
 # 個別ページに表示される ItemModel
 class VariableItemModelForTableView(StandardItemModelWithoutFirstRow):
@@ -413,31 +442,43 @@ class VariableWizardPage(QWizardPage):
     source_model: VariableItemModel
     proxy_model: VariableItemModelForTableView
     delegate: VariableTableViewDelegate
+    column_resizer: ResizeColumn
 
     def __init__(self, parent=None, load_femtet_fun: callable = None):
         super().__init__(parent)
         self.setup_ui()
-        self.setup_view()
         self.setup_model(load_femtet_fun)
+        self.setup_view()
         self.setup_delegate()
 
     def setup_ui(self):
         self.ui = Ui_WizardPage()
         self.ui.setupUi(self)
 
-    def setup_view(self):
-        pass
-
-    def setup_model(self, load_femtet_fun):
+    def setup_model(
+            self,
+            load_femtet_fun=None,
+    ):
         self.source_model = get_var_model(self)
         self.proxy_model = VariableItemModelForTableView()
         self.proxy_model.setSourceModel(self.source_model)
-        self.ui.tableView.setModel(self.proxy_model)
+
+        # load_femtet_fun: __main__.py から貰う想定の
+        # femtet 全体を load する関数
         self.ui.pushButton_load_prm.clicked.connect(
-            (lambda *_: self.source_model.load_femtet())
+            (lambda *_: self.source_model.load_femtet())  # debug 用
             if load_femtet_fun is None else
             (lambda *_: load_femtet_fun())
         )
+
+        self.ui.pushButton_test_prm.clicked.connect(
+            lambda *_: self.source_model.apply_test_values()
+        )
+
+    def setup_view(self):
+        view = self.ui.tableView
+        view.setModel(self.proxy_model)
+        self.column_resizer = ResizeColumn(view)
         self.resize_column()
 
     def setup_delegate(self):
@@ -446,11 +487,7 @@ class VariableWizardPage(QWizardPage):
         self.resize_column()
 
     def resize_column(self):
-        items = []
-        for r in range(self.source_model.rowCount()):
-            for c in range(self.source_model.columnCount()):
-                items.append(self.source_model.item(r, c))
-        resize_column(self.ui.tableView, *items)
+        self.column_resizer.resize_all_columns()
 
 
 if __name__ == '__main__':
