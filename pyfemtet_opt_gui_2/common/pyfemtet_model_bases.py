@@ -109,7 +109,7 @@ class StandardItemModelWithHeader(StandardItemModelWithHeaderSearch):
                     _role := Qt.ItemDataRole.UserRole,
                 )
 
-    def stash_current_table(self) -> dict[str, dict[str, dict[Qt.ItemDataRole, Any]]]:
+    def stash_current_table(self) -> dict[str, dict[Any, dict[Qt.ItemDataRole, Any]]]:
         """load 時に既存のデータを上書きする為に stash する
 
         dict[name, dict[ColumnName, dict[Qt.ItemDataRole, Any]]
@@ -121,8 +121,8 @@ class StandardItemModelWithHeader(StandardItemModelWithHeaderSearch):
         # 既存データについて iteration
         for r in range(1, self.rowCount()):
 
-            # 行ごとに dict を作成, key は obj_name など
-            row_information = dict()
+            # 行ごとに dict を作成, key は obj_name など headerData
+            row_information: dict[Any, dict[Qt.ItemDataRole, Any]] = dict()
 
             # 列ごとにデータを収取
             for header_name in self.ColumnNames:
@@ -270,7 +270,7 @@ class StandardItemModelAsQStandardItem(QStandardItem):
         self.proxy_model.dataChanged.connect(self.do_clone)
 
     @property
-    def source_model(self):
+    def source_model(self) -> QStandardItemModel | StandardItemModelWithHeader:
         if self._original_model_is_proxy:
             return self.proxy_model.sourceModel()
 
@@ -293,9 +293,10 @@ class StandardItemModelAsQStandardItem(QStandardItem):
                 # 自身の直接の子の変更のみ考慮する。
                 # 孫以降はその ItemAsModel の do_clone で
                 # 処理させるため。
-                # FIXME:
+                # Note:
                 #   純 QStandardItem に setChild している場合は
-                #   無視されてしまうので、回避策をここで。
+                #   無視されてしまうので、そういうデータを実装
+                #   する場合はその時に考える。
                 if arg.parent().isValid():
                     return
 
@@ -313,8 +314,7 @@ class StandardItemModelAsQStandardItem(QStandardItem):
                 # CustomDataRole.
                 with_first_row = False
                 if isinstance(self.source_model, StandardItemModelWithHeader):
-                    _m: StandardItemModelWithHeader = self.source_model
-                    with_first_row = _m.with_first_row
+                    with_first_row = self.source_model.with_first_row
                 item.setData(with_first_row, CustomItemDataRole.WithFirstRowRole)
 
                 # 直接の子アイテムを clone する

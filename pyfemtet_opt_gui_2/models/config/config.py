@@ -138,9 +138,10 @@ class QConfigTreeViewDelegate(QStyledItemDelegateWithCombobox):
         """index が partial model の構成要素の item かどうか"""
 
         # index の親を取得
-        model: QSortFilterProxyModelOfStandardItemModel = index.model()
+        model: QAbstractItemModel = index.model()
         assert isinstance(model, QSortFilterProxyModelOfStandardItemModel)
-        item = model.sourceModel().itemFromIndex(model.mapToSource(index.parent()))
+        model: QSortFilterProxyModelOfStandardItemModel
+        item: QStandardItem = model.sourceModel().itemFromIndex(model.mapToSource(index.parent()))
 
         # 親が ModelAsItem でなければ partial_model の一部ではない
         # 実装上、親は ModelAsItem にしているはずであるため
@@ -315,6 +316,7 @@ class ConfigItemModel(StandardItemModelWithHeader):
             item = StandardItemModelAsQStandardItem(
                 text=header_data, model=algorithm_model
             )
+            item.setEditable(False)
 
             # 切替前に disconnect するために新しい item を保持
             # noinspection PyAttributeOutsideInit
@@ -375,7 +377,8 @@ class QConfigItemModelForProblem(QSortFilterProxyModelOfStandardItemModel):
 
     def filterAcceptsColumn(self, source_column: int, source_parent: QModelIndex):
         # note を非表示
-        source_model: ConfigItemModel = self.sourceModel()
+        source_model = self.sourceModel()
+        assert isinstance(source_model, ConfigItemModel)
         if source_column == get_column_by_header_data(
                 source_model,
                 ConfigItemModel.ColumnNames.note
@@ -434,7 +437,13 @@ class ConfigWizardPage(QWizardPage):
             )
         )
 
+        # データの表示が変わったらカラムをリサイズする
         self.column_resizer = ResizeColumn(view)
+
+        # データが展開されたらカラムをリサイズする
+        view.expanded.connect(lambda index: self.column_resizer(index, index, [Qt.ItemDataRole.DisplayRole]))
+
+        # データがそろったので一旦リサイズする
         self.column_resizer.resize_all_columns()
 
     def setup_delegate(self):

@@ -34,19 +34,23 @@ class ReturnMsg:
 
     class Error(enum.StrEnum):
         _test = 'This is a test Error message.'
+
+        # femtet
         femtet_connection_failed = 'Femtet との接続がタイムアウトしました。'
         femtet_not_found = 'Femtet のプロセスがありません。'
         femtet_connection_not_yet = 'まだ Femtet と接続されていません。'
         femtet_access_error = 'Femtet にアクセスできません。'
         femtet_macro_version_old = 'Femtet 本体または最後に実行された「マクロ機能の有効化」のバージョンが古いです。'
-        evaluated_expression_not_float = '式が計算できないか、計算結果に実数以外の数が含まれています'  # 句読点なし
         cannot_open_sample_femprj = 'サンプルファイルのオープンに失敗しました'
+        femtet_macro_failed = 'Femtet マクロの実行に失敗しました。'
+
+        # expressions
+        cannot_recognize_as_an_expression = '文字式の認識に失敗しました。'
+        not_a_number = '数値または数式の認識に失敗しました。'
+        evaluated_expression_not_float = '式が計算できないか、計算結果に実数以外の数が含まれています'  # 句読点なし
         inconsistent_lb_ub = '上下限の大小関係が正しくありません。'
         inconsistent_value_ub = '値と上限の大小関係が正しくありません。'
         inconsistent_value_lb = '値と下限の大小関係が正しくありません。'
-        cannot_recognize_as_an_expression = '文字式の認識に失敗しました。'
-        not_a_number = '数値または数式の認識に失敗しました。'
-        femtet_macro_failed = 'Femtet マクロの実行に失敗しました。'
 
 
 # ReturnMsg を受け取ってダイアログ表示し

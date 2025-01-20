@@ -64,26 +64,18 @@ class VariableColumnNames(enum.StrEnum):
 # ===== qt objects =====
 # 個別ページに表示される TableView の Delegate
 class VariableTableViewDelegate(QStyledItemDelegate):
-    def createEditor(self, parent, option, index):
-        header_data = get_internal_header_data(index)
-        if (
-                header_data == VariableColumnNames.initial_value
-                or header_data == VariableColumnNames.lower_bound
-                or header_data == VariableColumnNames.upper_bound
-        ):
-            editor: QLineEdit = super().createEditor(parent, option, index)
-            return editor
-
-        else:
-            return super().createEditor(parent, option, index)
 
     def setModelData(self, editor, model, index):
+
+        # QLineEdit を使いたいので str を setText すること
+
         header_data = get_internal_header_data(index)
 
         if (
                 header_data == VariableColumnNames.initial_value
                 or header_data == VariableColumnNames.lower_bound
                 or header_data == VariableColumnNames.upper_bound
+                or header_data == VariableColumnNames.test_value
         ):
             editor: QLineEdit
 
@@ -119,27 +111,34 @@ class VariableTableViewDelegate(QStyledItemDelegate):
                 else:
                     raise RuntimeError('Internal Error!')
 
-            # overwrite it with the new user-input
-            if header_data == VariableColumnNames.initial_value:
-                init = new_expression.value
+            # if init or lb or ub, check bounds
+            if (
+                    header_data == VariableColumnNames.initial_value
+                    or header_data == VariableColumnNames.lower_bound
+                    or header_data == VariableColumnNames.upper_bound
+            ):
 
-            elif header_data == VariableColumnNames.lower_bound:
-                lb = new_expression.value
+                # overwrite it with the new user-input
+                if header_data == VariableColumnNames.initial_value:
+                    init = new_expression.value
 
-            elif header_data == VariableColumnNames.upper_bound:
-                ub = new_expression.value
+                elif header_data == VariableColumnNames.lower_bound:
+                    lb = new_expression.value
 
-            else:
-                raise NotImplementedError
+                elif header_data == VariableColumnNames.upper_bound:
+                    ub = new_expression.value
 
-            ret_msg, error_numbers = check_bounds(init, lb, ub)
-            if not can_continue(ret_msg, parent=self.parent(), additional_message=error_numbers):
-                return
+                else:
+                    raise NotImplementedError
 
-            else:
-                with EditModel(model):
-                    model.setData(index, text, Qt.ItemDataRole.DisplayRole)
-                    model.setData(index, new_expression, Qt.ItemDataRole.UserRole)
+                ret_msg, error_numbers = check_bounds(init, lb, ub)
+                if not can_continue(ret_msg, parent=self.parent(), additional_message=error_numbers):
+                    return  # cancel Editing
+
+            # finally, update the model.
+            with EditModel(model):
+                model.setData(index, new_expression.expr, Qt.ItemDataRole.DisplayRole)
+                model.setData(index, new_expression, Qt.ItemDataRole.UserRole)
 
         else:
             super().setModelData(editor, model, index)
@@ -167,13 +166,14 @@ class VariableItemModel(StandardItemModelWithHeader):
             return
 
         # 現在の状態を stash
-        stashed_data: dict[str, dict[str, str]] = self.stash_current_table()
+        stashed_data = self.stash_current_table()
 
         rows = len(expressions) + 1
         with EditModel(self):
             self.setRowCount(rows)  # header row for treeview
 
             for r, (name, expression) in zip(range(1, rows), expressions.items()):
+
                 # ===== use =====
                 with nullcontext():  # editor で畳みやすくするためだけのコンテキストマネージャ
                     item = QStandardItem()

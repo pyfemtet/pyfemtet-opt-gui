@@ -67,18 +67,40 @@ class Expression:
             e.value  # 0.5
 
         """
-        self.expr: str = str(expression)
-        # sympify 時に tuple 扱いになる
+        # ユーザー指定の何らかの入力
+        self._expr: str | float = expression
+
+        # sympify 時に tuple 扱いになるので , を置き換える
         # 日本人が数値に , を使うとき Python では _ を意味する
         # expression に _ が入っていても構わない
-        _expr = self.expr.replace(',', '_')
-        self._s_expr = sympify(_expr, locals={})
+        tmp_expr = str(self._expr).replace(',', '_')
+        self._s_expr = sympify(tmp_expr, locals={})
+
+    def _get_value_if_pure_number(self) -> float | None:
+        # 1.0000 => True
+        # 1 * 0.9 => False
+        try:
+            value = float(str(self._expr).replace(',', '_'))
+            return value
+        except ValueError:
+            return None
 
     def is_number(self) -> bool:
         return self._s_expr.is_number
 
     def is_expression(self) -> bool:
         return not self.is_number()
+
+    @property
+    def expr(self) -> str:
+        # 1.0000000e+0 などは 1 などにする
+        # ただし 1.1 * 1.1 などは 1.21 にしない
+        # self.is_number() は後者も True を返す
+        value = self._get_value_if_pure_number()
+        if value is not None:
+            return str(value)
+        else:
+            return self._expr
 
     @property
     def value(self) -> float:

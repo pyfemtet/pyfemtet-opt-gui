@@ -28,7 +28,6 @@ from abc import ABC
 
 
 # （共通の）ProblemView に表示するための ModelAsItem に使用するための Model
-# FIXME: うまくいっていないので使っていない。多分 do_clone がループする。
 class QAlgorithmItemModelForProblem(QSortFilterProxyModelOfStandardItemModel):
 
     def filterAcceptsColumn(self, source_column: int, source_parent: QModelIndex):
