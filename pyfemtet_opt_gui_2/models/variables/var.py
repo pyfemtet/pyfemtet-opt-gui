@@ -58,7 +58,7 @@ class VariableColumnNames(enum.StrEnum):
     lower_bound = '下限'
     upper_bound = '上限'
     test_value = 'テスト値 または\n文字式の計算結果'
-    note = '備考'
+    note = 'メモ欄'
 
 
 # ===== qt objects =====

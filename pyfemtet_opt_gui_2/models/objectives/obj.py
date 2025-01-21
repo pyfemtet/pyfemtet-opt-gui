@@ -54,7 +54,7 @@ class ObjectiveColumnNames(enum.StrEnum):
     name = '名前'
     direction = '最適化の目標',
     target_value = '目標値',
-    note = '備考',
+    note = 'メモ欄',
 
 
 class ObjectiveDirection(enum.StrEnum):  # python >= 3.11
