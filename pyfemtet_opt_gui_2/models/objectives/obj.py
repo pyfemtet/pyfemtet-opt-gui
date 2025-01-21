@@ -52,9 +52,9 @@ def get_obj_model_for_problem(parent, _with_dummy=None):
 class ObjectiveColumnNames(enum.StrEnum):
     use = CommonItemColumnName.use
     name = '名前'
-    direction = '最適化の目標',
-    target_value = '目標値',
-    note = 'メモ欄',
+    direction = '最適化の目標'
+    target_value = '目標値'
+    note = 'メモ欄'
 
 
 class ObjectiveDirection(enum.StrEnum):  # python >= 3.11
