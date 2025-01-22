@@ -66,12 +66,15 @@ class Constraint:
         self.var_model = var_model
 
     def finalize_check(self) -> tuple[ReturnMsg, str]:
-        # 上下限の関係がおかしければエラー
+        # 両方とも指定されていなければエラー
         if self.lb is None and self.ub is None:
             return ReturnMsg.Error.no_bounds, ''
 
+        # 上下関係がおかしければエラー
         if self.lb is not None and self.ub is not None:
-            return ReturnMsg.Error.inconsistent_lb_ub, ''
+            ret_msg, a_msg = check_bounds(None, self.lb, self.ub)
+            if ret_msg != ReturnMsg.no_message:
+                return ret_msg, a_msg
 
         # expression が None ならエラー
         if self.expression is None:
@@ -256,4 +259,57 @@ class ConstraintModel(StandardItemModelWithHeader):
 
             # 処理したので終了
             break
+
+    def get_constraint(self, name: str):
+        for r in self.get_row_iterable():
+
+            # 違う名前ならば次へ
+            _h = self.ColumnNames.name
+            c = self.get_column_by_header_data(_h)
+            if name != self.item(r, c).text():
+                continue
+
+            # 該当する場合 Constraint オブジェクトを作成
+            out = Constraint(var_model=None)
+            out.name = name
+
+            # expression, expr
+            with nullcontext():
+                _h = self.ColumnNames.expr
+                c = self.get_column_by_header_data(_h)
+                item = self.item(r, c)
+                expression = item.text()  # expression をそのまま表示
+
+                out.expression = expression
+
+            # lb
+            with nullcontext():
+                _h = self.ColumnNames.lb
+                c = self.get_column_by_header_data(_h)
+                item = self.item(r, c)
+                data = item.data(Qt.ItemDataRole.UserRole)
+                if data is not None:
+                    data: Expression
+                    assert data.is_number()
+                    data = data.value
+                out.lb = data
+
+            # ub
+            with nullcontext():
+                _h = self.ColumnNames.ub
+                c = self.get_column_by_header_data(_h)
+                item = self.item(r, c)
+                data = item.data(Qt.ItemDataRole.UserRole)
+                if data is not None:
+                    data: Expression
+                    assert data.is_number()
+                    data = data.value
+                out.ub = data
+
+            return out
+
+        else:
+            raise RuntimeError(f'constraint named `{name}` is not found.')
+
+
 

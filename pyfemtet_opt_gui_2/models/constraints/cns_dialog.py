@@ -48,28 +48,24 @@ class ConstraintEditorDialog(QDialog):
         super().__init__(parent, f)
 
         self.setup_ui()
-        self.setup_model(existing_constraint_name)
-        self.setup_view()
+        self.setup_model()
+        self.setup_view(existing_constraint_name)
         self.setup_signal(load_femtet_fun)
 
     def setup_ui(self):
         self.ui = Ui_Dialog()
         self.ui.setupUi(self)
 
-    def setup_model(self, existing_constraint_name):
+    def setup_model(self):
         # constraints
         self.constraints = get_cns_model(parent=self)
 
-        # constraint
-        if existing_constraint_name is not None:
-            raise NotImplementedError
-
         # variables
         self.original_var_model = get_var_model(parent=self, _with_dummy=True)
-        self.var_model = VariableItemModelForTableView()
+        self.var_model = VariableItemModelForTableView(self)
         self.var_model.setSourceModel(self.original_var_model)
 
-    def setup_view(self):
+    def setup_view(self, existing_constraint_name):
         view = self.ui.tableView_prmsOnCns
         view.setModel(self.var_model)
         # view.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
@@ -81,6 +77,19 @@ class ConstraintEditorDialog(QDialog):
         editor.textChanged.connect(
             lambda: self.update_evaluated_value(editor.toPlainText())
         )
+
+        # constraint
+        if existing_constraint_name is not None:
+            cns: Constraint = self.constraints.get_constraint(name=existing_constraint_name)
+
+            self.ui.lineEdit_name.setText(cns.name)
+            if cns.lb is not None:
+                self.ui.lineEdit_lb.setText(str(cns.lb))
+            if cns.ub is not None:
+                self.ui.lineEdit_ub.setText(str(cns.ub))
+            self.ui.plainTextEdit_cnsFormula.setPlainText(
+                cns.expression
+            )
 
     def setup_signal(self, load_femtet_fun: callable):
 
@@ -236,11 +245,32 @@ class ConstraintEditorDialog(QDialog):
         # ret_msg, a_msg = ReturnMsg.Error._test, ''
         # ret_msg, a_msg = ReturnMsg.Warn._test, ''
 
+        lb = self.ui.lineEdit_lb.text()
+        if lb != '':
+            try:
+                lb_value = float(lb)
+            except ValueError:
+                show_return_msg(ReturnMsg.Error.not_a_pure_number, parent=self, additional_message=': ' + lb)
+                return
+        else:
+            lb_value = None
+
+        ub = self.ui.lineEdit_ub.text()
+        if ub != '':
+            try:
+                ub_value = float(ub)
+            except ValueError:
+                show_return_msg(ReturnMsg.Error.not_a_pure_number, parent=self, additional_message=': ' + ub)
+                return
+        else:
+            ub_value = None
+
+
         constraint: Constraint = Constraint(self.original_var_model)
         constraint.name = self.ui.lineEdit_name.text() if self.ui.lineEdit_name.text() != '' else self.constraints.get_unique_name()
         constraint.expression = self.ui.plainTextEdit_cnsFormula.toPlainText()
-        constraint.lb = float(self.ui.lineEdit_lb.text()) if self.ui.lineEdit_lb.text() != '' else None
-        constraint.ub = float(self.ui.lineEdit_ub.text()) if self.ui.lineEdit_ub.text() != '' else None
+        constraint.lb = lb_value
+        constraint.ub = ub_value
 
         ret_msg, a_msg = constraint.finalize_check()
 

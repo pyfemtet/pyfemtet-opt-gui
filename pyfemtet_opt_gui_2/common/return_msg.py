@@ -53,6 +53,7 @@ class ReturnMsg:
         # expressions
         cannot_recognize_as_an_expression = '文字式の認識に失敗しました。'
         not_a_number = '数値または数式の認識に失敗しました。'
+        not_a_pure_number = '数値または数式の認識に失敗しました。'
         evaluated_expression_not_float = '式が計算できないか、計算結果に実数以外の数が含まれています'  # 句読点なし
         inconsistent_lb_ub = '上下限の大小関係が正しくありません。'
         inconsistent_value_ub = '値と上限の大小関係が正しくありません。'

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'WizardPage_cnsxhgeVE.ui'
+## Form generated from reading UI file 'WizardPage_cnsxqVVcZ.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.8.1
+## Created by: Qt User Interface Compiler version 6.7.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -42,13 +42,6 @@ class Ui_WizardPage(object):
         self.pushButton_edit.setIcon(icon1)
 
         self.verticalLayout.addWidget(self.pushButton_edit)
-
-        self.pushButton_remove = QPushButton(WizardPage)
-        self.pushButton_remove.setObjectName(u"pushButton_remove")
-        icon2 = QIcon(QIcon.fromTheme(QIcon.ThemeIcon.ListRemove))
-        self.pushButton_remove.setIcon(icon2)
-
-        self.verticalLayout.addWidget(self.pushButton_remove)
 
 
         self.gridLayout.addLayout(self.verticalLayout, 0, 0, 1, 1)
@@ -102,7 +95,6 @@ class Ui_WizardPage(object):
         WizardPage.setWindowTitle(QCoreApplication.translate("WizardPage", u"WizardPage", None))
         self.pushButton_add.setText(QCoreApplication.translate("WizardPage", u"\u8ffd\u52a0", None))
         self.pushButton_edit.setText(QCoreApplication.translate("WizardPage", u"\u7de8\u96c6", None))
-        self.pushButton_remove.setText(QCoreApplication.translate("WizardPage", u"\u524a\u9664", None))
         self.label_cnsList.setText(QCoreApplication.translate("WizardPage", u"\u62d8\u675f\u5f0f\u306e\u4e00\u89a7", None))
         self.textEdit_7.setMarkdown(QCoreApplication.translate("WizardPage", u"\u30d1\u30e9\u30e1\u30fc\u30bf\u306e\u7d44\u5408\u305b\u306b\u5236\u9650\u3092\u4ed8\u3051\u305f\u3044\u5834\u5408\u306f\u3001\u3053\u306e\u753b\u9762\u3067\u8a2d\u5b9a\u3057\u3066\u304f\u3060\u3055\u3044\u3002\n"
 "\n"
