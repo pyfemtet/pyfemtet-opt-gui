@@ -20,45 +20,103 @@ from pyfemtet_opt_gui_2.common.pyfemtet_model_bases import *
 from pyfemtet_opt_gui_2.common.return_msg import *
 from pyfemtet_opt_gui_2.femtet.femtet import *
 
+from pyfemtet_opt_gui_2.models.constraints.model import get_cns_model, ConstraintModel
+from pyfemtet_opt_gui_2.models.constraints.cns_dialog import ConstraintEditorDialog
+
 import enum
 import sys
 from contextlib import nullcontext
 
-# ===== model singleton pattern =====
-_CNS_MODEL = None
-_WITH_DUMMY = False
 
-
-def get_cns_model(parent=None, _with_dummy=None):
-    global _CNS_MODEL
-    if _CNS_MODEL is None:
-        _CNS_MODEL = ConstraintModel(
-            parent=parent,
-            _with_dummy=_with_dummy if _with_dummy is not None else _WITH_DUMMY,
-        )
-    return _CNS_MODEL
-
-
-def get_cns_model_for_problem(parent=None, with_dummy=None):
-    model = get_cns_model(parent, _with_dummy=None)
-    model_for_problem = ConstraintModelForProblem()
-    model_for_problem.setSoruceModel(model)
+def get_cns_model_for_problem(parent, _with_dummy=None):
+    model = get_cns_model(parent, _with_dummy)
+    model_for_problem = ConstraintModelForProblem(parent)
+    model_for_problem.setSourceModel(model)
     return model_for_problem
 
 
-# ===== header data =====
-class ConstraintColumnNames(enum.StrEnum):
-    use = CommonItemColumnName.use
-    name = '名前'
-    expr = '式'
-    lb = '下限'
-    ub = '上限'
-    note = 'メモ欄'
+class ConstraintModelForProblem(ProxyModelWithForProblem):
+    pass
 
 
-# ===== Qt objects =====
-# 大元のモデル
-class ConstraintModel(StandardItemModelWithHeader):
-    ColumnNames = ConstraintColumnNames
+# hide 1st row
+class ConstraintModelWithoutFirstRow(StandardItemModelWithoutFirstRow):
+    pass
 
 
+# UI
+class ConstraintWizardPage(QWizardPage):
+    ui: Ui_WizardPage
+    source_model: ConstraintModel
+    proxy_model: ConstraintModelWithoutFirstRow
+    column_resizer: ResizeColumn
+    view: QTableView
+
+    def __init__(self, parent=None, load_femtet_fun=None):
+        super().__init__(parent)
+        self.load_femtet_fun = load_femtet_fun
+        self.setup_ui()
+        self.setup_model()
+        self.setup_view()
+        self.setup_signal()
+
+    def setup_ui(self):
+        self.ui = Ui_WizardPage()
+        self.ui.setupUi(self)
+
+    def setup_model(self):
+        self.source_model = get_cns_model(parent=self)
+        self.proxy_model = ConstraintModelWithoutFirstRow(self)
+        self.proxy_model.setSourceModel(self.source_model)
+
+    def setup_view(self):
+        view = self.ui.tableView_cnsList
+        view.setModel(self.proxy_model)
+        self.view = view
+
+        self.column_resizer = ResizeColumn(view)
+        self.column_resizer.resize_all_columns()
+
+    def setup_signal(self):
+        self.ui.pushButton_add.clicked.connect(
+            lambda _: self.open_dialog()
+        )
+
+        self.ui.pushButton_edit.clicked.connect(
+            lambda _: self.open_dialog(self.get_selected_name())
+        )
+
+    def get_selected_name(self) -> str | None:
+        proxy_indexes = self.view.selectedIndexes()
+        if len(proxy_indexes) == 0:
+            return None
+
+        proxy_index: QModelIndex = proxy_indexes[0]
+
+        assert isinstance(proxy_index.model(), ConstraintModelWithoutFirstRow)
+        proxy_model: ConstraintModelWithoutFirstRow = proxy_index.model()
+
+        assert isinstance(proxy_model.sourceModel(), ConstraintModel)
+        source_model: ConstraintModel = proxy_model.sourceModel()
+        source_index = proxy_model.mapToSource(proxy_index)
+
+        r = source_index.row()
+        c = source_model.get_column_by_header_data(source_model.ColumnNames.name)
+
+        return source_model.item(r, c).text()
+
+    def open_dialog(self, name=None):
+        dialog = ConstraintEditorDialog(
+            parent=self,
+            existing_constraint_name=name,
+            load_femtet_fun=self.load_femtet_fun
+        )
+        dialog.show()
+
+
+if __name__ == '__main__':
+    app = QApplication()
+    app.setStyle('fusion')
+    window = ConstraintWizardPage()
+    window.show()
+    app.exec()

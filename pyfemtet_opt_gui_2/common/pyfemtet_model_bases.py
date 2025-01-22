@@ -24,6 +24,7 @@ __all__ = [
     'StandardItemModelWithEnhancedFirstRow',
     'StandardItemModelAsQStandardItem',
     'StandardItemModelWithHeader',
+    'ProxyModelWithForProblem',
 ]
 
 ICON_PATH = r'pyfemtet-opt-gui\pyfemtet_opt_gui_2\assets\icon\arrow.svg'
@@ -188,6 +189,12 @@ class StandardItemModelWithHeader(StandardItemModelWithHeaderSearch):
 
                     self.setItem(r, c, item)
 
+    def get_row_iterable(self):
+        if self.with_first_row:
+            return range(1, self.rowCount())
+        else:
+            return range(self.rowCount())
+
 
 # 各ページで使う、一行目を隠す ProxyModel
 class StandardItemModelWithoutFirstRow(QSortFilterProxyModelOfStandardItemModel):
@@ -196,6 +203,41 @@ class StandardItemModelWithoutFirstRow(QSortFilterProxyModelOfStandardItemModel)
             if source_row == 0:
                 return False
         return True
+
+
+# 各サブモデルが一覧ページで隠す・表示する ProxyModel
+class ProxyModelWithForProblem(QSortFilterProxyModelOfStandardItemModel):
+    
+    def filterAcceptsColumn(self, source_column, source_parent):
+
+        source_model: StandardItemModelWithHeader = self.sourceModel()
+        assert isinstance(source_model, StandardItemModelWithHeader)
+        
+        # use 列を隠す
+        if source_column == source_model.get_column_by_header_data(CommonItemColumnName.use):
+            return False
+        
+        return super().filterAcceptsColumn(source_column, source_parent)
+
+    def filterAcceptsRow(self, source_row: int, source_parent: QModelIndex):
+
+        source_model: StandardItemModelWithHeader = self.sourceModel()
+        assert isinstance(source_model, StandardItemModelWithHeader)
+
+        # with_first_row なら 1 行目は表示する
+        if (
+                source_model.with_first_row
+                and source_row == 0
+        ):
+            return True
+
+        # use が unchecked なら隠す
+        index = source_model.get_column_by_header_data(CommonItemColumnName.use, source_row)
+        item = source_model.itemFromIndex(index)
+        if item.checkState() == Qt.CheckState.Unchecked:
+            return False
+
+        return super().filterAcceptsRow(source_row, source_parent)
 
 
 # 一覧ページで使う、各モデルの一行目を強調する QStandardItemModel
@@ -254,7 +296,7 @@ class StandardItemModelAsQStandardItem(QStandardItem):
         if isinstance(model, QStandardItemModel):
             self._original_model_is_proxy = False
             self._source_model = model
-            self.proxy_model = QSortFilterProxyModelOfStandardItemModel()
+            self.proxy_model = QSortFilterProxyModelOfStandardItemModel(model.parent())
             self.proxy_model.setSourceModel(model)
 
         elif isinstance(model, QSortFilterProxyModelOfStandardItemModel):
@@ -268,6 +310,12 @@ class StandardItemModelAsQStandardItem(QStandardItem):
         self.setText(text)
         self.do_clone_all()
         self.proxy_model.dataChanged.connect(self.do_clone)
+        self.proxy_model.rowsMoved.connect(lambda *_: self.do_clone_all())
+        self.proxy_model.rowsRemoved.connect(lambda *_: self.do_clone_all())
+        self.proxy_model.rowsInserted.connect(lambda *_: self.do_clone_all())
+        self.proxy_model.columnsMoved.connect(lambda *_: self.do_clone_all())
+        self.proxy_model.columnsRemoved.connect(lambda *_: self.do_clone_all())
+        self.proxy_model.columnsInserted.connect(lambda *_: self.do_clone_all())
 
     @property
     def source_model(self) -> QStandardItemModel | StandardItemModelWithHeader:
@@ -278,90 +326,55 @@ class StandardItemModelAsQStandardItem(QStandardItem):
             return self._source_model
 
     def do_clone_all(self):
-        indices = []
+        self.setRowCount(self.proxy_model.rowCount())
+        self.setColumnCount(self.proxy_model.columnCount())
         for r in range(self.proxy_model.rowCount()):
             for c in range(self.proxy_model.columnCount()):
-                indices.append(self.proxy_model.index(r, c))
-        self.do_clone(*indices)
+                self.do_clone(self.proxy_model.index(r, c), self.proxy_model.index(r, c), [])
 
-    def do_clone(self, *args):
-        for arg in args:
-            if isinstance(arg, QModelIndex):
-                # 与えられているのは self.proxy_model の index
-                proxy_index: QModelIndex = arg
+    def do_clone(self, top_left, _bottom_right, _roles):
 
-                # 自身の直接の子の変更のみ考慮する。
-                # 孫以降はその ItemAsModel の do_clone で
-                # 処理させるため。
-                # Note:
-                #   純 QStandardItem に setChild している場合は
-                #   無視されてしまうので、そういうデータを実装
-                #   する場合はその時に考える。
-                if arg.parent().isValid():
-                    return
+        # 与えられているのは self.proxy_model の index
+        proxy_index: QModelIndex = top_left
 
-                # get source item
-                source_index = self.proxy_model.mapToSource(proxy_index)
-                source_item = self.proxy_model.sourceModel().itemFromIndex(source_index)
+        # 自身の直接の子の変更のみ考慮する。
+        # 孫以降はその ItemAsModel の do_clone で
+        # 処理させるため。
+        # Note:
+        #   純 QStandardItem に setChild している場合は
+        #   無視されてしまうので、そういうデータを実装
+        #   する場合はその時に考える。
+        if proxy_index.parent().isValid():
+            return
 
-                # clone item
-                item = source_item.clone()
+        # get source item
+        source_index = self.proxy_model.mapToSource(proxy_index)
+        source_item = self.proxy_model.sourceModel().itemFromIndex(source_index)
 
-                # if clone source model is a
-                # StandardItemModelWithHeader,
-                # check `with_first_row` attribute
-                # and set the value to the item's
-                # CustomDataRole.
-                with_first_row = False
-                if isinstance(self.source_model, StandardItemModelWithHeader):
-                    with_first_row = self.source_model.with_first_row
-                item.setData(with_first_row, CustomItemDataRole.WithFirstRowRole)
+        # clone item
+        item = source_item.clone()
 
-                # 直接の子アイテムを clone する
-                # 多分、dataChange の連鎖で勝手に再帰する
-                if source_item.hasChildren():
-                    rows = source_item.rowCount()
-                    columns = source_item.columnCount()
-                    for r in range(rows):
-                        for c in range(columns):
-                            item.setChild(r, c, source_item.child(r, c).clone())
+        # if clone source model is a
+        # StandardItemModelWithHeader,
+        # check `with_first_row` attribute
+        # and set the value to the item's
+        # CustomDataRole.
+        with_first_row = False
+        if isinstance(self.source_model, StandardItemModelWithHeader):
+            with_first_row = self.source_model.with_first_row
+        item.setData(with_first_row, CustomItemDataRole.WithFirstRowRole)
 
-                # do clone
-                r, c = arg.row(), arg.column()
-                self.setChild(r, c, item)
+        # 直接の子アイテムを clone する
+        # 多分、dataChange の連鎖で勝手に再帰する
+        if source_item.hasChildren():
+            rows = source_item.rowCount()
+            columns = source_item.columnCount()
+            for r in range(rows):
+                for c in range(columns):
+                    child = source_item.child(r, c)
+                    if child is not None:
+                        item.setChild(r, c, child.clone())
 
-    def clone_back(
-            self,
-            top_left: QModelIndex,  # index of some ItemModel containing ItemModelAsItem
-            _bottom_right: QModelIndex,
-            _roles: list[Qt.ItemDataRole],
-    ):
-        # StandardItemModelAsQStandardItem は
-        # 大元の ItemModel が変更されるたび
-        # self の Item を更新する仕組みなので
-        # この Item を参照する ItemModel を通じて
-        # Item が変更された場合その変更は
-        # 大元の ItemModel に反映されない。
-        # そうしたい場合は、これを使う。
-        # ItemModel の dataChanged に connect して
-        # self を変更する。
-
-        # まず 順方向 clone を切る
-        self.proxy_model.dataChanged.disconnect(self.do_clone)
-
-        # top_left のみ考える
-        index = top_left
-
-        # 貰った変更 index を変換する
-        proxy_index = self.proxy_model.index(index.row(), index.column())
-
-        # どこかの ItemModel による変更を self から
-        # 追って取得する
-        data = self.model().data(index)
-
-        with EditModel(self.proxy_model):
-            # 変更を適用する
-            self.proxy_model.setData(proxy_index, data)
-
-        # 順方向 clone を戻す
-        self.proxy_model.dataChanged.connect(self.do_clone)
+        # do clone
+        r, c = proxy_index.row(), proxy_index.column()
+        self.setChild(r, c, item)

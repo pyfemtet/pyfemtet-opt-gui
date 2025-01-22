@@ -62,9 +62,9 @@ def get_config_model_for_problem(parent, _with_dummy=None):
         source_model = ConfigItemModel(
             parent,
             _WITH_DUMMY if _with_dummy is None else _with_dummy,
-            hide_algorithm_note=True,
+            original_model=get_config_model(parent, _with_dummy)
         )
-        _CONFIG_MODEL_FOR_PROBLEM = QConfigItemModelForProblem()
+        _CONFIG_MODEL_FOR_PROBLEM = QConfigItemModelForProblem(parent)
         _CONFIG_MODEL_FOR_PROBLEM.setSourceModel(source_model)
     return _CONFIG_MODEL_FOR_PROBLEM
 
@@ -82,7 +82,8 @@ class ConfigHeaderNames(enum.StrEnum):
 # 設定項目のベース
 class AbstractConfigItem:
     name = ...
-    default = ''
+    default_display = ''
+    default_internal = None
     note = ''
 
 
@@ -90,7 +91,7 @@ class AbstractConfigItem:
 # 複雑なので切り出し
 class Algorithm(AbstractConfigItem):
     name = '最適化アルゴリズム'
-    default = DEFAULT_ALGORITHM_CONFIG.name
+    default_display = DEFAULT_ALGORITHM_CONFIG.name
     choices: dict[str, callable] = {
         AbstractAlgorithmConfig.name: get_abstract_algorithm_config_model,
         RandomAlgorithmConfig.name: get_random_algorithm_config_model,
@@ -102,13 +103,15 @@ class ConfigItemClassEnum(enum.Enum):
     @enum.member
     class n_trials(AbstractConfigItem):
         name = '解析実行回数'
-        default = 10
+        default_display = str(10)
+        default_internal = 10
         note = ''
 
     @enum.member
     class timeout(AbstractConfigItem):
         name = 'タイムアウト'
-        default = 'なし'
+        default_display = 'なし'
+        default_internal = None
         note = ''
 
     @enum.member
@@ -204,6 +207,30 @@ class QConfigTreeViewDelegate(QStyledItemDelegateWithCombobox):
             index_ = self.get_partial_model_index(index)
             return self.partial_model_delegate.setModelData(editor, self.partial_model, index_)
 
+        # n_trials or timeout の場合は int か None にする
+        hd = get_internal_header_data(index)
+        vhd = get_internal_header_data(index, Qt.Orientation.Vertical)
+        if (
+                hd == ConfigHeaderNames.value
+                and (
+                vhd == ConfigItemClassEnum.n_trials.value.name
+                or vhd == ConfigItemClassEnum.timeout.value.name
+        )
+        ):
+            editor: QLineEdit
+            text = editor.text()
+            try:
+                display = str(int(text))
+                value = int(text)
+                if value <= 0:
+                    display = 'なし'
+                    value = None
+            except ValueError:
+                display = 'なし'
+                value = None
+            model.setData(index, display, Qt.ItemDataRole.DisplayRole)
+            model.setData(index, value, Qt.ItemDataRole.UserRole)
+
         # その他の場合
         super().setModelData(editor, model, index)
 
@@ -213,10 +240,15 @@ class ConfigItemModel(StandardItemModelWithHeader):
     ColumnNames = ConfigHeaderNames
     RowNames = [enum_item.value.name for enum_item in ConfigItemClassEnum]
 
-    def __init__(self, parent=None, _with_dummy=True, hide_algorithm_note=False):
+    def __init__(self, parent=None, _with_dummy=True, original_model: 'ConfigItemModel' = None):
         super().__init__(parent, _with_dummy)
 
-        self.hide_algorithm_note = hide_algorithm_note
+        # SortFilterProxyModel に列方向の Recursive 機能がないため、
+        # problem 画面に正しく表示するためには以下のことをする。
+        # 1. for problem に対して Algorithm Model に Note を非表示にする proxy をかける
+        # 2. not for problem に対して for problem に clone する
+        self.original_model = original_model
+        self.is_original_model = self.original_model is None
 
         # モデルの全体を構築する
         self.setup_model()
@@ -303,34 +335,84 @@ class ConfigItemModel(StandardItemModelWithHeader):
             if hasattr(self, '__algorithm_item__'):
                 self.__algorithm_item__.proxy_model.dataChanged.disconnect(self.__algorithm_item__.do_clone)
 
-            # 指定された algorithm_name の Model を取得
-            if self.hide_algorithm_note:
-                _algorithm_model = Algorithm().choices[algorithm_name](self.parent())
-                algorithm_model = QAlgorithmItemModelForProblem()
-                algorithm_model.setSourceModel(_algorithm_model)
+            # # 1. for problem の場合は Algorithm Model に Note を非表示にする proxy をかける
+            # if self.original_model is not None:
+            #     _algorithm_model = Algorithm().choices[algorithm_name](self.parent())
+            #     algorithm_model = QAlgorithmItemModelForProblem(self.parent())
+            #     algorithm_model.setSourceModel(_algorithm_model)
+            # else:
+            #     algorithm_model = Algorithm().choices[algorithm_name](self.parent())
+
+            # 大元のモデルの場合は algorithm_model を ModelAsItem として登録する
+            if self.is_original_model:
+                self.algorithm_model: QAbstractAlgorithmItemModel = Algorithm().choices[algorithm_name](self.parent())
+
+                # Model から ModelAsItem を作成
+                item = StandardItemModelAsQStandardItem(
+                    text=header_data, model=self.algorithm_model
+                )
+                item.setEditable(False)
+
+                # 切替前に disconnect するために新しい item を保持
+                # noinspection PyAttributeOutsideInit
+                self.__algorithm_item__ = item
+
+                # Item の置き換え
+                self.setItem(r, c, item)
+
+                # Item を置き換えたことをクラスに記憶
+                self.algorithm_name = algorithm_name
+
+                # itemData を restore
+                # self.setData(self.index(r, c), expanded, role)
+                self.setItemData(self.index(r, c), item_data)
+
+            # for problem の場合は original model の clone を設定する
             else:
-                algorithm_model = Algorithm().choices[algorithm_name](self.parent())
+                # def clone(item_: QStandardItem):
+                #     item__ = item_.clone()
+                #     if item_.hasChildren():
+                #         item__.setRowCount(item_.rowCount())
+                #         item__.setColumnCount(item_.columnCount())
+                #         for r_ in range(item_.rowCount()):
+                #             for c_ in range(item_.columnCount()):
+                #                 child = item_.child(r_, c_)
+                #                 if child is not None:
+                #                     item__.setChild(r_, c_, child.clone())
+                #     self.setItem(item_.row(), item_.column(), item__)
+                #
+                # self.original_model.itemChanged.connect(clone)
 
+                def clone(tl, _br, roles):
+                    if not (len(roles) == 0 or (Qt.ItemDataRole.DisplayRole in roles)):
+                        return
 
-            # Model から ModelAsItem を作成
-            item = StandardItemModelAsQStandardItem(
-                text=header_data, model=algorithm_model
-            )
-            item.setEditable(False)
+                    item_ = self.original_model.itemFromIndex(tl)
+                    item__ = item_.clone()
+                    if item_.hasChildren():
+                        item__.setRowCount(item_.rowCount())
+                        item__.setColumnCount(item_.columnCount())
+                        for r_ in range(item_.rowCount()):
+                            for c_ in range(item_.columnCount()):
+                                child = item_.child(r_, c_)
+                                if child is not None:
+                                    # original_model の algorithm model の
+                                    # note 列ならコピーしない
+                                    if item_ == self.original_model.__algorithm_item__:
+                                        hd = self.original_model.algorithm_model.ColumnNames.note
+                                        c_note = self.original_model.algorithm_model.get_column_by_header_data(hd)
+                                        if c_ == c_note:
+                                            continue
+                                    item__.setChild(r_, c_, child.clone())
 
-            # 切替前に disconnect するために新しい item を保持
-            # noinspection PyAttributeOutsideInit
-            self.__algorithm_item__ = item
+                    self.setItem(item_.row(), item_.column(), item__)
 
-            # Item の置き換え
-            self.setItem(r, c, item)
+                self.original_model.dataChanged.connect(clone)
+                for r in range(self.original_model.rowCount()):
+                    for c in range(self.original_model.columnCount()):
+                        index = self.original_model.index(r, c)
+                        clone(index, index, [])
 
-            # Item を置き換えたことをクラスに記憶
-            self.algorithm_name = algorithm_name
-
-            # itemData を restore
-            # self.setData(self.index(r, c), expanded, role)
-            self.setItemData(self.index(r, c), item_data)
 
     def setup_model(self):
         rows = len(self.RowNames)
@@ -345,7 +427,8 @@ class ConfigItemModel(StandardItemModelWithHeader):
             item_cls_list: list[AbstractConfigItem] = [enum_item.value for enum_item in ConfigItemClassEnum]
             for r, item_cls in zip(range(1, len(ConfigItemClassEnum) + 1), item_cls_list):
                 name = item_cls.name
-                value = item_cls.default
+                display = item_cls.default_display
+                value = item_cls.default_internal
                 note = item_cls.note
 
                 # name
@@ -360,7 +443,8 @@ class ConfigItemModel(StandardItemModelWithHeader):
                 with nullcontext():
                     c = self.get_column_by_header_data(self.ColumnNames.value)
                     item: QStandardItem = QStandardItem()
-                    item.setText(str(value))
+                    item.setText(str(display))
+                    item.setData(value, Qt.ItemDataRole.UserRole)
                     self.setItem(r, c, item)
 
                 # note
@@ -370,6 +454,26 @@ class ConfigItemModel(StandardItemModelWithHeader):
                     item.setEditable(False)
                     item.setText(str(note))
                     self.setItem(r, c, item)
+
+    def is_no_finish_conditions(self):
+        # 値
+        hd = self.ColumnNames.value
+        c = self.get_column_by_header_data(hd)
+
+        # n_trials
+        vhd = ConfigItemClassEnum.n_trials.value.name
+        r = self.get_row_by_header_data(vhd)
+        n_trials = self.item(r, c).data(Qt.ItemDataRole.UserRole)
+
+        # timeout
+        vhd = ConfigItemClassEnum.timeout.value.name
+        r = self.get_row_by_header_data(vhd)
+        timeout = self.item(r, c).data(Qt.ItemDataRole.UserRole)
+
+        if n_trials is None and timeout is None:
+            return True
+        else:
+            return False
 
 
 # 一覧 Problem ページに表示される StandardItemModelAsStandardItem 用 ItemModel
@@ -467,6 +571,21 @@ class ConfigWizardPage(QWizardPage):
         # 上記 delegate に適用（上書き）する
         self.ui.treeView.setItemDelegate(self.delegate)
         self.column_resizer.resize_all_columns()
+
+    def validatePage(self) -> bool:
+        # 終了条件が設定されていなければ
+        # 警告を出して進めていいかどうか
+        # 確認する
+        if self.source_model.is_no_finish_conditions():
+            ret_msg = ReturnMsg.Warn.no_finish_conditions
+            if can_continue(ret_msg, parent=self):
+                # 進めてもよい
+                return True
+            else:
+                # やっぱりやめる
+                return False
+
+        return super().validatePage()
 
 
 if __name__ == '__main__':

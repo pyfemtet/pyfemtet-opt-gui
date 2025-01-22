@@ -1,11 +1,21 @@
-from numpy import mean
 from sympy import sympify
+from sympy.core.sympify import SympifyError
+from sympy import Min, Max, Add, Symbol
 
 from pyfemtet_opt_gui_2.common.return_msg import ReturnMsg
 
 __all__ = [
-    'Expression', 'eval_expressions', 'check_bounds',
+    'Expression', 'eval_expressions', 'check_bounds', 'SympifyError'
 ]
+
+
+def get_valid_functions(expressions=None):
+    return {
+        'mean': lambda *args: Add(*args).subs(expressions if expressions is not None else {}) / len(args),
+        'max': Max,
+        'min': Min,
+        'S': Symbol('S')
+    }
 
 
 def check_bounds(value=None, lb=None, ub=None) -> tuple[ReturnMsg, str]:
@@ -66,15 +76,29 @@ class Expression:
             e.expr  # '1/2'
             e.value  # 0.5
 
+            e = Expression('1.0000')
+            e.expr  # '1.0'
+            e.value  # 1.0
+
+
+
         """
         # ユーザー指定の何らかの入力
         self._expr: str | float = expression
 
-        # sympify 時に tuple 扱いになるので , を置き換える
-        # 日本人が数値に , を使うとき Python では _ を意味する
-        # expression に _ が入っていても構わない
-        tmp_expr = str(self._expr).replace(',', '_')
-        self._s_expr = sympify(tmp_expr, locals={})
+        # max(name1, name2) など関数を入れる際に問題になるので
+        # 下記の仕様は廃止
+        # # sympify 時に tuple 扱いになるので , を置き換える
+        # # 日本人が数値に , を使うとき Python では _ を意味する
+        # # expression に _ が入っていても構わない
+        # tmp_expr = str(self._expr).replace(',', '_')
+        tmp_expr = self._expr
+        try:
+            self._s_expr = sympify(tmp_expr, locals=get_valid_functions())
+            self.is_valid = True
+        except SympifyError as e:
+            self.is_valid = False
+            raise e
 
     def _get_value_if_pure_number(self) -> float | None:
         # 1.0000 => True
@@ -109,6 +133,9 @@ class Expression:
         else:
             raise ValueError(f'Cannot convert expression {self.expr} to float.')
 
+    def __repr__(self):
+        return self.__str__()
+
     def __str__(self):
         return f'{self.expr} ({str(self._s_expr)})'
 
@@ -119,7 +146,7 @@ class Expression:
         return int(float(self))
 
 
-def eval_expressions(expressions: dict[str, Expression | float | str]) -> tuple[dict[str, float], ReturnMsg]:
+def eval_expressions(expressions: dict[str, Expression | float | str]) -> tuple[dict[str, float], ReturnMsg, str]:
     #  値渡しに変換
     expressions = expressions.copy()
 
@@ -132,30 +159,32 @@ def eval_expressions(expressions: dict[str, Expression | float | str]) -> tuple[
 
     expression: str | float
     for key, expression in expressions.items():
-        evaluated = sympify(
+
+        sympified = sympify(
             expression,
-            locals={
-                'mean': lambda *args: mean(args),
-                # 'std': lambda *args: std(args),  # doesn't work
-                'max': max,
-                'min': min,
-            }
-        ).subs(expressions)
+            locals=get_valid_functions(expressions),
+        )
 
-        try:
-            value = float(evaluated)
-
-        except Exception:  # mostly TypeError
+        if isinstance(sympified, tuple):
             value = None
             error_keys.append(key)
+
+        else:
+            evaluated = sympified.subs(expressions)
+            try:
+                value = float(evaluated)
+
+            except TypeError:  # mostly TypeError or ValueError
+                value = None
+                error_keys.append(key)
 
         out[key] = value
 
     if error_keys:
-        return {}, ReturnMsg.Error.evaluated_expression_not_float + f': {error_keys}'
+        return {}, ReturnMsg.Error.evaluated_expression_not_float, f': {error_keys}'
 
     else:
-        return out, ReturnMsg.no_message
+        return out, ReturnMsg.no_message, ''
 
 
 if __name__ == '__main__':
@@ -167,16 +196,16 @@ if __name__ == '__main__':
         'n': Expression(3.0),
         'coil_radius_grad': Expression(0.1),
         'gap': Expression('current * 2 + sympy'),
-        'current': 1.0,
+        'current': 'n',
         'coil_height': 'sqrt(coil_pitch * (n))',
         'sympy': 0,
-        'test': "mean(1, 2, 3)",
+        'test': "mean(gap, 2, 3)",
         'test2': "max(1, 2, 3)",
-        'test3': "min(1, 2, 3)",
+        'test3': "min(current, 2, 3)",
         'test4': "min(1., 2., 3.)",
     }
 
-    evaluated_, ret_msg = eval_expressions(expressions_)
-    print(ret_msg)
+    evaluated_, ret_msg, additional_msg = eval_expressions(expressions_)
     for key_, value_ in evaluated_.items():
         print(key_, value_)
+    print(ret_msg)

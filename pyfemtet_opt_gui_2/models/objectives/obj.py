@@ -13,7 +13,6 @@ from PySide6.QtGui import *
 # noinspection PyUnresolvedReferences
 from PySide6 import QtWidgets, QtCore, QtGui
 
-
 import enum
 import sys
 from contextlib import nullcontext
@@ -24,7 +23,6 @@ from pyfemtet_opt_gui_2.common.qt_util import *
 from pyfemtet_opt_gui_2.common.pyfemtet_model_bases import *
 from pyfemtet_opt_gui_2.common.return_msg import *
 from pyfemtet_opt_gui_2.femtet.femtet import *
-
 
 # ===== model =====
 OBJ_MODEL = None
@@ -43,7 +41,7 @@ def get_obj_model(parent=None, _with_dummy=None) -> 'ObjectiveTableItemModel':
 
 def get_obj_model_for_problem(parent, _with_dummy=None):
     model = get_obj_model(parent, _with_dummy)
-    model_for_problem = QObjectiveItemModelForProblemTableView()
+    model_for_problem = QObjectiveItemModelForProblemTableView(parent)
     model_for_problem.setSourceModel(model)
     return model_for_problem
 
@@ -140,7 +138,6 @@ class ObjectiveItemDelegate(QStyledItemDelegate):
 
 
 class ObjectiveTableItemModel(StandardItemModelWithHeader):
-
     ColumnNames = ObjectiveColumnNames
 
     def flags(self, index):
@@ -190,7 +187,6 @@ class ObjectiveTableItemModel(StandardItemModelWithHeader):
                     c = self.get_column_by_header_data(self.ColumnNames.use)
                     self.setItem(r, c, item)
 
-
                 # ===== name =====
                 with nullcontext():
                     # これは stash を復元する必要がない
@@ -199,7 +195,6 @@ class ObjectiveTableItemModel(StandardItemModelWithHeader):
                     item.setEditable(False)
                     c = self.get_column_by_header_data(self.ColumnNames.name)
                     self.setItem(r, c, item)
-
 
                 # ===== direction =====
                 with nullcontext():
@@ -219,7 +214,6 @@ class ObjectiveTableItemModel(StandardItemModelWithHeader):
                     c = self.get_column_by_header_data(self.ColumnNames.direction)
                     self.setItem(r, c, item)
 
-
                 # ===== target_value =====
                 with nullcontext():
                     item = QStandardItem()
@@ -236,7 +230,6 @@ class ObjectiveTableItemModel(StandardItemModelWithHeader):
 
                     c = self.get_column_by_header_data(self.ColumnNames.target_value)
                     self.setItem(r, c, item)
-
 
                 # ===== note =====
                 with nullcontext():
@@ -256,9 +249,29 @@ class ObjectiveTableItemModel(StandardItemModelWithHeader):
                     c = self.get_column_by_header_data(self.ColumnNames.note)
                     self.setItem(r, c, item)
 
+    def is_nothing_checked(self) -> bool:
+        # ひとつも used がなければ False
+        hd = self.ColumnNames.use
+        c = self.get_column_by_header_data(hd)
+        check_list = []
+        for r in self.get_row_iterable():
+            check_list.append(self.item(r, c).checkState())
+        # Checked がひとつもない
+        return all([ch != Qt.CheckState.Checked for ch in check_list])
 
-class QObjectiveItemModelForProblemTableView(QSortFilterProxyModelOfStandardItemModel):
-    pass
+
+class QObjectiveItemModelForProblemTableView(ProxyModelWithForProblem):
+
+    def filterAcceptsColumn(self, source_column: int, source_parent: QModelIndex):
+        # use を非表示
+        source_model: ObjectiveTableItemModel = self.sourceModel()
+        if source_column == get_column_by_header_data(
+                source_model,
+                ObjectiveTableItemModel.ColumnNames.use
+        ):
+            return False
+
+        return True
 
 
 class ObjectiveItemModelWithoutFirstRow(StandardItemModelWithoutFirstRow):
@@ -266,7 +279,6 @@ class ObjectiveItemModelWithoutFirstRow(StandardItemModelWithoutFirstRow):
 
 
 class ObjectiveWizardPage(QWizardPage):
-
     ui: Ui_WizardPage_obj
     source_model: ObjectiveTableItemModel
     proxy_model: ObjectiveItemModelWithoutFirstRow
@@ -289,7 +301,7 @@ class ObjectiveWizardPage(QWizardPage):
 
     def setup_model(self, load_femtet_fun):
         self.source_model = get_obj_model(self)
-        self.proxy_model = ObjectiveItemModelWithoutFirstRow()
+        self.proxy_model = ObjectiveItemModelWithoutFirstRow(self)
         self.proxy_model.setSourceModel(self.source_model)
 
         # ボタンを押したらモデルを更新する
@@ -298,6 +310,20 @@ class ObjectiveWizardPage(QWizardPage):
             if load_femtet_fun is None else
             (lambda *_: load_femtet_fun())
         )
+
+        # model の checkState が変更されたら
+        # isComplete を更新する
+        def filter_role(_1, _2, roles):
+            if Qt.ItemDataRole.CheckStateRole in roles:  # or len(roles) == 0
+
+                # 警告を表示する（編集は受け入れる）
+                if self.source_model.is_nothing_checked():
+                    ret_msg = ReturnMsg.Warn.no_objs_selected
+                    show_return_msg(return_msg=ret_msg, parent=self)
+
+                self.completeChanged.emit()
+
+        self.source_model.dataChanged.connect(filter_role)
 
     def setup_view(self):
 
@@ -332,6 +358,12 @@ class ObjectiveWizardPage(QWizardPage):
 
     def resize_column(self):
         self.column_resizer.resize_all_columns()
+
+    def isComplete(self) -> bool:
+        if self.source_model.is_nothing_checked():
+            return False
+        else:
+            return True
 
 
 if __name__ == '__main__':

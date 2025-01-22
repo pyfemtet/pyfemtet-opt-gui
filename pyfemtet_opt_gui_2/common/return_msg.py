@@ -10,9 +10,7 @@ from PySide6.QtGui import *
 # noinspection PyUnresolvedReferences
 from PySide6.QtWidgets import *
 
-
 import enum
-
 
 __all__ = [
     'ReturnMsg',
@@ -31,6 +29,14 @@ class ReturnMsg:
         _test = 'This is a test warning message.'
         update_lb_automatically = '値と下限の関係が正しくなくなったため、下限を更新します。'
         update_ub_automatically = '値と上限の関係が正しくなくなったため、上限を更新します。'
+        inconsistent_value_bounds = ('現在の初期値に基づいて計算される値と'
+                                     '上下限の関係が正しくありません。最適'
+                                     '化の初期値が拘束を満たさない場合、最'
+                                     '適化が収束しないかエラーになる場合が'
+                                     'あります。続行しますか？')
+        no_params_selected = '少なくともひとつの変数を選択してください。'
+        no_objs_selected = '少なくともひとつの目的関数を選択してください。'
+        no_finish_conditions = '最適化の終了条件が指定されていません。この場合、手動で最適化を停止するまで計算を続けます。よろしいですか？'
 
     class Error(enum.StrEnum):
         _test = 'This is a test Error message.'
@@ -51,6 +57,7 @@ class ReturnMsg:
         inconsistent_lb_ub = '上下限の大小関係が正しくありません。'
         inconsistent_value_ub = '値と上限の大小関係が正しくありません。'
         inconsistent_value_lb = '値と下限の大小関係が正しくありません。'
+        no_bounds = '上下限のいずれかを設定してください。'
 
 
 # ReturnMsg を受け取ってダイアログ表示し
@@ -61,7 +68,6 @@ def show_return_msg(
         with_cancel_button=False,
         additional_message=None,
 ) -> bool:
-
     if return_msg == ReturnMsg.no_message:
         return True
 
@@ -145,6 +151,7 @@ if __name__ == '__main__':
         # return ReturnMsg.Warn._test
         # return ReturnMsg.Error._test
 
+
     return_msg_ = some_fun()
 
     if return_msg_:
@@ -160,7 +167,6 @@ if __name__ == '__main__':
 
         else:
             raise NotImplementedError
-
 
 # basic usage
 if __name__ == '__main__':

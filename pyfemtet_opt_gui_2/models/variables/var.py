@@ -13,7 +13,6 @@ from PySide6.QtGui import *
 # noinspection PyUnresolvedReferences
 from PySide6 import QtWidgets, QtCore, QtGui
 
-
 import enum
 import sys
 from contextlib import nullcontext
@@ -25,7 +24,6 @@ from pyfemtet_opt_gui_2.common.pyfemtet_model_bases import *
 from pyfemtet_opt_gui_2.common.return_msg import *
 from pyfemtet_opt_gui_2.common.expression_processor import *
 from pyfemtet_opt_gui_2.femtet.femtet import *
-
 
 # ===== model =====
 _VAR_MODEL = None
@@ -45,7 +43,7 @@ def get_var_model(parent, _with_dummy=None) -> 'VariableItemModel':
 
 def get_var_model_for_problem(parent, _with_dummy=None):
     var_model = get_var_model(parent, _with_dummy)
-    var_model_for_problem = QVariableItemModelForProblem()
+    var_model_for_problem = QVariableItemModelForProblem(parent)
     var_model_for_problem.setSourceModel(var_model)
     return var_model_for_problem
 
@@ -146,8 +144,100 @@ class VariableTableViewDelegate(QStyledItemDelegate):
 
 # 大元の ItemModel
 class VariableItemModel(StandardItemModelWithHeader):
-
     ColumnNames = VariableColumnNames
+
+    def _set_dummy_data(self, n_rows=None):
+        rows = n_rows if n_rows is not None else 3
+        columns = len(self.ColumnNames)
+
+        if self.with_first_row:
+            rows += 1
+            iterable = range(1, rows)
+        else:
+            iterable = range(0, rows)
+
+        with EditModel(self):
+            self.setRowCount(rows)
+            self.setColumnCount(columns)
+
+        with EditModel(self):
+            for r in iterable:
+                # self.ColumnNames.use
+                with nullcontext():
+                    _h = self.ColumnNames.use
+                    c = self.get_column_by_header_data(_h)
+
+                    item = QStandardItem()
+                    item.setCheckable(True)
+                    item.setCheckState(Qt.CheckState.Checked)
+                    item.setEditable(False)
+
+                    self.setItem(r, c, item)
+
+                # self.ColumnNames.name
+                with nullcontext():
+                    _h = self.ColumnNames.name
+                    c = self.get_column_by_header_data(_h)
+
+                    item = QStandardItem()
+                    item.setText(f'name{r}')
+                    item.setEditable(False)
+
+                    self.setItem(r, c, item)
+
+                # self.ColumnNames.initial_value
+                with nullcontext():
+                    _h = self.ColumnNames.initial_value
+                    c = self.get_column_by_header_data(_h)
+
+                    item = QStandardItem()
+                    item.setText(f'{r}')
+                    item.setData(Expression(f'{r}'), Qt.ItemDataRole.UserRole)
+
+                    self.setItem(r, c, item)
+
+                # self.ColumnNames.lower_bound
+                with nullcontext():
+                    _h = self.ColumnNames.lower_bound
+                    c = self.get_column_by_header_data(_h)
+
+                    item = QStandardItem()
+                    item.setText(f'{r - 1}')
+                    item.setData(Expression(f'{r - 1}'), Qt.ItemDataRole.UserRole)
+
+                    self.setItem(r, c, item)
+
+                # self.ColumnNames.upper_bound
+                with nullcontext():
+                    _h = self.ColumnNames.upper_bound
+                    c = self.get_column_by_header_data(_h)
+
+                    item = QStandardItem()
+                    item.setText(f'{r + 1}')
+                    item.setData(Expression(f'{r + 1}'), Qt.ItemDataRole.UserRole)
+
+                    self.setItem(r, c, item)
+
+                # self.ColumnNames.test_value
+                with nullcontext():
+                    _h = self.ColumnNames.test_value
+                    c = self.get_column_by_header_data(_h)
+
+                    item = QStandardItem()
+                    item.setText(f'{r + 1}')
+                    item.setData(Expression(f'{r + 1}'), Qt.ItemDataRole.UserRole)
+
+                    self.setItem(r, c, item)
+
+                # self.ColumnNames.note
+                with nullcontext():
+                    _h = self.ColumnNames.note
+                    c = self.get_column_by_header_data(_h)
+
+                    item = QStandardItem()
+                    item.setText(f'{r + 1}')
+
+                    self.setItem(r, c, item)
 
     def load_femtet(self):
         # variables 取得
@@ -161,8 +251,8 @@ class VariableItemModel(StandardItemModelWithHeader):
         # Femtet から取得してもよいが、
         # initial_value が stash されたものを
         # 使う仕様に変える可能性があるため
-        variable_values, ret_msg = eval_expressions(expressions)
-        if not can_continue(ret_msg, self.parent()):
+        variable_values, ret_msg, additional_msg = eval_expressions(expressions)
+        if not can_continue(ret_msg, self.parent(), additional_message=additional_msg):
             return
 
         # 現在の状態を stash
@@ -372,6 +462,8 @@ class VariableItemModel(StandardItemModelWithHeader):
                     c = self.get_column_by_header_data(self.ColumnNames.note)
                     self.setItem(r, c, item)
 
+
+
     def flags(self, index):
         r = index.row()
 
@@ -379,8 +471,9 @@ class VariableItemModel(StandardItemModelWithHeader):
         # initial が expression なら disabled
         c_initial_value = self.get_column_by_header_data(value=self.ColumnNames.initial_value)
         expression: Expression = self.item(r, c_initial_value).data(Qt.ItemDataRole.UserRole)
-        if expression.is_expression():
-            return ~Qt.ItemFlag.ItemIsEnabled
+        if expression is not None:
+            if expression.is_expression():
+                return ~Qt.ItemFlag.ItemIsEnabled
 
         return super().flags(index)
 
@@ -413,6 +506,31 @@ class VariableItemModel(StandardItemModelWithHeader):
             additional_message=a_msg,
         )
 
+    def get_current_variables(self) -> dict[str, Expression]:
+        if self.with_first_row:
+            iterable = range(1, self.rowCount())
+        else:
+            iterable = range(0, self.rowCount())
+        c_name = self.get_column_by_header_data(self.ColumnNames.name)
+        c_value = self.get_column_by_header_data(self.ColumnNames.initial_value)
+        out = dict()
+        for r in iterable:
+            name = self.item(r, c_name).text()
+            index = self.index(r, c_value)
+            expr: Expression = self.data(index, Qt.ItemDataRole.UserRole)
+            out.update({name: expr})
+        return out
+
+    def is_nothing_checked(self) -> bool:
+        # ひとつも used がなければ False
+        hd = self.ColumnNames.use
+        c = self.get_column_by_header_data(hd)
+        check_list = []
+        for r in self.get_row_iterable():
+            check_list.append(self.item(r, c).checkState())
+        # Checked がひとつもない
+        return all([ch != Qt.CheckState.Checked for ch in check_list])
+
 
 # 個別ページに表示される ItemModel
 class VariableItemModelForTableView(StandardItemModelWithoutFirstRow):
@@ -421,10 +539,9 @@ class VariableItemModelForTableView(StandardItemModelWithoutFirstRow):
 
 
 # 一覧 Problem ページに表示される StandardItemModelAsStandardItem 用 ItemModel
-class QVariableItemModelForProblem(QSortFilterProxyModelOfStandardItemModel):
+class QVariableItemModelForProblem(ProxyModelWithForProblem):
 
     def filterAcceptsColumn(self, source_column: int, source_parent: QModelIndex):
-
         # test_value を非表示
         source_model: VariableItemModel = self.sourceModel()
         if source_column == get_column_by_header_data(
@@ -433,7 +550,7 @@ class QVariableItemModelForProblem(QSortFilterProxyModelOfStandardItemModel):
         ):
             return False
 
-        return True
+        return super().filterAcceptsColumn(source_column, source_parent)
 
 
 # 個別ページ
@@ -460,7 +577,7 @@ class VariableWizardPage(QWizardPage):
             load_femtet_fun=None,
     ):
         self.source_model = get_var_model(self)
-        self.proxy_model = VariableItemModelForTableView()
+        self.proxy_model = VariableItemModelForTableView(self)
         self.proxy_model.setSourceModel(self.source_model)
 
         # load_femtet_fun: __main__.py から貰う想定の
@@ -471,9 +588,24 @@ class VariableWizardPage(QWizardPage):
             (lambda *_: load_femtet_fun())
         )
 
+        # test value を Femtet に転送する
         self.ui.pushButton_test_prm.clicked.connect(
             lambda *_: self.source_model.apply_test_values()
         )
+
+        # model の checkState が変更されたら
+        # isComplete を更新する
+        def filter_role(_1, _2, roles):
+            if Qt.ItemDataRole.CheckStateRole in roles:  # or len(roles) == 0
+
+                # 警告を表示する（編集は受け入れる）
+                if self.source_model.is_nothing_checked():
+                    ret_msg = ReturnMsg.Warn.no_params_selected
+                    show_return_msg(return_msg=ret_msg, parent=self)
+
+                self.completeChanged.emit()
+
+        self.source_model.dataChanged.connect(filter_role)
 
     def setup_view(self):
         view = self.ui.tableView
@@ -488,6 +620,12 @@ class VariableWizardPage(QWizardPage):
 
     def resize_column(self):
         self.column_resizer.resize_all_columns()
+
+    def isComplete(self) -> bool:
+        if self.source_model.is_nothing_checked():
+            return False
+        else:
+            return True
 
 
 if __name__ == '__main__':

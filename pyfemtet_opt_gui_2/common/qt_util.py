@@ -26,12 +26,14 @@ __all__ = [
     'QSortFilterProxyModelOfStandardItemModel',
     'get_internal_header_data',
     'get_column_by_header_data',
+    'get_row_by_header_data',
     'StandardItemModelWithHeaderSearch',
     'start_edit_specific_column',
     'QStyledItemDelegateWithCombobox',
     'CustomItemDataRole',
     'ExpandStateKeeper',
     'ResizeColumn',
+    'HeaderDataNotFound',
 ]
 
 
@@ -61,23 +63,33 @@ class EditModel:
         self.model = model
 
     def __enter__(self):
-        self.model.beginResetModel()
+        # self.model.beginResetModel()
+        pass
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        self.model.endResetModel()
-
-        # ===== 取りやめた実装 =====
+        # self.model.endResetModel()
+        #
+        # # ===== 取りやめた実装 =====
         # # https://doc.qt.io/qt-6/qabstractitemmodel.html#dataChanged
         # # index_1: 変更範囲の開始 index
         # # index_2: 変更範囲の終了 index
         # # roles: list[int]: 変更範囲で変更された itemDataRole のリスト。
         # #     空リストを渡せば全て変更されたとみなす。
-        # self.model.dataChanged.emit(index_1, index_2, self.roles)
+        # index_1 = self.model.index(0, 0)
+        # index_2 = self.model.index(self.model.rowCount() - 1, self.model.columnCount() - 1)
+        # roles = []
+        # self.model.dataChanged.emit(index_1, index_2, roles)
+        pass
 
 
 # QSortFilterProxyModel.sourceModel() の入力補完を
 # QStandardItemModel に対して行うためのラッパー
 class QSortFilterProxyModelOfStandardItemModel(QSortFilterProxyModel):
+
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.setRecursiveFilteringEnabled(True)
+
     def sourceModel(self) -> QStandardItemModel:
         s = super().sourceModel()
         assert isinstance(s, QStandardItemModel)
@@ -188,7 +200,6 @@ class ExpandStateKeeper:
         view.model().dataChanged.connect(self.check_restore_expand_state)
         # view.model().dataChanged.connect(lambda *_: ik.restore_expand_state())
 
-
     def _set_data(self, index, value):
         self.view.model().setData(
             index,
@@ -236,6 +247,10 @@ class ExpandStateKeeper:
 # header の UserDataRole を前提とした QStandardItemModel
 # ======================================================
 
+class HeaderDataNotFound(Exception):
+    pass
+
+
 # index の位置に対応する UserRole の headerData を取得
 def get_internal_header_data(index: QModelIndex, orientation=Qt.Orientation.Horizontal):
     if orientation == Qt.Orientation.Horizontal:
@@ -272,8 +287,8 @@ def get_column_by_header_data(model: QStandardItemModel, value, r=None) -> int |
 
     # not found
     else:
-        raise RuntimeError(f'Internal Error! The header data {value} '
-                           f'is not found.')
+        raise HeaderDataNotFound(f'Internal Error! The header data {value} '
+                                 f'is not found.')
 
 
 def get_row_by_header_data(model: QStandardItemModel, value, c=None) -> int | QModelIndex:
@@ -346,7 +361,6 @@ def start_edit_specific_column(edit_fun, header_value, *args, **_kwargs):
 
 # dataChanged のスロットとして使える callable クラス
 class ResizeColumn:
-
     _concrete_method: callable = None
 
     def __init__(self, view: QAbstractItemView):
