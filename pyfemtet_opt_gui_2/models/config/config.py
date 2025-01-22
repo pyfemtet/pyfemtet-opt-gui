@@ -27,7 +27,6 @@ from pyfemtet_opt_gui_2.models.config.algorithm.base import (
     QAbstractAlgorithmItemModel,
     AbstractAlgorithmConfig,
     get_abstract_algorithm_config_model,
-    QAlgorithmItemModelForProblem,
 )
 
 from pyfemtet_opt_gui_2.models.config.algorithm.algorithm_random import (
