@@ -120,15 +120,16 @@ class QStyledItemDelegateWithCombobox(QStyledItemDelegate):
         cb.setCurrentText(default)
         cb.setFrame(False)
 
-        # combobox の選択を確定したら即時モデルに反映する
-        # (セルの編集状態解除を待たない)
-        def _setModelData(text, editor_: QComboBox, index_):
-            editor_.setCurrentText(text)
-            self.setModelData(editor_, index_.model(), index_)
-
-        cb.currentTextChanged.connect(
-            lambda text: _setModelData(text, cb, index)
-        )
+        # TODO: 若干不便だがクラッシュしやすいため原因がわかるまで実装とりやめ
+        # # combobox の選択を確定したら即時モデルに反映する
+        # # (セルの編集状態解除を待たない)
+        # def _setModelData(text, editor_: QComboBox, index_):
+        #     editor_.setCurrentText(text)
+        #     self.setModelData(editor_, index_.model(), index_)
+        #
+        # cb.currentTextChanged.connect(
+        #     lambda text: _setModelData(text, cb, index)
+        # )
 
         # combobox が作成されたら（つまり編集状態になったら）
         # 即時メニューを展開する

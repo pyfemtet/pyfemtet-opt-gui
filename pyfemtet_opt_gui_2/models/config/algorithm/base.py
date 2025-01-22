@@ -27,19 +27,20 @@ import enum
 from abc import ABC
 
 
-# （共通の）ProblemView に表示するための ModelAsItem に使用するための Model
-class QAlgorithmItemModelForProblem(QSortFilterProxyModelOfStandardItemModel):
-
-    def filterAcceptsColumn(self, source_column: int, source_parent: QModelIndex):
-        # note を非表示
-        source_model: QAbstractAlgorithmItemModel = self.sourceModel()
-        if source_column == get_column_by_header_data(
-                source_model,
-                QAbstractAlgorithmItemModel.ColumnNames.note
-        ):
-            return False
-
-        return super().filterAcceptsColumn(source_column, source_parent)
+# これを使うと ConfigModel と ConfigModelForProblem の同期がかなり複雑になるので実装とりやめ
+# # （共通の）ProblemView に表示するための ModelAsItem に使用するための Model
+# class QAlgorithmItemModelForProblem(QSortFilterProxyModelOfStandardItemModel):
+#
+#     def filterAcceptsColumn(self, source_column: int, source_parent: QModelIndex):
+#         # note を非表示
+#         source_model: QAbstractAlgorithmItemModel = self.sourceModel()
+#         if source_column == get_column_by_header_data(
+#                 source_model,
+#                 QAbstractAlgorithmItemModel.ColumnNames.note
+#         ):
+#             return False
+#
+#         return super().filterAcceptsColumn(source_column, source_parent)
 
 
 # （共通の）Treeview に表示するための Algorithm の ItemModelAsItem

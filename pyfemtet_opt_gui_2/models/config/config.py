@@ -213,9 +213,9 @@ class QConfigTreeViewDelegate(QStyledItemDelegateWithCombobox):
         if (
                 hd == ConfigHeaderNames.value
                 and (
-                vhd == ConfigItemClassEnum.n_trials.value.name
-                or vhd == ConfigItemClassEnum.timeout.value.name
-        )
+                    vhd == ConfigItemClassEnum.n_trials.value.name
+                    or vhd == ConfigItemClassEnum.timeout.value.name
+                )
         ):
             editor: QLineEdit
             text = editor.text()
@@ -239,6 +239,7 @@ class QConfigTreeViewDelegate(QStyledItemDelegateWithCombobox):
 class ConfigItemModel(StandardItemModelWithHeader):
     ColumnNames = ConfigHeaderNames
     RowNames = [enum_item.value.name for enum_item in ConfigItemClassEnum]
+    algorithm_model: QAbstractAlgorithmItemModel
 
     def __init__(self, parent=None, _with_dummy=True, original_model: 'ConfigItemModel' = None):
         super().__init__(parent, _with_dummy)
@@ -308,111 +309,114 @@ class ConfigItemModel(StandardItemModelWithHeader):
 
     def setup_algorithm(self, algorithm_name):
 
-        with EditModel(self):
-            # 「最適化手法」の行番号を取得する
-            header_data = ConfigItemClassEnum.algorithm.value.name
-            r = self.get_row_by_header_data(value=header_data)
+        # 「最適化手法」の行番号を取得する
+        header_data = ConfigItemClassEnum.algorithm.value.name
+        r = self.get_row_by_header_data(value=header_data)
 
-            # TreeView で child が表示されるのは c==0 のみ
-            c = 0
+        # TreeView で child が表示されるのは c==0 のみ
+        c = 0
 
-            # TreeView での展開情報を格納するためと
-            # DisplayRole を「最適化アルゴリズム」に
-            # 設定しなおすために itemData を退避する
-            item_data: dict = self.itemData(self.index(r, c))
-            # print(item_data)  # {0: '最適化アルゴリズム', 13: PySide6.QtCore.QSize(100, 26), 257: True}
+        # TreeView での展開情報を格納するためと
+        # DisplayRole を「最適化アルゴリズム」に
+        # 設定しなおすために itemData を退避する
+        item_data: dict = self.itemData(self.index(r, c))
+        # print(item_data)  # {0: '最適化アルゴリズム', 13: PySide6.QtCore.QSize(100, 26), 257: True}
 
-            #   ItemModel に紐づかない Item は即座に C++ 内で削除されるが
-            # Python 上では ItemModel.dataChanged.connect(Item.do_clone) が
-            # 生きているので Item の切り替え後 ItemModel に変更があった場合
-            # Python は C++ に古い削除された C++ へのアクセスを試みさせる。
-            #   その際に RuntimeError が出る。
-            #   古い Item は Python のメモリ上にはあるがロジック上は
-            # 使われておらず、切替先の Item では __init__ で別途 dataChanged に
-            # connect しているので動作に問題はないが、気持ち悪いので
-            # Item の切り替え前に古い C++ QStandardItem オブジェクトへの
-            # Connection を切っておく。
-            if hasattr(self, '__algorithm_item__'):
-                self.__algorithm_item__.proxy_model.dataChanged.disconnect(self.__algorithm_item__.do_clone)
+        #   ItemModel に紐づかない Item は即座に C++ 内で削除されるが
+        # Python 上では ItemModel.dataChanged.connect(Item.do_clone) が
+        # 生きているので Item の切り替え後 ItemModel に変更があった場合
+        # Python は C++ に古い削除された C++ へのアクセスを試みさせる。
+        #   その際に RuntimeError が出る。
+        #   古い Item は Python のメモリ上にはあるがロジック上は
+        # 使われておらず、切替先の Item では __init__ で別途 dataChanged に
+        # connect しているので動作に問題はないが、気持ち悪いので
+        # Item の切り替え前に古い C++ QStandardItem オブジェクトへの
+        # Connection を切っておく。
+        if hasattr(self, '__algorithm_item__'):
+            self.__algorithm_item__.proxy_model.dataChanged.disconnect(self.__algorithm_item__.do_clone)
 
-            # # 1. for problem の場合は Algorithm Model に Note を非表示にする proxy をかける
-            # if self.original_model is not None:
-            #     _algorithm_model = Algorithm().choices[algorithm_name](self.parent())
-            #     algorithm_model = QAlgorithmItemModelForProblem(self.parent())
-            #     algorithm_model.setSourceModel(_algorithm_model)
-            # else:
-            #     algorithm_model = Algorithm().choices[algorithm_name](self.parent())
+        # 大元のモデルの場合は algorithm_model を ModelAsItem として登録する
+        if self.is_original_model:
+            self.algorithm_model: QAbstractAlgorithmItemModel = Algorithm().choices[algorithm_name](self.parent())
 
-            # 大元のモデルの場合は algorithm_model を ModelAsItem として登録する
-            if self.is_original_model:
-                self.algorithm_model: QAbstractAlgorithmItemModel = Algorithm().choices[algorithm_name](self.parent())
+            # Model から ModelAsItem を作成
+            item = StandardItemModelAsQStandardItem(
+                text=header_data, model=self.algorithm_model
+            )
+            item.setEditable(False)
 
-                # Model から ModelAsItem を作成
-                item = StandardItemModelAsQStandardItem(
-                    text=header_data, model=self.algorithm_model
-                )
-                item.setEditable(False)
+            # 切替前に disconnect するために新しい item を保持
+            # noinspection PyAttributeOutsideInit
+            self.__algorithm_item__ = item
 
-                # 切替前に disconnect するために新しい item を保持
-                # noinspection PyAttributeOutsideInit
-                self.__algorithm_item__ = item
+            # Item の置き換え
+            self.setItem(r, c, item)
 
-                # Item の置き換え
-                self.setItem(r, c, item)
+            # Item を置き換えたことをクラスに記憶
+            self.algorithm_name = algorithm_name
 
-                # Item を置き換えたことをクラスに記憶
-                self.algorithm_name = algorithm_name
+            # itemData を restore
+            # self.setData(self.index(r, c), expanded, role)
+            self.setItemData(self.index(r, c), item_data)
 
-                # itemData を restore
-                # self.setData(self.index(r, c), expanded, role)
-                self.setItemData(self.index(r, c), item_data)
+        # for problem の場合は original model の clone を設定する
+        # QSortFilterProxyModel が Column 方向の Recursive Filter に対応していないので
+        # clone の処理の中で除きたいデータを除く
+        else:
 
-            # for problem の場合は original model の clone を設定する
-            else:
-                # def clone(item_: QStandardItem):
-                #     item__ = item_.clone()
-                #     if item_.hasChildren():
-                #         item__.setRowCount(item_.rowCount())
-                #         item__.setColumnCount(item_.columnCount())
-                #         for r_ in range(item_.rowCount()):
-                #             for c_ in range(item_.columnCount()):
-                #                 child = item_.child(r_, c_)
-                #                 if child is not None:
-                #                     item__.setChild(r_, c_, child.clone())
-                #     self.setItem(item_.row(), item_.column(), item__)
-                #
-                # self.original_model.itemChanged.connect(clone)
+            def clone(tl, _br, _roles):
 
-                def clone(tl, _br, roles):
-                    if not (len(roles) == 0 or (Qt.ItemDataRole.DisplayRole in roles)):
-                        return
+                # item を子供ごと clone
+                # TODO: Config を第三階層以降の深さにする際はここを再帰的にする
+                item_ = self.original_model.itemFromIndex(tl)
+                item__ = item_.clone()
+                if item_.hasChildren():
+                    item__.setRowCount(item_.rowCount())
+                    item__.setColumnCount(item_.columnCount())
+                    for r_ in range(item_.rowCount()):
+                        for c_ in range(item_.columnCount()):
+                            child = item_.child(r_, c_)
+                            if child is not None:
+                                # original_model の algorithm model の
+                                # note 列ならコピーしない
+                                if item_ == self.original_model.__algorithm_item__:
+                                    hd = self.original_model.algorithm_model.ColumnNames.note
+                                    c_note = self.original_model.algorithm_model.get_column_by_header_data(hd)
+                                    if c_ == c_note:
+                                        continue
+                                item__.setChild(r_, c_, child.clone())
 
-                    item_ = self.original_model.itemFromIndex(tl)
-                    item__ = item_.clone()
-                    if item_.hasChildren():
-                        item__.setRowCount(item_.rowCount())
-                        item__.setColumnCount(item_.columnCount())
-                        for r_ in range(item_.rowCount()):
-                            for c_ in range(item_.columnCount()):
-                                child = item_.child(r_, c_)
-                                if child is not None:
-                                    # original_model の algorithm model の
-                                    # note 列ならコピーしない
-                                    if item_ == self.original_model.__algorithm_item__:
-                                        hd = self.original_model.algorithm_model.ColumnNames.note
-                                        c_note = self.original_model.algorithm_model.get_column_by_header_data(hd)
-                                        if c_ == c_note:
-                                            continue
-                                    item__.setChild(r_, c_, child.clone())
+                # 与えられた index に対し遡及的に変更を反映していく
+                index_: QModelIndex = tl
+                parent_item__ = item__
+                while index_.parent().isValid():
 
-                    self.setItem(item_.row(), item_.column(), item__)
+                    # まず original_model の親を探す
+                    parent_item_ = self.original_model.itemFromIndex(index_.parent())
 
-                self.original_model.dataChanged.connect(clone)
-                for r in range(self.original_model.rowCount()):
-                    for c in range(self.original_model.columnCount()):
-                        index = self.original_model.index(r, c)
-                        clone(index, index, [])
+                    # 対応する self の親を探す
+                    parent_item__ = self.item(index_.parent().row(), index_.parent().column())
 
+                    # もし存在しなければ作る
+                    if parent_item__ is None:
+                        parent_item__ = parent_item_.clone()
+                        parent_item__.setRowCount(parent_item_.rowCount())
+                        parent_item__.setColumnCount(parent_item_.columnCount())
+
+                    # self の親に対して setChild する
+                    parent_item__.setChild(index_.row(), index_.column(), item__)
+
+                    # この時点で対象の index_ は親の index になっていなければならない
+                    index_ = index_.parent()
+
+                # 変更反映が終了したら self に set する
+                self.setItem(index_.row(), index_.column(), parent_item__)
+
+            self.original_model.dataChanged.connect(clone)
+            for r in range(self.original_model.rowCount()):
+                for c in range(self.original_model.columnCount()):
+                    index = self.original_model.index(r, c)
+                    clone(index, index, [])
 
     def setup_model(self):
         rows = len(self.RowNames)
@@ -530,7 +534,7 @@ class ConfigWizardPage(QWizardPage):
 
         # view.expandAll()  # 初めから Algorithm の設定項目が全部見えたら鬱陶しい
 
-        # direction 列のみシングルクリックでコンボボックスが
+        # シングルクリックでコンボボックスが
         # 開くようにシングルクリックで edit モードに入るよう
         # にする
         view.clicked.connect(
