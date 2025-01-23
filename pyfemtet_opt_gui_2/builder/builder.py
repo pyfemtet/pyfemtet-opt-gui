@@ -10,6 +10,10 @@ __all__ = [
 INDENT = '    '
 
 
+def ind(n_indent):
+    return INDENT * n_indent
+
+
 # import 文
 def create_header():
     code = '''
@@ -48,7 +52,7 @@ def main():
 
 
 # each command
-def create_command_line(command_json, n_indent=1):
+def create_command_line(command_json, n=1):
     # reconstruct
     _command = json.loads(command_json)
     assert isinstance(_command, dict)
@@ -86,14 +90,14 @@ def create_command_line(command_json, n_indent=1):
     convert(_kwargs, kwargs)
 
     # function(\n
-    code = f'{f"{ret} = " if ret is not None else ""}{function}(\n'
+    code = ind(n) + f'{f"{ret} = " if ret is not None else ""}{function}(\n'
 
     for key, value in kwargs.items():
         #     key=value,\n
-        code += f'{INDENT}{key}={value},\n'
+        code += ind(n + 1) + f'{key}={value},\n'
 
     # )
-    code += ')\n'
+    code += ind(n) + ')\n'
 
     return code
 
