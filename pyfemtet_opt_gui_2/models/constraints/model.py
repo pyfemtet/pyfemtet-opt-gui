@@ -217,7 +217,8 @@ class ConstraintModel(StandardItemModelWithHeader):
                     item = QStandardItem()
                     item.setEditable(False)  # 編集不可
                     item.setText(constraint.expression)  # expression をそのまま表示
-                    item.setData(Expression(constraint.expression), Qt.ItemDataRole.UserRole)  # Expression に変換したものを UserRole に保管、finalize 出 Expression 二辺っ巻できることは確定している
+                    item.setData(Expression(constraint.expression),
+                                 Qt.ItemDataRole.UserRole)  # Expression に変換したものを UserRole に保管、finalize 出 Expression 二辺っ巻できることは確定している
                     self.setItem(r, c, item)
 
                 # lb
@@ -310,6 +311,3 @@ class ConstraintModel(StandardItemModelWithHeader):
 
         else:
             raise RuntimeError(f'constraint named `{name}` is not found.')
-
-
-
