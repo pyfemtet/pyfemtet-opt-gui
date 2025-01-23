@@ -462,8 +462,6 @@ class VariableItemModel(StandardItemModelWithHeader):
                     c = self.get_column_by_header_data(self.ColumnNames.note)
                     self.setItem(r, c, item)
 
-
-
     def flags(self, index):
         r = index.row()
 
@@ -530,6 +528,105 @@ class VariableItemModel(StandardItemModelWithHeader):
             check_list.append(self.item(r, c).checkState())
         # Checked がひとつもない
         return all([ch != Qt.CheckState.Checked for ch in check_list])
+
+    def output_json(self) -> str:
+        """Use 列が Checked のものを json 形式にして出力"""
+
+        out_object = list()
+
+        for r in self.get_row_iterable():
+
+            command_object = dict()
+
+            hd = self.ColumnNames.use
+            c = self.get_column_by_header_data(hd)
+
+            if self.item(r, c).isCheckable() \
+                    and self.item(r, c).checkState() == Qt.CheckState.Checked:
+
+                # add_parameter
+                command_object.update(
+                    dict(command='femopt.add_parameter')
+                )
+
+                args_object = dict()
+
+                # name
+                with nullcontext():
+                    item = self.item(r, self.get_column_by_header_data(self.ColumnNames.name))
+                    args_object.update(
+                        dict(name=f'"{item.text()}"')
+                    )
+
+                # initial_value
+                with nullcontext():
+                    item = self.item(r, self.get_column_by_header_data(self.ColumnNames.initial_value))
+                    expr: Expression = item.data(Qt.ItemDataRole.UserRole)
+                    assert expr.is_number()
+                    args_object.update(
+                        dict(initial_value=expr.value)
+                    )
+
+                # lower_bound
+                with nullcontext():
+                    item = self.item(r, self.get_column_by_header_data(self.ColumnNames.lower_bound))
+                    expr: Expression = item.data(Qt.ItemDataRole.UserRole)
+                    assert expr.is_number()
+                    args_object.update(
+                        dict(lower_bound=expr.value)
+                    )
+
+                # upper_bound
+                with nullcontext():
+                    item = self.item(r, self.get_column_by_header_data(self.ColumnNames.upper_bound))
+                    expr: Expression = item.data(Qt.ItemDataRole.UserRole)
+                    assert expr.is_number()
+                    args_object.update(
+                        dict(upper_bound=expr.value)
+                    )
+
+                command_object.update(args_object)
+
+            else:
+                # add_expression
+                command_object.update(
+                    dict(command='femopt.add_expression')
+                )
+
+                args_object = dict()
+
+                # name
+                with nullcontext():
+                    item = self.item(r, self.get_column_by_header_data(self.ColumnNames.name))
+                    args_object.update(
+                        dict(name=f'"{item.text()}"')
+                    )
+
+                # fun
+                with nullcontext():
+                    item = self.item(r, self.get_column_by_header_data(self.ColumnNames.initial_value))
+                    expr: Expression = item.data(Qt.ItemDataRole.UserRole)
+                    if expr.is_number():
+                        value = f'lambda: {expr.value}'
+                    else:
+                        args = [symbol.name for symbol in expr._s_expr.args]
+                        value = f'lambda {', '.join(args)}: {expr.expr.replace('\n', '')}'
+                    args_object.update(
+                        dict(fun=value)
+                    )
+
+                # pass_to_fem
+                with nullcontext():
+                    args_object.update(
+                        dict(pass_to_fem=True)
+                    )
+
+                command_object.update(args_object)
+
+            out_object.append(command_object)
+
+        import json
+        return json.dumps(out_object)
 
 
 # 個別ページに表示される ItemModel

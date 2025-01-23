@@ -17,6 +17,7 @@ from pyfemtet_opt_gui_2.models.objectives.obj import get_obj_model_for_problem
 from pyfemtet_opt_gui_2.models.variables.var import get_var_model_for_problem
 from pyfemtet_opt_gui_2.models.config.config import get_config_model_for_problem
 from pyfemtet_opt_gui_2.models.constraints.cns import get_cns_model_for_problem
+from pyfemtet_opt_gui_2.builder.main import create_script
 
 SUB_MODELS = None
 PROBLEM_MODEL = None
@@ -90,6 +91,7 @@ class ConfirmWizardPage(QWizardPage):
         self.setup_ui()
         self.setup_model()
         self.setup_view()
+        self.setup_signal()
 
     def setup_ui(self):
         self.ui = Ui_WizardPage()
@@ -107,6 +109,20 @@ class ConfirmWizardPage(QWizardPage):
 
         self.column_resizer = ResizeColumn(view)
         self.column_resizer.resize_all_columns()
+
+    def setup_signal(self):
+        # 「スクリプトを保存する」を実行するとスクリプトを保存する
+        self.ui.pushButton_save_script.clicked.connect(
+
+        )
+
+    def create_script(self):
+        # 保存ファイル名を決めてもらう
+        # キャンセルなら何もしない
+        # python モジュールとしての命名規則に従っていなければもう一度
+        # create_script
+        # 「保存後すぐ実行する」にチェックがあれば実行する
+        pass
 
 
 if __name__ == '__main__':
