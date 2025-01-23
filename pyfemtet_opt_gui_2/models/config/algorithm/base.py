@@ -156,6 +156,22 @@ class QAbstractAlgorithmItemModel(StandardItemModelWithHeader):
     def get_delegate(self):
         return QStyledItemDelegate()
 
+    # abstract
+    def output_json(self):
+        out = dict(
+            ret='opt',
+            command='OptunaOptimizer',
+            args=dict(
+                sampler_class='TPESampler',
+                sampler_kwargs=dict(
+                    n_startup_trials=10,
+                )
+            )
+        )
+
+        import json
+        return json.dumps([out])
+
 
 # シングルトンパターン
 

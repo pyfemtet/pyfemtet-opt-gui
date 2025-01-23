@@ -37,14 +37,7 @@ class RandomAlgorithmConfig(AbstractAlgorithmConfig):
     name = 'Random'
 
     class Items(enum.Enum):
-        @enum.member
-        class Seed(AbstractAlgorithmConfigItem):
-            name = 'seed 値'
-            default = 'なし'
-            note = ('実行ごとに同じ結果が再現されるようにするには、\n'
-                    '自然数を指定してください。ただし Femtet で数値\n'
-                    '誤差が入りやすい項目（例：ミーゼス応力）を目的\n'
-                    '関数にすると再現しなくなる場合があります。')
+        pass
 
 
 # （アルゴリズムごとの）設定値の入力ルール
@@ -93,6 +86,22 @@ class QRandomAlgorithmItemModel(QAbstractAlgorithmItemModel):
 
     def get_delegate(self):
         return RandomAlgorithmDelegate()
+
+    def output_json(self):
+        """
+        opt = OptunaOptimizer(
+            sampler_class=RandomSampler,
+        )
+        """
+        out = dict(
+            ret='opt',
+            command='OptunaOptimizer',
+            args=dict(
+                sampler_class='RandomSampler',
+            )
+        )
+        import json
+        return json.dumps([out])
 
 
 # シングルトンパターン

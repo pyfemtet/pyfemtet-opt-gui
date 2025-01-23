@@ -91,7 +91,7 @@ class ObjectiveItemDelegate(QStyledItemDelegate):
         elif get_internal_header_data(index) == ObjectiveColumnNames.target_value:
             editor: QLineEdit = super().createEditor(parent, option, index)
             double_validator = QDoubleValidator()
-            double_validator.setRange(-1e10, 1e10, 2)
+            double_validator.setRange(-1e20, 1e20, 2)
             editor.setValidator(double_validator)
             return editor
 
@@ -260,6 +260,53 @@ class ObjectiveTableItemModel(StandardItemModelWithHeader):
             check_list.append(self.item(r, c).checkState())
         # Checked がひとつもない
         return all([ch != Qt.CheckState.Checked for ch in check_list])
+
+    def output_dict(self):
+        # これは FemtetInterface の parametric_indexes_... 引数
+        # だけを返す
+
+        parametric_output_indexes_use_as_objective = dict()
+
+        # use 列の列番号
+        c_use = self.get_column_by_header_data(self.ColumnNames.use)
+
+        # direction 列の列番号
+        c_direction = self.get_column_by_header_data(self.ColumnNames.direction)
+
+        # target_value 列の列番号
+        c_target_value = self.get_column_by_header_data(self.ColumnNames.target_value)
+
+        for parametric_output_index, r in enumerate(self.get_row_iterable()):
+
+            # 使用していなければ次へ
+            if self.item(r, c_use).checkState() != Qt.CheckState.Checked:
+                continue
+
+            # direction を取得
+            direction = self.item(r, c_direction).text()
+
+            # direction が aim to なら
+            if direction == ObjectiveDirection.specific_value:
+
+                # target_value を取得
+                # delegate で doubleValidator の実装を
+                # 維持している限り float にできる
+                target = float(self.item(r, c_target_value).text())
+
+                # index に対して target 値を入れる
+                parametric_output_indexes_use_as_objective.update(
+                    {parametric_output_index: target}
+                )
+
+            # そうでなければ
+            else:
+
+                # index に対して minimize 又は maximize を入れる
+                parametric_output_indexes_use_as_objective.update(
+                    {parametric_output_index: direction}
+                )
+
+        return parametric_output_indexes_use_as_objective
 
 
 class QObjectiveItemModelForProblemTableView(ProxyModelWithForProblem):

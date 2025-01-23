@@ -5,6 +5,7 @@ __all__ = [
     'create_footer',
     'create_main',
     'create_command_line',
+    'create_femopt'
 ]
 
 INDENT = '    '
@@ -47,6 +48,15 @@ def create_main():
 # 最適化のメイン関数
 def main():
 '''[1:]
+
+    return code
+
+
+# femopt = FEMOpt(fem, opt)
+def create_femopt(n_indent=1):
+    code = f'''
+{ind(n_indent)}femopt = FEMOpt(fem=fem, opt=opt)
+    '''[1:]
 
     return code
 

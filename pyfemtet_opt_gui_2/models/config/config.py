@@ -117,6 +117,17 @@ class ConfigItemClassEnum(enum.Enum):
     class algorithm(Algorithm):
         pass
 
+    @enum.member
+    class seed(AbstractConfigItem):
+        name = 'シード値'
+        default_display = 'なし'
+        default_internal = None
+        note = ('ランダム要素のある最適化手法において、\n'
+                '毎回同じ結果が再現されるようにします。\n'
+                'ただし、解析の種類によってはこの値を\n'
+                '設定しても全く同じ結果にはならない場合が\n'
+                'あります。')
+
 
 # ===== Models =====
 
@@ -206,29 +217,35 @@ class QConfigTreeViewDelegate(QStyledItemDelegateWithCombobox):
             index_ = self.get_partial_model_index(index)
             return self.partial_model_delegate.setModelData(editor, self.partial_model, index_)
 
-        # n_trials or timeout の場合は int か None にする
+        # 条件分岐するために header data を取得
         hd = get_internal_header_data(index)
         vhd = get_internal_header_data(index, Qt.Orientation.Vertical)
-        if (
-                hd == ConfigHeaderNames.value
-                and (
-                    vhd == ConfigItemClassEnum.n_trials.value.name
-                    or vhd == ConfigItemClassEnum.timeout.value.name
-                )
-        ):
-            editor: QLineEdit
-            text = editor.text()
-            try:
-                display = str(int(text))
-                value = int(text)
-                if value <= 0:
+
+        # 「設定値」の話である
+        if hd == ConfigHeaderNames.value:
+
+            # 以下の条件を満たす
+            cond = (
+                    vhd == ConfigItemClassEnum.n_trials.value.name  # n_trials
+                    or vhd == ConfigItemClassEnum.timeout.value.name  # timeout
+                    or vhd == ConfigItemClassEnum.seed.value.name  # seed
+            )
+            if cond:
+
+                editor: QLineEdit
+                text = editor.text()
+                try:
+                    display = str(int(text))
+                    value = int(text)
+                    if value <= 0:
+                        display = 'なし'
+                        value = None
+                except ValueError:
                     display = 'なし'
                     value = None
-            except ValueError:
-                display = 'なし'
-                value = None
-            model.setData(index, display, Qt.ItemDataRole.DisplayRole)
-            model.setData(index, value, Qt.ItemDataRole.UserRole)
+                model.setData(index, display, Qt.ItemDataRole.DisplayRole)
+                model.setData(index, value, Qt.ItemDataRole.UserRole)
+                return
 
         # その他の場合
         super().setModelData(editor, model, index)
@@ -451,11 +468,11 @@ class ConfigItemModel(StandardItemModelWithHeader):
 
             # note
             with nullcontext():
-                    c = self.get_column_by_header_data(self.ColumnNames.note)
-                    item: QStandardItem = QStandardItem()
-                    item.setEditable(False)
-                    item.setText(str(note))
-                    self.setItem(r, c, item)
+                c = self.get_column_by_header_data(self.ColumnNames.note)
+                item: QStandardItem = QStandardItem()
+                item.setEditable(False)
+                item.setText(str(note))
+                self.setItem(r, c, item)
 
     def is_no_finish_conditions(self):
         # 値
@@ -476,6 +493,87 @@ class ConfigItemModel(StandardItemModelWithHeader):
             return True
         else:
             return False
+
+    def output_json(self):
+        """
+
+        femopt.set_random_seed(...)
+
+        femopt.optimize(
+            n_trials=...,
+            timeout=...,
+        )
+
+        """
+
+        out_ = []
+
+        # 「設定値」列の番号
+        c_value = self.get_column_by_header_data(self.ColumnNames.value)
+
+        # set_random_seed
+        with nullcontext():
+
+            out = dict(
+                command='femopt.set_random_seed',
+            )
+
+            out_args = dict()
+
+            # seed
+            cls = ConfigItemClassEnum.seed.value
+            with nullcontext():
+                # 行番号
+                vhd = cls.name
+                r = self.get_row_by_header_data(vhd)
+
+                arg = 'seed'
+                value = self.item(r, c_value).data(Qt.ItemDataRole.UserRole)
+
+                out_args.update({arg: value})
+
+            if value is not None:
+                out.update({'args': out_args})
+                out_.append(out)
+
+        # femopt.optimize
+        with nullcontext():
+
+            out = dict(
+                command='femopt.optimize',
+            )
+
+            out_args = dict()
+
+            # n_trials
+            cls = ConfigItemClassEnum.n_trials.value
+            with nullcontext():
+                # 行番号
+                vhd = cls.name
+                r = self.get_row_by_header_data(vhd)
+
+                arg = 'n_trials'
+                value = self.item(r, c_value).data(Qt.ItemDataRole.UserRole)
+
+                out_args.update({arg: value})
+
+            # timeout
+            cls = ConfigItemClassEnum.timeout.value
+            with nullcontext():
+                # 行番号
+                vhd = cls.name
+                r = self.get_row_by_header_data(vhd)
+
+                arg = 'timeout'
+                value = self.item(r, c_value).data(Qt.ItemDataRole.UserRole)
+
+                out_args.update({arg: value})
+
+            out.update({'args': out_args})
+            out_.append(out)
+
+        import json
+        return json.dumps(out_)
 
 
 # 一覧 Problem ページに表示される StandardItemModelAsStandardItem 用 ItemModel

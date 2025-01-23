@@ -543,9 +543,11 @@ class VariableItemModel(StandardItemModelWithHeader):
             hd = self.ColumnNames.use
             c = self.get_column_by_header_data(hd)
 
+            if not self.item(r, c).isCheckable():
+                continue
+
             # add_parameter
-            if self.item(r, c).isCheckable() \
-                    and self.item(r, c).checkState() == Qt.CheckState.Checked:
+            if self.item(r, c).checkState() == Qt.CheckState.Checked:
 
                 command_object.update(
                     {'command': 'femopt.add_parameter'}
