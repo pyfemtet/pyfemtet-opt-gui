@@ -152,11 +152,11 @@ class ObjectiveTableItemModel(StandardItemModelWithHeader):
 
         return super().flags(index)
 
-    def load_femtet(self):
+    def load_femtet(self) -> ReturnMsg:
         # parametric if 設定取得
         obj_names, ret_msg = get_obj_names()
         if not can_continue(ret_msg, parent=self.parent()):
-            return
+            return ret_msg
 
         # 現在の状態を stash
         stashed_data: dict[str, dict[str, str]] = self.stash_current_table()
@@ -248,6 +248,8 @@ class ObjectiveTableItemModel(StandardItemModelWithHeader):
                     # item 作成
                     c = self.get_column_by_header_data(self.ColumnNames.note)
                     self.setItem(r, c, item)
+
+        return ReturnMsg.no_message
 
     def is_nothing_checked(self) -> bool:
         # ひとつも used がなければ False

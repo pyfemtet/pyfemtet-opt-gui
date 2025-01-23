@@ -110,6 +110,13 @@ class StandardItemModelWithHeader(StandardItemModelWithHeaderSearch):
                     _role := Qt.ItemDataRole.UserRole,
                 )
 
+                # self.setHeaderData(
+                #     _section := r,
+                #     _orientation := Qt.Orientation.Vertical,
+                #     _value := name,
+                #     _role := Qt.ItemDataRole.DisplayRole,
+                # )
+
     def stash_current_table(self) -> dict[str, dict[Any, dict[Qt.ItemDataRole, Any]]]:
         """load 時に既存のデータを上書きする為に stash する
 

@@ -4,6 +4,7 @@ import webbrowser
 
 from femtetutils import util
 from win32com.client import Dispatch, CDispatch
+# noinspection PyUnresolvedReferences
 from pythoncom import com_error
 import win32process
 
@@ -26,6 +27,7 @@ __all__ = [
     'get_variables',
     'apply_variables',
     'open_help',
+    'get_name',
 ]
 
 
@@ -293,3 +295,19 @@ def _get_help_url(partial_url):
 
 def open_help(partial_url):
     webbrowser.open(_get_help_url(partial_url))
+
+
+# ===== project name =====
+def get_name() -> tuple[tuple[str, str] | None, ReturnMsg]:
+
+    # check Femtet Connection
+    ret = get_connection_state()
+    if ret != ReturnMsg.no_message:
+        return None, ret
+
+    # check something opened
+    if _Femtet.Project == '':
+        return ('解析プロジェクトが開かれていません', ''), ReturnMsg.no_message
+
+    # else, return them
+    return (_Femtet.Project, _Femtet.AnalysisModelName), ReturnMsg.no_message

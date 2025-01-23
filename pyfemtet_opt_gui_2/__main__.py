@@ -14,6 +14,7 @@ from pyfemtet_opt_gui_2.femtet.femtet import *
 from pyfemtet_opt_gui_2.common.return_msg import *
 
 from pyfemtet_opt_gui_2.ui.ui_Wizard_main import Ui_Wizard
+from pyfemtet_opt_gui_2.models.analysis_model.analysis_model import AnalysisModelWizardPage
 from pyfemtet_opt_gui_2.models.variables.var import VariableWizardPage
 from pyfemtet_opt_gui_2.models.objectives.obj import ObjectiveWizardPage
 from pyfemtet_opt_gui_2.models.constraints.cns import ConstraintWizardPage
@@ -33,6 +34,7 @@ class ConnectionMessage(enum.StrEnum):
 
 class Main(QWizard):
     ui: Ui_Wizard
+    am_page: 'AnalysisModelWizardPage'
     var_page: 'VariableWizardPage'
     obj_page: 'ObjectiveWizardPage'
     cns_page: 'ConstraintWizardPage'
@@ -55,12 +57,14 @@ class Main(QWizard):
         self.ui.wizardPage_init.isComplete = lambda: get_connection_state() == ReturnMsg.no_message
 
     def setup_page(self):
+        self.am_page = AnalysisModelWizardPage(self, load_femtet_fun=self.load_femtet)
         self.var_page = VariableWizardPage(self, load_femtet_fun=self.load_femtet)
         self.obj_page = ObjectiveWizardPage(self, load_femtet_fun=self.load_femtet)
         self.cns_page = ConstraintWizardPage(self, load_femtet_fun=self.load_femtet)
         self.config_page = ConfigWizardPage(self)
         self.problem_page = ConfirmWizardPage(self)
 
+        self.addPage(self.am_page)
         self.addPage(self.var_page)
         self.addPage(self.obj_page)
         self.addPage(self.cns_page)
@@ -147,8 +151,17 @@ class Main(QWizard):
             return ReturnMsg.Error.cannot_open_sample_femprj, path
 
     def load_femtet(self):
-        self.var_page.source_model.load_femtet()
-        self.obj_page.source_model.load_femtet()
+        ret_msg = self.am_page.source_model.load_femtet()
+        if ret_msg != ReturnMsg.no_message:
+            return
+
+        ret_msg = self.var_page.source_model.load_femtet()
+        if ret_msg != ReturnMsg.no_message:
+            return
+
+        ret_msg = self.obj_page.source_model.load_femtet()
+        if ret_msg != ReturnMsg.no_message:
+            return
 
 
 if __name__ == '__main__':

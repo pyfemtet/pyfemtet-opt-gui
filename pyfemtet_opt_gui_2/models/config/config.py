@@ -421,37 +421,36 @@ class ConfigItemModel(StandardItemModelWithHeader):
         rows = len(self.RowNames)
         columns = len(self.ColumnNames)
 
-        with EditModel(self):
-            self.setRowCount(1 + rows)
-            self.setColumnCount(columns)
+        self.setRowCount(1 + rows)
+        self.setColumnCount(columns)
 
-            # whole table
-            item_cls: AbstractConfigItem
-            item_cls_list: list[AbstractConfigItem] = [enum_item.value for enum_item in ConfigItemClassEnum]
-            for r, item_cls in zip(range(1, len(ConfigItemClassEnum) + 1), item_cls_list):
-                name = item_cls.name
-                display = item_cls.default_display
-                value = item_cls.default_internal
-                note = item_cls.note
+        # whole table
+        item_cls: AbstractConfigItem
+        item_cls_list: list[AbstractConfigItem] = [enum_item.value for enum_item in ConfigItemClassEnum]
+        for r, item_cls in zip(range(1, len(ConfigItemClassEnum) + 1), item_cls_list):
+            name = item_cls.name
+            display = item_cls.default_display
+            value = item_cls.default_internal
+            note = item_cls.note
 
-                # name
-                with nullcontext():
-                    c = self.get_column_by_header_data(self.ColumnNames.name)
-                    item: QStandardItem = QStandardItem()
-                    item.setEditable(False)
-                    item.setText(name)
-                    self.setItem(r, c, item)
+            # name
+            with nullcontext():
+                c = self.get_column_by_header_data(self.ColumnNames.name)
+                item: QStandardItem = QStandardItem()
+                item.setEditable(False)
+                item.setText(name)
+                self.setItem(r, c, item)
 
-                # value
-                with nullcontext():
-                    c = self.get_column_by_header_data(self.ColumnNames.value)
-                    item: QStandardItem = QStandardItem()
-                    item.setText(str(display))
-                    item.setData(value, Qt.ItemDataRole.UserRole)
-                    self.setItem(r, c, item)
+            # value
+            with nullcontext():
+                c = self.get_column_by_header_data(self.ColumnNames.value)
+                item: QStandardItem = QStandardItem()
+                item.setText(str(display))
+                item.setData(value, Qt.ItemDataRole.UserRole)
+                self.setItem(r, c, item)
 
-                # note
-                with nullcontext():
+            # note
+            with nullcontext():
                     c = self.get_column_by_header_data(self.ColumnNames.note)
                     item: QStandardItem = QStandardItem()
                     item.setEditable(False)

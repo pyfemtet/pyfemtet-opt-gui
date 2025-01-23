@@ -239,13 +239,13 @@ class VariableItemModel(StandardItemModelWithHeader):
 
                     self.setItem(r, c, item)
 
-    def load_femtet(self):
+    def load_femtet(self) -> ReturnMsg:
         # variables 取得
         expression: Expression
         expressions: dict[str, Expression]
         expressions, ret_msg = get_variables()
         if not can_continue(ret_msg, self.parent()):
-            return
+            return ret_msg
 
         # variables の評価
         # Femtet から取得してもよいが、
@@ -253,7 +253,7 @@ class VariableItemModel(StandardItemModelWithHeader):
         # 使う仕様に変える可能性があるため
         variable_values, ret_msg, additional_msg = eval_expressions(expressions)
         if not can_continue(ret_msg, self.parent(), additional_message=additional_msg):
-            return
+            return ret_msg
 
         # 現在の状態を stash
         stashed_data = self.stash_current_table()
@@ -462,6 +462,8 @@ class VariableItemModel(StandardItemModelWithHeader):
                     c = self.get_column_by_header_data(self.ColumnNames.note)
                     self.setItem(r, c, item)
 
+        return ReturnMsg.no_message
+
     def flags(self, index):
         r = index.row()
 
@@ -541,12 +543,12 @@ class VariableItemModel(StandardItemModelWithHeader):
             hd = self.ColumnNames.use
             c = self.get_column_by_header_data(hd)
 
+            # add_parameter
             if self.item(r, c).isCheckable() \
                     and self.item(r, c).checkState() == Qt.CheckState.Checked:
 
-                # add_parameter
                 command_object.update(
-                    dict(command='femopt.add_parameter')
+                    {'command': 'femopt.add_parameter'}
                 )
 
                 args_object = dict()
@@ -585,12 +587,10 @@ class VariableItemModel(StandardItemModelWithHeader):
                         dict(upper_bound=expr.value)
                     )
 
-                command_object.update(args_object)
-
+            # add_expression
             else:
-                # add_expression
                 command_object.update(
-                    dict(command='femopt.add_expression')
+                    {'command': 'femopt.add_expression'}
                 )
 
                 args_object = dict()
@@ -610,7 +610,8 @@ class VariableItemModel(StandardItemModelWithHeader):
                         value = f'lambda: {expr.value}'
                     else:
                         args = [symbol.name for symbol in expr._s_expr.args]
-                        value = f'lambda {', '.join(args)}: {expr.expr.replace('\n', '')}'
+                        # lambda <args>: <expr>
+                        value = 'lambda ' + ', '.join(args) + ': ' + expr.expr
                     args_object.update(
                         dict(fun=value)
                     )
@@ -621,8 +622,7 @@ class VariableItemModel(StandardItemModelWithHeader):
                         dict(pass_to_fem=True)
                     )
 
-                command_object.update(args_object)
-
+            command_object.update({'args': args_object})
             out_object.append(command_object)
 
         import json

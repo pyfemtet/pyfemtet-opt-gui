@@ -13,10 +13,13 @@ from PySide6.QtWidgets import *
 from pyfemtet_opt_gui_2.ui.ui_WizardPage_confirm import Ui_WizardPage
 from pyfemtet_opt_gui_2.common.qt_util import *
 from pyfemtet_opt_gui_2.common.pyfemtet_model_bases import *
-from pyfemtet_opt_gui_2.models.objectives.obj import get_obj_model_for_problem
+
+from pyfemtet_opt_gui_2.models.analysis_model.analysis_model import get_am_model_for_problem
 from pyfemtet_opt_gui_2.models.variables.var import get_var_model_for_problem
-from pyfemtet_opt_gui_2.models.config.config import get_config_model_for_problem
+from pyfemtet_opt_gui_2.models.objectives.obj import get_obj_model_for_problem
 from pyfemtet_opt_gui_2.models.constraints.cns import get_cns_model_for_problem
+from pyfemtet_opt_gui_2.models.config.config import get_config_model_for_problem
+
 from pyfemtet_opt_gui_2.builder.main import create_script
 
 SUB_MODELS = None
@@ -29,6 +32,7 @@ def get_sub_models(parent) -> dict[str, QStandardItemModel]:
     if SUB_MODELS is None:
         assert parent is not None
         SUB_MODELS = dict(
+            femprj=get_am_model_for_problem(parent=parent),
             parameters=get_var_model_for_problem(parent=parent),
             objectives=get_obj_model_for_problem(parent=parent),
             constraints=get_cns_model_for_problem(parent=parent),
@@ -113,14 +117,15 @@ class ConfirmWizardPage(QWizardPage):
     def setup_signal(self):
         # 「スクリプトを保存する」を実行するとスクリプトを保存する
         self.ui.pushButton_save_script.clicked.connect(
-
+            self.save_script
         )
 
-    def create_script(self):
+    def save_script(self):
         # 保存ファイル名を決めてもらう
         # キャンセルなら何もしない
         # python モジュールとしての命名規則に従っていなければもう一度
         # create_script
+        create_script()
         # 「保存後すぐ実行する」にチェックがあれば実行する
         pass
 
@@ -132,6 +137,7 @@ if __name__ == '__main__':
     from pyfemtet_opt_gui_2.models.variables.var import VariableWizardPage
     from pyfemtet_opt_gui_2.models.config.config import ConfigWizardPage
     from pyfemtet_opt_gui_2.models.constraints.cns import ConstraintWizardPage
+    from pyfemtet_opt_gui_2.models.analysis_model.analysis_model import AnalysisModelWizardPage
 
     get_femtet()
 
@@ -149,6 +155,9 @@ if __name__ == '__main__':
 
     page_cns = ConstraintWizardPage()
     page_cns.show()
+
+    page_am = AnalysisModelWizardPage()
+    page_am.show()
 
     page_main = ConfirmWizardPage()
     page_main.show()

@@ -49,6 +49,7 @@ class ReturnMsg:
         femtet_macro_version_old = 'Femtet 本体または最後に実行された「マクロ機能の有効化」のバージョンが古いです。'
         cannot_open_sample_femprj = 'サンプルファイルのオープンに失敗しました'
         femtet_macro_failed = 'Femtet マクロの実行に失敗しました。'
+        femprj_or_model_inconsistent = 'Femtet で開かれている解析モデルが上記のモデルと一致しません。Femtet で開かれているモデルを確認し、「Load」ボタンを押してください。'
 
         # expressions
         cannot_recognize_as_an_expression = '文字式の認識に失敗しました。'

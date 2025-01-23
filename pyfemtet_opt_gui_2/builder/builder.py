@@ -1,9 +1,16 @@
 import json
 
+__all__ = [
+    'create_header',
+    'create_footer',
+    'create_main',
+    'create_command_line',
+]
 
 INDENT = '    '
 
 
+# import 文
 def create_header():
     code = '''
 # pyfemtet 基本クラス
@@ -21,7 +28,8 @@ mean = lambda *args: _mean(args)
     return code
 
 
-def create_entry_point():
+# if __name__ == '__main__':
+def create_footer():
     code = '''
 if __name__ == '__main__':
     main()
@@ -29,9 +37,9 @@ if __name__ == '__main__':
     return code
 
 
+# def main():
 def create_main():
-
-    code = '''
+    code = f'''
 # 最適化のメイン関数
 def main():
 '''[1:]
@@ -39,6 +47,7 @@ def main():
     return code
 
 
+# each command
 def create_command_line(command_json, n_indent=1):
     # reconstruct
     _command = json.loads(command_json)
@@ -55,7 +64,7 @@ def create_command_line(command_json, n_indent=1):
     # create
     function: str = command['command']
     _kwargs: dict = command['args']
-    ret: str = command['ret']
+    ret: str | None = command['ret']
 
     # kwargs の value が dict なら
     # その key が int なら int にする
@@ -76,14 +85,17 @@ def create_command_line(command_json, n_indent=1):
     kwargs = {}
     convert(_kwargs, kwargs)
 
-    code = (f'{f'{ret} = ' if ret is not None else ''}'
-            f'{function}(\n{INDENT * (1 + n_indent)}'
-            f'{f',\n{INDENT * (1 + n_indent)}'.join(
-                [f'{key}={value}' for key, value in kwargs.items()
-                 ]
-            )}\n{INDENT * n_indent})\n')
+    # function(\n
+    code = f'{f"{ret} = " if ret is not None else ""}{function}(\n'
 
-    return INDENT * n_indent + code
+    for key, value in kwargs.items():
+        #     key=value,\n
+        code += f'{INDENT}{key}={value},\n'
+
+    # )
+    code += ')\n'
+
+    return code
 
 
 if __name__ == '__main__':
@@ -129,7 +141,6 @@ if __name__ == '__main__':
 
     create_command_line(g_command_json)
 
-
     code = ''
 
     code += create_header()
@@ -139,6 +150,6 @@ if __name__ == '__main__':
     code += create_command_line(g_command_json)
     code += '\n'
     code += '\n'
-    code += create_entry_point()
+    code += create_footer()
 
     print(code)

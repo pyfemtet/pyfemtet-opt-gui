@@ -45,6 +45,7 @@ __all__ = [
 class CustomItemDataRole(enum.IntEnum):
     IsExpandedRole = Qt.ItemDataRole.UserRole + 1
     WithFirstRowRole = Qt.ItemDataRole.UserRole + 2
+    CustomResizeRole = Qt.ItemDataRole.UserRole + 3
 
 
 # bold font の規定値
@@ -169,7 +170,8 @@ class QStyledItemDelegateWithCombobox(QStyledItemDelegate):
 
     def get_combobox_size_hint(self, option, index) -> QSize:
         size = super().sizeHint(option, index)
-        size.setWidth(24 + size.width())  # combobox の下三角マークの幅
+        size.setWidth(20 + size.width())  # combobox の下三角マークの幅
+        index.model().setData(index, 20, CustomItemDataRole.CustomResizeRole)
         return size
 
     def paint(self, painter, option, index) -> None:
@@ -393,22 +395,28 @@ class ResizeColumn:
                 index = model.index(r, c)
                 self(index, None, [Qt.ItemDataRole.DisplayRole])
 
-    def _set_size_hint(self, index: QModelIndex):
-        model = index.model()
+    def _set_size_hint(self, index: QModelIndex) -> tuple[QStandardItem, QSize]:
 
+        # item を取得
+        model = index.model()
         if isinstance(model, QSortFilterProxyModelOfStandardItemModel):
             model: QSortFilterProxyModelOfStandardItemModel
             source_index = model.mapToSource(index)
             item = model.sourceModel().itemFromIndex(source_index)
-
         else:
             model: QStandardItemModel
             item = model.itemFromIndex(index)
 
+        # sizeHint を更新
         h = self._calc_required_height(item, self.view)
         w = self._calc_required_width(item, self.view)
         size = QSize(w, h)
         item.setSizeHint(size)
+
+        if item.data(CustomItemDataRole.CustomResizeRole) == 'ignore':
+            return item, QSize(1, h)
+
+        return item, size
 
     def _resize_table_view(self, index: QModelIndex):
         self.view: QTableView
@@ -429,19 +437,68 @@ class ResizeColumn:
         self.view: QTreeView
         model = self.view.model()
 
+        max_width_list_per_column = dict()
+
         for c in range(model.columnCount()):
+            # この関数を使うと femprj の絶対パスが長いときに
+            # 自動的にその長さに合わせてしまう
+            # self.view.resizeColumnToContents(c)
+
+            if c not in max_width_list_per_column.keys():
+                max_width_list_per_column[c] = 0
+
             for r in range(model.rowCount()):
                 index: QModelIndex = model.index(r, c)
-                self._set_size_hint(index)
+                item, size = self._set_size_hint(index)
 
-            self.view.resizeColumnToContents(c)
+                # item の幅で更新
+                max_width_list_per_column[c] = max(
+                    size.width(), max_width_list_per_column[c]
+                )
+
+                # item の children を見る
+                if item.hasChildren():
+
+                    for r_ in range(item.rowCount()):
+                        for c_ in range(item.columnCount()):
+                            # c_ 列がまだなら作る
+                            if c_ not in max_width_list_per_column.keys():
+                                max_width_list_per_column[c_] = 0
+
+                            child = item.child(r_, c_)
+                            if child is not None:
+                                child_w = self._calc_required_width(child, self.view)
+
+                                # c_==0 ならインデントぶんの下駄を設定する
+                                if c_ == 0:
+                                    child_w += 24
+
+                                max_width_list_per_column[c_] = max(
+                                    child_w, max_width_list_per_column[c_]
+                                )
+
+        for c, width in max_width_list_per_column.items():
+            self.view.header().show()
+            self.view.header().resizeSections(QHeaderView.ResizeMode.Interactive)
+            self.view.header().resizeSection(c, width)
 
     @staticmethod
     def _calc_required_width(item: QStandardItem, view: QAbstractItemView):
+
         # magic numbers...
         ICON_SPACE_WIDTH = 24
         CHECKBOX_SPACE_WIDTH = 24
         MARGIN = 8
+        other_space = 24
+
+        # 強制的に追加するスペースがあるか
+        # (CustomDelegate で Combobox を入れているなど)
+        if isinstance(item.data(CustomItemDataRole.CustomResizeRole), int):
+            other_space = item.data(CustomItemDataRole.CustomResizeRole)
+
+        # ignore かどうか
+        if item.data(CustomItemDataRole.CustomResizeRole) == 'ignore':
+            return 0
 
         # fontMetrics to calc the required width of text
         fm = view.fontMetrics()
@@ -462,13 +519,13 @@ class ResizeColumn:
             # logger.debug(f'{icon_width=}')
             icon_width = ICON_SPACE_WIDTH
 
-        # get the checkable width
+        # get the check-able width
         if item.isCheckable():
             checkbox_width = CHECKBOX_SPACE_WIDTH
         else:
             checkbox_width = 0
 
-        return MARGIN + text_area_width + icon_width + checkbox_width
+        return MARGIN + text_area_width + icon_width + checkbox_width + other_space
 
     @staticmethod
     def _calc_required_height(item: QStandardItem, view: QAbstractItemView):
