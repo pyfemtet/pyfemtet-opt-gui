@@ -5,6 +5,7 @@ from pyfemtet_opt_gui_2.models.analysis_model.analysis_model import get_am_model
 from pyfemtet_opt_gui_2.models.variables.var import get_var_model, VariableItemModel
 from pyfemtet_opt_gui_2.models.config.config import get_config_model, ConfigItemModel
 from pyfemtet_opt_gui_2.models.objectives.obj import get_obj_model, ObjectiveTableItemModel
+from pyfemtet_opt_gui_2.models.constraints.model import get_cns_model, ConstraintModel
 
 
 def create_from_model(model):
@@ -49,6 +50,11 @@ def create_var_script():
     create_from_model(model)
 
 
+def create_cns_script():
+    model: ConstraintModel = get_cns_model(None)
+    create_from_model(model)
+
+
 def create_optimize_script():
     model: ConfigItemModel = get_config_model(None)
     create_from_model(model)
@@ -61,6 +67,7 @@ def create_script():
     create_opt_script()
     print(create_femopt())
     create_var_script()
+    create_cns_script()
     create_optimize_script()
     # create_constraint_script()
     print(create_footer())

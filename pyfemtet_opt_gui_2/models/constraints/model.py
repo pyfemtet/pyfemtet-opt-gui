@@ -53,12 +53,14 @@ class ConstraintColumnNames(enum.StrEnum):
 # ===== intermediate data =====
 
 class Constraint:
+    use: bool
     name: str | None
     expression: str | None
     lb: float | None
     ub: float | None
 
     def __init__(self, var_model):
+        self.use = None
         self.name = None
         self.expression = None
         self.lb = None
@@ -274,6 +276,13 @@ class ConstraintModel(StandardItemModelWithHeader):
             out = Constraint(var_model=None)
             out.name = name
 
+            # use
+            with nullcontext():
+                _h = self.ColumnNames.use
+                c = self.get_column_by_header_data(_h)
+                use = self.item(r, c).checkState() == Qt.CheckState.Checked
+                out.use = use
+
             # expression, expr
             with nullcontext():
                 _h = self.ColumnNames.expr
@@ -311,3 +320,45 @@ class ConstraintModel(StandardItemModelWithHeader):
 
         else:
             raise RuntimeError(f'constraint named `{name}` is not found.')
+
+    def output_json(self):
+        """
+        add_constraint(
+            name=name,
+            fun=lambda a, b, c: a * (b + c),
+            lower_bound = 1.
+            upper_bound = None,
+            strict=True,
+        )
+        """
+
+        constraints: list[Constraint] = [self.get_constraint(name) for name in self.get_constraint_names()]
+
+        out = []
+
+        for constraint in constraints:
+            if not constraint.use:
+                continue
+
+            cmd = dict(command='femopt.add_constraint')
+            args = dict()
+
+            expression = constraint.expression.replace('\n', '')
+            expr = Expression(expression)
+            s = expr._s_expr
+
+            args.update(
+                dict(
+                    name=f'"{constraint.name}"',
+                    fun='lambda ' + ', '.join([_s.name for _s in s.free_symbols]) + ': ' + expression,
+                    lower_bound=constraint.lb,
+                    upper_bound=constraint.ub,
+                    strict=True,
+                )
+            )
+
+            cmd.update({'args': args})
+            out.append(cmd)
+
+        import json
+        return json.dumps(out)

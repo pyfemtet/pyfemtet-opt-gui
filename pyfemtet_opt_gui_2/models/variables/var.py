@@ -546,6 +546,12 @@ class VariableItemModel(StandardItemModelWithHeader):
             if not self.item(r, c).isCheckable():
                 continue
 
+
+            # FIXME: 拘束の式で使えるようにするには
+            #   add_expression しないといけないが
+            #   そうすると femprj の数式を壊すことになる
+            #   use_variable とかで fem から変数値を
+            #   取得する仕組みを考えたほうがいいと思う
             # add_parameter
             if self.item(r, c).checkState() == Qt.CheckState.Checked:
 
@@ -611,7 +617,7 @@ class VariableItemModel(StandardItemModelWithHeader):
                     if expr.is_number():
                         value = f'lambda: {expr.value}'
                     else:
-                        args = [symbol.name for symbol in expr._s_expr.args]
+                        args = [symbol.name for symbol in expr._s_expr.free_symbols]
                         # lambda <args>: <expr>
                         value = 'lambda ' + ', '.join(args) + ': ' + expr.expr
                     args_object.update(
