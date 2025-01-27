@@ -27,6 +27,9 @@ from pyfemtet_opt_gui_2.builder.worker import OptimizationWorker
 
 import requests
 from requests.exceptions import ConnectionError
+from packaging.version import Version
+
+import pyfemtet
 
 SUB_MODELS = None
 PROBLEM_MODEL = None
@@ -175,19 +178,30 @@ class ConfirmWizardPage(QWizardPage):
     def switch_button(self, running: bool):
         # worker が実行ならば button を disabled にするなど
         button = self.ui.pushButton_save_script
-        if running:
-            button.clicked.disconnect(self.save_script)
-            button.clicked.connect(self.stop_optimization)
-            button.setText('現在の解析を最後にして最適化を停止する')
-        else:
-            # 元に戻す
-            button.clicked.disconnect(self.stop_optimization)
-            button.clicked.connect(self.save_script)
-            button.setText(button.accessibleName())
 
-            # history_path の情報を model から消す（初期化）
-            model = get_config_model_for_problem(self)
-            model.reset_history_path()
+        if Version(pyfemtet.__version__) >= Version("0.8.5"):
+            if running:
+                button.clicked.disconnect(self.save_script)
+                button.clicked.connect(self.stop_optimization)
+                button.setText('現在の解析を最後にして最適化を停止する')
+            else:
+                # 元に戻す
+                button.clicked.disconnect(self.stop_optimization)
+                button.clicked.connect(self.save_script)
+                button.setText(button.accessibleName())
+
+                # history_path の情報を model から消す（初期化）
+                model = get_config_model_for_problem(self)
+                model.reset_history_path()
+
+        else:
+            if running:
+                button.setText('最適化の実行中はスクリプトを保存できません')
+                button.setDisabled(True)
+            else:
+                # 元に戻す
+                button.setText(button.accessibleName())
+                button.setDisabled(False)
 
     def stop_optimization(self):
         # port record が存在するかチェックする
