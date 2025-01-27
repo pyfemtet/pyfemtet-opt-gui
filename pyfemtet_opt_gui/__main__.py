@@ -138,7 +138,7 @@ class Main(QWizard):
 
         path = os.path.abspath(
             os.path.join(
-                os.path.dirname('__file__'),
+                os.path.dirname(__file__),
                 'assets', 'samples', 'sample.femprj'
             )
         ).replace(os.path.altsep, os.path.sep)

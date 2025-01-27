@@ -104,9 +104,7 @@ class QTPEAlgorithmItemModel(QAbstractAlgorithmItemModel):
             command='OptunaOptimizer',
             args=dict(
                 sampler_class='TPESampler',
-                sampler_kwargs=dict(
-                    n_startup_trials=n_startup_trials,
-                )
+                sampler_kwargs={'"n_startup_trials"': n_startup_trials}
             )
         )
 

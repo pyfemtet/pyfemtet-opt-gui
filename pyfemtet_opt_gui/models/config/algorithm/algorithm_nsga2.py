@@ -47,8 +47,8 @@ class NSGAIIAlgorithmConfig(AbstractAlgorithmConfig):
         @enum.member
         class mutation_prob(AbstractAlgorithmConfigItem):
             name = '試行ごとの変異確率'
-            default = 'デフォルト'
-            note = '0 ぁら 1 までの数値が有効です。'
+            default = '自動'
+            note = '0 から 1 までの数値が有効です。'
 
 
 # （アルゴリズムごとの）設定値の入力ルール
@@ -129,7 +129,7 @@ class QNSGAIIAlgorithmItemModel(QAbstractAlgorithmItemModel):
         r = self.get_row_by_header_data(NSGAIIAlgorithmConfig.Items.population_size.value.name)
         c = self.get_column_by_header_data(self.ColumnNames.value)
         population_size = int(self.item(r, c).text())
-        sampler_kwargs.update(dict(population_size=population_size))
+        sampler_kwargs.update({'"population_size"': population_size})
 
         # mutation_prob
         r = self.get_row_by_header_data(NSGAIIAlgorithmConfig.Items.mutation_prob.value.name)
@@ -138,7 +138,7 @@ class QNSGAIIAlgorithmItemModel(QAbstractAlgorithmItemModel):
         if mutation_prob == NSGAIIAlgorithmConfig.Items.mutation_prob.value.default:
             pass
         else:
-            sampler_kwargs.update(dict(mutation_prob=float(mutation_prob)))
+            sampler_kwargs.update({'"mutation_prob"': float(mutation_prob)})
 
         out = dict(
             ret='opt',
