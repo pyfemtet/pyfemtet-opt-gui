@@ -35,7 +35,7 @@ import enum
 # （アルゴリズムごとの）設定項目
 class RandomAlgorithmConfig(AbstractAlgorithmConfig):
     name = 'Random'
-    note = 'パラメータをランダムに決めます。'
+    note = 'Optuna 実装に基づくランダムサンプリング'
 
     class Items(enum.Enum):
         pass
@@ -43,42 +43,7 @@ class RandomAlgorithmConfig(AbstractAlgorithmConfig):
 
 # （アルゴリズムごとの）設定値の入力ルール
 class RandomAlgorithmDelegate(QStyledItemDelegate):
-
-    def is_seed_value(self, index):
-        column_data = get_internal_header_data(index)
-        row_data = get_internal_header_data(index, Qt.Orientation.Vertical)
-
-        # `Seed` 行の `value` 列かどうか
-        return (
-                column_data == QRandomAlgorithmItemModel.ColumnNames.value
-                and row_data == RandomAlgorithmConfig.Items.Seed.value.name
-        )
-
-    def createEditor(self, parent, option, index):
-
-        if self.is_seed_value(index):
-            editor: QLineEdit = QLineEdit(parent=parent)
-            return editor
-
-        else:
-            return super().createEditor(parent, option, index)
-
-    def setModelData(self, editor, model, index):
-        if self.is_seed_value(index):
-            editor: QLineEdit
-            value = editor.text()
-            try:
-                value = int(value)
-                if value < 0:
-                    raise ValueError
-                value = str(value)
-            except ValueError:
-                value = str(RandomAlgorithmConfig.Items.Seed.value.default)
-            with EditModel(model):
-                model.setData(index, value, Qt.ItemDataRole.DisplayRole)
-
-        else:
-            return super().setModelData(editor, model, index)
+    pass
 
 
 # （アルゴリズムごとの）設定項目の ItemModel

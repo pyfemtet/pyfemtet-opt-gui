@@ -65,7 +65,7 @@ class AlgorithmItemModelColumnNames(enum.StrEnum):
 class AbstractAlgorithmConfigItem(ABC):
     name = '何かの設定項目'
     default = '何かのデフォルト値'
-    note = '設定項目の備考'
+    note = '設定項目の説明'
 
 
 # （アルゴリズムごとの）設定全体

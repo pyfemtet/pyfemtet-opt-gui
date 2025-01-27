@@ -40,7 +40,22 @@ from pyfemtet_opt_gui.models.config.algorithm.algorithm_random import (
     RandomAlgorithmConfig,
 )
 
-DEFAULT_ALGORITHM_CONFIG = RandomAlgorithmConfig
+from pyfemtet_opt_gui.models.config.algorithm.algorithm_tpe import (
+    get_tpe_algorithm_config_model,
+    TPEAlgorithmConfig,
+)
+
+from pyfemtet_opt_gui.models.config.algorithm.algorithm_pof_botorch import (
+    get_pof_botorch_algorithm_config_model,
+    PoFBoTorchAlgorithmConfig,
+)
+
+from pyfemtet_opt_gui.models.config.algorithm.algorithm_nsga2 import (
+    get_nsgaii_algorithm_config_model,
+    NSGAIIAlgorithmConfig,
+)
+
+DEFAULT_ALGORITHM_CONFIG = TPEAlgorithmConfig
 Q_DEFAULT_ALGORITHM_CONFIG_ITEM_FACTORY = get_random_algorithm_config_model
 
 # ===== model =====
@@ -99,7 +114,10 @@ class Algorithm(AbstractConfigItem):
     default_display = DEFAULT_ALGORITHM_CONFIG.name
     choices: dict[str, callable] = {
         # AbstractAlgorithmConfig.name: get_abstract_algorithm_config_model,  # for debug
+        TPEAlgorithmConfig.name: get_tpe_algorithm_config_model,
         RandomAlgorithmConfig.name: get_random_algorithm_config_model,
+        PoFBoTorchAlgorithmConfig.name: get_pof_botorch_algorithm_config_model,
+        NSGAIIAlgorithmConfig.name: get_nsgaii_algorithm_config_model,
     }
     note = DEFAULT_ALGORITHM_CONFIG.note
 
