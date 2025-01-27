@@ -35,6 +35,7 @@ import enum
 # （アルゴリズムごとの）設定項目
 class RandomAlgorithmConfig(AbstractAlgorithmConfig):
     name = 'Random'
+    note = 'パラメータをランダムに決めます。'
 
     class Items(enum.Enum):
         pass

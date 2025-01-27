@@ -71,6 +71,7 @@ class AbstractAlgorithmConfigItem(ABC):
 # （アルゴリズムごとの）設定全体
 class AbstractAlgorithmConfig:
     name = 'Abstract Algorithm'
+    note = 'GUI のデバッグ用の項目です。'
 
     class Items(enum.Enum):
         # abstract class

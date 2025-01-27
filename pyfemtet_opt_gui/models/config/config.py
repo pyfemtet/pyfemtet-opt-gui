@@ -98,9 +98,10 @@ class Algorithm(AbstractConfigItem):
     name = '最適化アルゴリズム'
     default_display = DEFAULT_ALGORITHM_CONFIG.name
     choices: dict[str, callable] = {
-        AbstractAlgorithmConfig.name: get_abstract_algorithm_config_model,
+        # AbstractAlgorithmConfig.name: get_abstract_algorithm_config_model,  # for debug
         RandomAlgorithmConfig.name: get_random_algorithm_config_model,
     }
+    note = DEFAULT_ALGORITHM_CONFIG.note
 
 
 # 設定項目の実装
@@ -477,6 +478,9 @@ class ConfigItemModel(StandardItemModelWithHeader):
             # self.setData(self.index(r, c), expanded, role)
             self.setItemData(self.index(r, c), item_data)
 
+            # algorithm の note を更新
+            self.setup_algorithm_note()
+
         # for problem の場合は original model の clone を設定する
         # QSortFilterProxyModel が Column 方向の Recursive Filter に対応していないので
         # clone の処理の中で除きたいデータを除く
@@ -535,6 +539,29 @@ class ConfigItemModel(StandardItemModelWithHeader):
                 for c in range(self.original_model.columnCount()):
                     index = self.original_model.index(r, c)
                     clone(index, index, [])
+
+    def setup_algorithm_note(self):
+
+        r = self.get_row_by_header_data(value=ConfigItemClassEnum.algorithm.value.name)
+        c = self.get_column_by_header_data(self.ColumnNames.note)
+        item = self.item(r, c)
+
+        note = self.algorithm_model.AlgorithmConfig.note
+        entire_note = str(note)
+
+        # note が存在しない
+        if note is None:
+            pass
+
+        # note に改行が存在しない
+        elif '\n' not in entire_note:
+            item.setText(entire_note)
+
+        # note に改行が存在する
+        else:
+            head = entire_note.split('\n')[0] + '...'
+            item.setText(head)
+            item.setToolTip(entire_note)
 
     def setup_model(self):
         rows = len(self.RowNames)
