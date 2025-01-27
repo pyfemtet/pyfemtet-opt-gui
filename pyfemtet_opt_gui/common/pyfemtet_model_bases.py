@@ -13,7 +13,7 @@ from PySide6.QtGui import *
 # noinspection PyUnresolvedReferences
 from PySide6 import QtWidgets, QtCore, QtGui
 
-from pyfemtet_opt_gui_2.common.qt_util import *
+from pyfemtet_opt_gui.common.qt_util import *
 
 import enum
 from typing import Any

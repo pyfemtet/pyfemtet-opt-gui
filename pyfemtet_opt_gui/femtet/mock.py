@@ -1,4 +1,4 @@
-from pyfemtet_opt_gui_2.common.return_msg import ReturnMsg
+from pyfemtet_opt_gui.common.return_msg import ReturnMsg
 
 __all__ = [
     'get_femtet',

@@ -13,16 +13,16 @@ from PySide6.QtGui import *
 # noinspection PyUnresolvedReferences
 from PySide6 import QtWidgets, QtCore, QtGui
 
-from pyfemtet_opt_gui_2.ui.ui_Dialog_cns_edit import Ui_Dialog
+from pyfemtet_opt_gui.ui.ui_Dialog_cns_edit import Ui_Dialog
 
-from pyfemtet_opt_gui_2.common.qt_util import *
-from pyfemtet_opt_gui_2.common.pyfemtet_model_bases import *
-from pyfemtet_opt_gui_2.common.return_msg import *
-from pyfemtet_opt_gui_2.common.expression_processor import *
-from pyfemtet_opt_gui_2.femtet.femtet import *
+from pyfemtet_opt_gui.common.qt_util import *
+from pyfemtet_opt_gui.common.pyfemtet_model_bases import *
+from pyfemtet_opt_gui.common.return_msg import *
+from pyfemtet_opt_gui.common.expression_processor import *
+from pyfemtet_opt_gui.femtet.femtet import *
 
-from pyfemtet_opt_gui_2.models.variables.var import get_var_model, VariableItemModelForTableView, VariableItemModel, VariableTableViewDelegate
-from pyfemtet_opt_gui_2.models.constraints.model import get_cns_model, ConstraintModel, Constraint
+from pyfemtet_opt_gui.models.variables.var import get_var_model, VariableItemModelForTableView, VariableItemModel, VariableTableViewDelegate
+from pyfemtet_opt_gui.models.constraints.model import get_cns_model, ConstraintModel, Constraint
 
 
 import enum
@@ -310,7 +310,7 @@ class ConstraintEditorDialog(QDialog):
         super().accept()
 
     def _load_femtet_debug(self):
-        from pyfemtet_opt_gui_2.models.variables.var import VariableItemModel
+        from pyfemtet_opt_gui.models.variables.var import VariableItemModel
         source_model = self.var_model.sourceModel()
         assert isinstance(source_model, VariableItemModel)
         source_model: VariableItemModel

@@ -1,11 +1,11 @@
 import json
-from pyfemtet_opt_gui_2.builder.builder import *
+from pyfemtet_opt_gui.builder.builder import *
 
-from pyfemtet_opt_gui_2.models.analysis_model.analysis_model import get_am_model, FemprjModel
-from pyfemtet_opt_gui_2.models.variables.var import get_var_model, VariableItemModel
-from pyfemtet_opt_gui_2.models.config.config import get_config_model, ConfigItemModel
-from pyfemtet_opt_gui_2.models.objectives.obj import get_obj_model, ObjectiveTableItemModel
-from pyfemtet_opt_gui_2.models.constraints.model import get_cns_model, ConstraintModel
+from pyfemtet_opt_gui.models.analysis_model.analysis_model import get_am_model, FemprjModel
+from pyfemtet_opt_gui.models.variables.var import get_var_model, VariableItemModel
+from pyfemtet_opt_gui.models.config.config import get_config_model, ConfigItemModel
+from pyfemtet_opt_gui.models.objectives.obj import get_obj_model, ObjectiveTableItemModel
+from pyfemtet_opt_gui.models.constraints.model import get_cns_model, ConstraintModel
 
 
 def create_from_model(model, method='output_json', n_indent=1):

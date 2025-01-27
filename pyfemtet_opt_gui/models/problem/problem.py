@@ -10,20 +10,20 @@ from PySide6.QtGui import *
 # noinspection PyUnresolvedReferences
 from PySide6.QtWidgets import *
 
-from pyfemtet_opt_gui_2.ui.ui_WizardPage_confirm import Ui_WizardPage
-from pyfemtet_opt_gui_2.common.qt_util import *
-from pyfemtet_opt_gui_2.common.pyfemtet_model_bases import *
-from pyfemtet_opt_gui_2.common.return_msg import *
+from pyfemtet_opt_gui.ui.ui_WizardPage_confirm import Ui_WizardPage
+from pyfemtet_opt_gui.common.qt_util import *
+from pyfemtet_opt_gui.common.pyfemtet_model_bases import *
+from pyfemtet_opt_gui.common.return_msg import *
 
-from pyfemtet_opt_gui_2.models.analysis_model.analysis_model import get_am_model_for_problem
-from pyfemtet_opt_gui_2.models.variables.var import get_var_model_for_problem
-from pyfemtet_opt_gui_2.models.objectives.obj import get_obj_model_for_problem
-from pyfemtet_opt_gui_2.models.constraints.cns import get_cns_model_for_problem
-from pyfemtet_opt_gui_2.models.config.config import get_config_model_for_problem
+from pyfemtet_opt_gui.models.analysis_model.analysis_model import get_am_model_for_problem
+from pyfemtet_opt_gui.models.variables.var import get_var_model_for_problem
+from pyfemtet_opt_gui.models.objectives.obj import get_obj_model_for_problem
+from pyfemtet_opt_gui.models.constraints.cns import get_cns_model_for_problem
+from pyfemtet_opt_gui.models.config.config import get_config_model_for_problem
 
-from pyfemtet_opt_gui_2.builder.main import create_script
-from pyfemtet_opt_gui_2.builder.file_dialog import ScriptBuilderFileDialog
-from pyfemtet_opt_gui_2.builder.worker import OptimizationWorker
+from pyfemtet_opt_gui.builder.main import create_script
+from pyfemtet_opt_gui.builder.file_dialog import ScriptBuilderFileDialog
+from pyfemtet_opt_gui.builder.worker import OptimizationWorker
 
 import requests
 from requests.exceptions import ConnectionError
@@ -240,12 +240,12 @@ class ConfirmWizardPage(QWizardPage):
 
 if __name__ == '__main__':
     import sys
-    from pyfemtet_opt_gui_2.femtet.femtet import get_femtet
-    from pyfemtet_opt_gui_2.models.objectives.obj import ObjectiveWizardPage
-    from pyfemtet_opt_gui_2.models.variables.var import VariableWizardPage
-    from pyfemtet_opt_gui_2.models.config.config import ConfigWizardPage
-    from pyfemtet_opt_gui_2.models.constraints.cns import ConstraintWizardPage
-    from pyfemtet_opt_gui_2.models.analysis_model.analysis_model import AnalysisModelWizardPage
+    from pyfemtet_opt_gui.femtet.femtet import get_femtet
+    from pyfemtet_opt_gui.models.objectives.obj import ObjectiveWizardPage
+    from pyfemtet_opt_gui.models.variables.var import VariableWizardPage
+    from pyfemtet_opt_gui.models.config.config import ConfigWizardPage
+    from pyfemtet_opt_gui.models.constraints.cns import ConstraintWizardPage
+    from pyfemtet_opt_gui.models.analysis_model.analysis_model import AnalysisModelWizardPage
 
     get_femtet()
 

@@ -13,13 +13,13 @@ from PySide6.QtGui import *
 # noinspection PyUnresolvedReferences
 from PySide6 import QtWidgets, QtCore, QtGui
 
-from pyfemtet_opt_gui_2.ui.ui_WizardPage_cns import Ui_WizardPage
+from pyfemtet_opt_gui.ui.ui_WizardPage_cns import Ui_WizardPage
 
-from pyfemtet_opt_gui_2.common.qt_util import *
-from pyfemtet_opt_gui_2.common.expression_processor import *
-from pyfemtet_opt_gui_2.common.pyfemtet_model_bases import *
-from pyfemtet_opt_gui_2.common.return_msg import *
-from pyfemtet_opt_gui_2.femtet.femtet import *
+from pyfemtet_opt_gui.common.qt_util import *
+from pyfemtet_opt_gui.common.expression_processor import *
+from pyfemtet_opt_gui.common.pyfemtet_model_bases import *
+from pyfemtet_opt_gui.common.return_msg import *
+from pyfemtet_opt_gui.femtet.femtet import *
 
 import enum
 import sys

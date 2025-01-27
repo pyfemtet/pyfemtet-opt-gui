@@ -23,19 +23,19 @@ import sys
 from contextlib import nullcontext
 from pathlib import Path
 
-from pyfemtet_opt_gui_2.ui.ui_WizardPage_config import Ui_WizardPage
+from pyfemtet_opt_gui.ui.ui_WizardPage_config import Ui_WizardPage
 
-from pyfemtet_opt_gui_2.common.qt_util import *
-from pyfemtet_opt_gui_2.common.pyfemtet_model_bases import *
-from pyfemtet_opt_gui_2.common.return_msg import *
+from pyfemtet_opt_gui.common.qt_util import *
+from pyfemtet_opt_gui.common.pyfemtet_model_bases import *
+from pyfemtet_opt_gui.common.return_msg import *
 
-from pyfemtet_opt_gui_2.models.config.algorithm.base import (
+from pyfemtet_opt_gui.models.config.algorithm.base import (
     QAbstractAlgorithmItemModel,
     AbstractAlgorithmConfig,
     get_abstract_algorithm_config_model,
 )
 
-from pyfemtet_opt_gui_2.models.config.algorithm.algorithm_random import (
+from pyfemtet_opt_gui.models.config.algorithm.algorithm_random import (
     get_random_algorithm_config_model,
     RandomAlgorithmConfig,
 )
@@ -573,7 +573,23 @@ class ConfigItemModel(StandardItemModelWithHeader):
                 c = self.get_column_by_header_data(self.ColumnNames.note)
                 item: QStandardItem = QStandardItem()
                 item.setEditable(False)
-                item.setText(str(note))
+
+                entire_note = str(note)
+
+                # note が存在しない
+                if note is None:
+                    pass
+
+                # note に改行が存在しない
+                elif '\n' not in entire_note:
+                    item.setText(entire_note)
+
+                # note に改行が存在する
+                else:
+                    head = entire_note.split('\n')[0] + '...'
+                    item.setText(head)
+                    item.setToolTip(entire_note)
+
                 self.setItem(r, c, item)
 
     def is_no_finish_conditions(self):
@@ -901,7 +917,7 @@ class ConfigWizardPage(QWizardPage):
 
 if __name__ == '__main__':
     # _WITH_DUMMY = True  # comment out to prevent debug
-    # from pyfemtet_opt_gui_2.femtet.mock import get_femtet, get_obj_names  # comment out to prevent debug
+    # from pyfemtet_opt_gui.femtet.mock import get_femtet, get_obj_names  # comment out to prevent debug
 
     app = QApplication()
     app.setStyle('fusion')

@@ -17,12 +17,12 @@ import enum
 import sys
 from contextlib import nullcontext
 
-from pyfemtet_opt_gui_2.ui.ui_WizardPage_obj import Ui_WizardPage_obj
+from pyfemtet_opt_gui.ui.ui_WizardPage_obj import Ui_WizardPage_obj
 
-from pyfemtet_opt_gui_2.common.qt_util import *
-from pyfemtet_opt_gui_2.common.pyfemtet_model_bases import *
-from pyfemtet_opt_gui_2.common.return_msg import *
-from pyfemtet_opt_gui_2.femtet.femtet import *
+from pyfemtet_opt_gui.common.qt_util import *
+from pyfemtet_opt_gui.common.pyfemtet_model_bases import *
+from pyfemtet_opt_gui.common.return_msg import *
+from pyfemtet_opt_gui.femtet.femtet import *
 
 # ===== model =====
 OBJ_MODEL = None
@@ -417,7 +417,7 @@ class ObjectiveWizardPage(QWizardPage):
 
 if __name__ == '__main__':
     # _WITH_DUMMY = True  # comment out to prevent debug
-    # from pyfemtet_opt_gui_2.femtet.mock import get_femtet, get_obj_names  # comment out to prevent debug
+    # from pyfemtet_opt_gui.femtet.mock import get_femtet, get_obj_names  # comment out to prevent debug
 
     get_femtet()
 

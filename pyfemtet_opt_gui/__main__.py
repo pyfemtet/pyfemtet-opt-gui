@@ -10,16 +10,16 @@ from PySide6.QtGui import *
 # noinspection PyUnresolvedReferences
 from PySide6.QtWidgets import *
 
-from pyfemtet_opt_gui_2.femtet.femtet import *
-from pyfemtet_opt_gui_2.common.return_msg import *
+from pyfemtet_opt_gui.femtet.femtet import *
+from pyfemtet_opt_gui.common.return_msg import *
 
-from pyfemtet_opt_gui_2.ui.ui_Wizard_main import Ui_Wizard
-from pyfemtet_opt_gui_2.models.analysis_model.analysis_model import AnalysisModelWizardPage
-from pyfemtet_opt_gui_2.models.variables.var import VariableWizardPage
-from pyfemtet_opt_gui_2.models.objectives.obj import ObjectiveWizardPage
-from pyfemtet_opt_gui_2.models.constraints.cns import ConstraintWizardPage
-from pyfemtet_opt_gui_2.models.config.config import ConfigWizardPage
-from pyfemtet_opt_gui_2.models.problem.problem import ConfirmWizardPage
+from pyfemtet_opt_gui.ui.ui_Wizard_main import Ui_Wizard
+from pyfemtet_opt_gui.models.analysis_model.analysis_model import AnalysisModelWizardPage
+from pyfemtet_opt_gui.models.variables.var import VariableWizardPage
+from pyfemtet_opt_gui.models.objectives.obj import ObjectiveWizardPage
+from pyfemtet_opt_gui.models.constraints.cns import ConstraintWizardPage
+from pyfemtet_opt_gui.models.config.config import ConfigWizardPage
+from pyfemtet_opt_gui.models.problem.problem import ConfirmWizardPage
 
 import os
 import sys
@@ -137,11 +137,11 @@ class Main(QWizard):
             return ret_msg
 
         path = os.path.abspath(
-                os.path.join(
-                    os.path.dirname('__file__'),
-                    'assets', 'samples', 'sample.femprj'
-                )
-            ).replace(os.path.altsep, os.path.sep)
+            os.path.join(
+                os.path.dirname('__file__'),
+                'assets', 'samples', 'sample.femprj'
+            )
+        ).replace(os.path.altsep, os.path.sep)
         succeeded = Femtet.LoadProject(path, True)
 
         if succeeded:
@@ -164,8 +164,7 @@ class Main(QWizard):
             return
 
 
-if __name__ == '__main__':
-
+def main():
     app = QApplication()
     app.setStyle('fusion')
 
@@ -173,3 +172,7 @@ if __name__ == '__main__':
     page_obj.show()
 
     sys.exit(app.exec())
+
+
+if __name__ == '__main__':
+    main()

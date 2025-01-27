@@ -13,17 +13,17 @@ from PySide6 import QtWidgets, QtCore, QtGui
 from contextlib import nullcontext
 
 # noinspection PyUnresolvedReferences
-from pyfemtet_opt_gui_2.common.qt_util import *
+from pyfemtet_opt_gui.common.qt_util import *
 # noinspection PyUnresolvedReferences
-from pyfemtet_opt_gui_2.common.pyfemtet_model_bases import *
+from pyfemtet_opt_gui.common.pyfemtet_model_bases import *
 # noinspection PyUnresolvedReferences
-from pyfemtet_opt_gui_2.common.return_msg import *
+from pyfemtet_opt_gui.common.return_msg import *
 # noinspection PyUnresolvedReferences
-from pyfemtet_opt_gui_2.common.expression_processor import *
+from pyfemtet_opt_gui.common.expression_processor import *
 # noinspection PyUnresolvedReferences
-from pyfemtet_opt_gui_2.femtet.femtet import *
+from pyfemtet_opt_gui.femtet.femtet import *
 
-from pyfemtet_opt_gui_2.models.config.algorithm.base import (
+from pyfemtet_opt_gui.models.config.algorithm.base import (
     QAbstractAlgorithmItemModel,
     AbstractAlgorithmConfig,
     AbstractAlgorithmConfigItem,

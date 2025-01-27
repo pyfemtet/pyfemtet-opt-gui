@@ -2,7 +2,7 @@ from sympy import sympify
 from sympy.core.sympify import SympifyError
 from sympy import Min, Max, Add, Symbol
 
-from pyfemtet_opt_gui_2.common.return_msg import ReturnMsg
+from pyfemtet_opt_gui.common.return_msg import ReturnMsg
 
 __all__ = [
     'Expression', 'eval_expressions', 'check_bounds', 'SympifyError'

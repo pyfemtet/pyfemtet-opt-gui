@@ -8,9 +8,9 @@ from win32com.client import Dispatch, CDispatch
 from pythoncom import com_error
 import win32process
 
-from pyfemtet_opt_gui_2.logger import get_logger
-from pyfemtet_opt_gui_2.common.return_msg import ReturnMsg
-from pyfemtet_opt_gui_2.common.expression_processor import Expression
+from pyfemtet_opt_gui.logger import get_logger
+from pyfemtet_opt_gui.common.return_msg import ReturnMsg
+from pyfemtet_opt_gui.common.expression_processor import Expression
 
 logger = get_logger('Femtet')
 

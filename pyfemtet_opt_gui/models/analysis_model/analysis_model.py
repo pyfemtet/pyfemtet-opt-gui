@@ -17,13 +17,13 @@ from PySide6.QtGui import *
 # noinspection PyUnresolvedReferences
 from PySide6 import QtWidgets, QtCore, QtGui
 
-from pyfemtet_opt_gui_2.ui.ui_WizardPage_analysis_model import Ui_WizardPage
+from pyfemtet_opt_gui.ui.ui_WizardPage_analysis_model import Ui_WizardPage
 
-from pyfemtet_opt_gui_2.common.qt_util import *
-from pyfemtet_opt_gui_2.common.pyfemtet_model_bases import *
-from pyfemtet_opt_gui_2.common.return_msg import *
-from pyfemtet_opt_gui_2.common.expression_processor import *
-from pyfemtet_opt_gui_2.femtet.femtet import *
+from pyfemtet_opt_gui.common.qt_util import *
+from pyfemtet_opt_gui.common.pyfemtet_model_bases import *
+from pyfemtet_opt_gui.common.return_msg import *
+from pyfemtet_opt_gui.common.expression_processor import *
+from pyfemtet_opt_gui.femtet.femtet import *
 
 # ===== model =====
 _FEMPRJ_MODEL = None
@@ -288,7 +288,7 @@ class AnalysisModelWizardPage(QWizardPage):
 
 if __name__ == '__main__':
     # _WITH_DUMMY = True  # comment out to prevent debug
-    # from pyfemtet_opt_gui_2.femtet.mock import get_femtet, get_obj_names  # comment out to prevent debug
+    # from pyfemtet_opt_gui.femtet.mock import get_femtet, get_obj_names  # comment out to prevent debug
 
     get_femtet()
 
