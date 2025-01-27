@@ -28,7 +28,7 @@ import enum
 
 class ConnectionMessage(enum.StrEnum):
     no_connection = '接続されていません。'
-    connecting = '接続可能な Femtet を探しています...\n見つからない場合は起動します...'
+    connecting = '接続可能な Femtet を探しています...\n見つからない場合は起動して接続します...'
     connected = '接続されています。'
 
 

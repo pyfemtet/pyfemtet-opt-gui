@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'WizardPage_analysis_modelRDYiSR.ui'
+## Form generated from reading UI file 'WizardPage_analysis_modelvdsFyp.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.8.1
 ##
@@ -23,7 +23,7 @@ class Ui_WizardPage(object):
     def setupUi(self, WizardPage):
         if not WizardPage.objectName():
             WizardPage.setObjectName(u"WizardPage")
-        WizardPage.resize(400, 300)
+        WizardPage.resize(601, 364)
         self.gridLayout = QGridLayout(WizardPage)
         self.gridLayout.setObjectName(u"gridLayout")
         self.pushButton_load = QPushButton(WizardPage)
@@ -61,11 +61,11 @@ class Ui_WizardPage(object):
     def retranslateUi(self, WizardPage):
         WizardPage.setWindowTitle(QCoreApplication.translate("WizardPage", u"WizardPage", None))
         self.pushButton_load.setText(QCoreApplication.translate("WizardPage", u"[F\u27a1] Load", None))
-        self.textEdit.setMarkdown(QCoreApplication.translate("WizardPage", u".femprj \u30d5\u30a1\u30a4\u30eb\u3092\u958b\u3044\u3066\u304f\u3060\u3055\u3044\u3002\n"
+        self.textEdit.setMarkdown(QCoreApplication.translate("WizardPage", u"Femtet \u3067\u6700\u9069\u5316\u3057\u305f\u3044 .femprj \u30d5\u30a1\u30a4\u30eb\u3092\u958b\u3044\u3066\u304f\u3060\u3055\u3044\u3002\n"
 "\n"
-"\u76ee\u7684\u306e\u89e3\u6790\u30e2\u30c7\u30eb\u3092\u958b\u304d\u3001\u300cLoad\u300d \u3092\u62bc\u3057\u3066\u304f\u3060\u3055\u3044\u3002\n"
+".femprj \u30d5\u30a1\u30a4\u30eb\u3092\u5909\u66f4\u3057\u305f\u5834\u5408\u306f\u3001\u518d\u8aad\u307f\u8fbc\u307f\u306e\u305f\u3081\u300cLoad\u300d\u30dc\u30bf\u30f3\u3092\u62bc\u3057\u3066\u304f\u3060\u3055\u3044\u3002\n"
 "\n"
-".femprj \u3068 model \u304c\u76ee\u7684\u306e\u3082\u306e\u306b\u306a\u308c\u3070\u3001\u300c\u6b21\u3078 / Next\u300d \u3092\u62bc\u3057\u3066\u304f\u3060\u3055\u3044\u3002\n"
+"\u4e0a\u8a18\u306e .femprj \u3068 model \u306b\u9593\u9055\u3044\u304c\u306a\u3051\u308c\u3070\u3001\u300c\u6b21\u3078 / Next\u300d \u3092\u62bc\u3057\u3066\u304f\u3060\u3055\u3044\u3002\n"
 "\n"
 "", None))
         self.textEdit.setHtml(QCoreApplication.translate("WizardPage", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
@@ -75,9 +75,9 @@ class Ui_WizardPage(object):
 "li.unchecked::marker { content: \"\\2610\"; }\n"
 "li.checked::marker { content: \"\\2612\"; }\n"
 "</style></head><body style=\" font-family:'Yu Gothic UI'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:6px; margin-bottom:6px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">.femprj \u30d5\u30a1\u30a4\u30eb\u3092\u958b\u3044\u3066\u304f\u3060\u3055\u3044\u3002</p>\n"
-"<p style=\" margin-top:6px; margin-bottom:6px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">\u76ee\u7684\u306e\u89e3\u6790\u30e2\u30c7\u30eb\u3092\u958b\u304d\u3001\u300cLoad\u300d \u3092\u62bc\u3057\u3066\u304f\u3060\u3055\u3044\u3002</p>\n"
-"<p style=\" margin-top:6px; marg"
-                        "in-bottom:6px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">.femprj \u3068 model \u304c\u76ee\u7684\u306e\u3082\u306e\u306b\u306a\u308c\u3070\u3001\u300c\u6b21\u3078 / Next\u300d \u3092\u62bc\u3057\u3066\u304f\u3060\u3055\u3044\u3002</p></body></html>", None))
+"<p style=\" margin-top:6px; margin-bottom:6px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Femtet \u3067\u6700\u9069\u5316\u3057\u305f\u3044 .femprj \u30d5\u30a1\u30a4\u30eb\u3092\u958b\u3044\u3066\u304f\u3060\u3055\u3044\u3002</p>\n"
+"<p style=\" margin-top:6px; margin-bottom:6px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">.femprj \u30d5\u30a1\u30a4\u30eb\u3092\u5909\u66f4\u3057\u305f\u5834\u5408\u306f\u3001\u518d\u8aad\u307f\u8fbc\u307f\u306e\u305f\u3081"
+                        "\u300cLoad\u300d\u30dc\u30bf\u30f3\u3092\u62bc\u3057\u3066\u304f\u3060\u3055\u3044\u3002</p>\n"
+"<p style=\" margin-top:6px; margin-bottom:6px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">\u4e0a\u8a18\u306e .femprj \u3068 model \u306b\u9593\u9055\u3044\u304c\u306a\u3051\u308c\u3070\u3001\u300c\u6b21\u3078 / Next\u300d \u3092\u62bc\u3057\u3066\u304f\u3060\u3055\u3044\u3002</p></body></html>", None))
     # retranslateUi
 

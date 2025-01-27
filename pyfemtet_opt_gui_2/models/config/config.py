@@ -81,7 +81,7 @@ class ConfigHeaderNames(enum.StrEnum):
     # use = CommonItemColumnName.use  # 不要、かつ Algorithm とも一貫して見やすい
     name = '項目'
     value = '設定値'
-    note = '備考'
+    note = '説明'
 
 
 # 設定項目のベース
@@ -127,11 +127,25 @@ class ConfigItemClassEnum(enum.Enum):
         default_display = ''
         default_internal = None  # 使わない
         note = ('最適化結果を記録する csv のファイル名です。\n'
-                '空欄又にすると日時に基づいてファイル名を決定します。\n'
+                '空欄にすると日時に基づいてファイル名を決定します。\n'
                 '既存のファイルパスを指定すると、その csv ファイルの内容を\n'
                 '読み込んで続きから最適化を行います（アルゴリズムが対応し\n'
                 'ている場合）。このとき、設計変数、拘束式、目的関数は元の\n'
                 'csv ファイルを生成した最適化の設定と一致させてください。')
+
+    @enum.member
+    class n_parallel(AbstractConfigItem):
+        name = '並列最適化'
+        default_display = 'なし'
+        default_internal = 1
+        note = ('2 以上の値を指定した場合、その数の Femtet プロセスを用い\n'
+                '最適化のイテレーションを並列・高速化することができます。\n'
+                '「なし」または「1」を指定すると並列化しません。\n'
+                '※ 2 つ目以降の Femtet は自動起動します。\n'
+                '※ 自動起動した分に関しても通常起動と同様にライセンスを\n'
+                '　 使用します。\n'
+                '※ 1 回の解析を内部で並列計算する Femtet 全体設定の機能\n'
+                '　 とは別の機能です。')
 
     @enum.member
     class algorithm(Algorithm):
@@ -205,8 +219,8 @@ class QConfigTreeViewDelegate(QStyledItemDelegateWithCombobox):
         """
 
         # partial model があればまずそれを処理する
-        # partial delegate に sizeHint 等を定義した
-        # 場合は同様の処理を sizeHint 等に入れる
+        # TODO: partial delegate に sizeHint 等を定義した
+        #   場合は同様の処理を sizeHint 等に入れること
         if self.is_partial_model_item(index):
             index_ = self.get_partial_model_index(index)
             return self.partial_model_delegate.createEditor(parent, option, index_)
@@ -249,20 +263,29 @@ class QConfigTreeViewDelegate(QStyledItemDelegateWithCombobox):
                     vhd == ConfigItemClassEnum.n_trials.value.name  # n_trials
                     or vhd == ConfigItemClassEnum.timeout.value.name  # timeout
                     or vhd == ConfigItemClassEnum.seed.value.name  # seed
+                    or vhd == ConfigItemClassEnum.n_parallel.value.name  # n_parallel
             )
             if cond:
 
                 editor: QLineEdit
                 text = editor.text()
+
+                # positive int かどうか
                 try:
+                    # int ではある
                     display = str(int(text))
                     value = int(text)
+
+                    # positive ではない
                     if value <= 0:
                         display = 'なし'
                         value = None
+
+                # positive int ではない
                 except ValueError:
                     display = 'なし'
                     value = None
+
                 model.setData(index, display, Qt.ItemDataRole.DisplayRole)
                 model.setData(index, value, Qt.ItemDataRole.UserRole)
                 return
@@ -582,6 +605,7 @@ class ConfigItemModel(StandardItemModelWithHeader):
             n_trials=...,
             timeout=...,
             _port_record_path=...,
+            n_parallel=...,
         )
 
         """
@@ -644,6 +668,24 @@ class ConfigItemModel(StandardItemModelWithHeader):
 
                 arg = 'timeout'
                 value = self.item(r, c_value).data(Qt.ItemDataRole.UserRole)
+
+                out_args.update({arg: value})
+
+            # n_parallel
+            cls = ConfigItemClassEnum.n_parallel.value
+            with nullcontext():
+                # 行番号
+                vhd = cls.name
+                r = self.get_row_by_header_data(vhd)
+
+                arg = 'n_parallel'
+                value = self.item(r, c_value).data(Qt.ItemDataRole.UserRole)
+
+                # n_parallel の default 値は None でなく 1 だが、
+                # それに関係なく n_parallel の note で
+                # 「なし」の時は 1 にすると説明している
+                if value is None:
+                    value = 1
 
                 out_args.update({arg: value})
 

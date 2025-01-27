@@ -46,7 +46,14 @@ li.checked::marker { content: &quot;\2612&quot;; }
     </widget>
    </item>
    <item row="0" column="0">
-    <widget class="QTreeView" name="treeView"/>
+    <widget class="QTreeView" name="treeView">
+     <property name="alternatingRowColors">
+      <bool>true</bool>
+     </property>
+     <property name="verticalScrollMode">
+      <enum>QAbstractItemView::ScrollMode::ScrollPerPixel</enum>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>

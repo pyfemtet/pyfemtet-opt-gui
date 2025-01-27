@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'WizardPage_configuFgbhn.ui'
+## Form generated from reading UI file 'WizardPage_configlYhibT.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.7.2
+## Created by: Qt User Interface Compiler version 6.8.1
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -15,9 +15,9 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QAbstractScrollArea, QApplication, QGridLayout, QHeaderView,
-    QSizePolicy, QTextEdit, QTreeView, QWidget,
-    QWizardPage)
+from PySide6.QtWidgets import (QAbstractItemView, QAbstractScrollArea, QApplication, QGridLayout,
+    QHeaderView, QSizePolicy, QTextEdit, QTreeView,
+    QWidget, QWizardPage)
 
 class Ui_WizardPage(object):
     def setupUi(self, WizardPage):
@@ -40,6 +40,8 @@ class Ui_WizardPage(object):
 
         self.treeView = QTreeView(WizardPage)
         self.treeView.setObjectName(u"treeView")
+        self.treeView.setAlternatingRowColors(True)
+        self.treeView.setVerticalScrollMode(QAbstractItemView.ScrollMode.ScrollPerPixel)
 
         self.gridLayout.addWidget(self.treeView, 0, 0, 1, 1)
 
