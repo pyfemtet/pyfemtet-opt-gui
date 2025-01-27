@@ -1,3 +1,8 @@
+import json
+import os
+import datetime
+import csv
+
 # noinspection PyUnresolvedReferences
 from PySide6.QtCore import *
 
@@ -16,6 +21,7 @@ from PySide6 import QtWidgets, QtCore, QtGui
 import enum
 import sys
 from contextlib import nullcontext
+from pathlib import Path
 
 from pyfemtet_opt_gui_2.ui.ui_WizardPage_config import Ui_WizardPage
 
@@ -104,14 +110,28 @@ class ConfigItemClassEnum(enum.Enum):
         name = '解析実行回数'
         default_display = str(10)
         default_internal = 10
-        note = ''
+        note = ('解析および結果取得の成功数がこの値になると最適化を終了します。\n'
+                '「なし」の場合、回数による終了条件を設けません。')
 
     @enum.member
     class timeout(AbstractConfigItem):
         name = 'タイムアウト'
         default_display = 'なし'
         default_internal = None
-        note = ''
+        note = ('最適化が開始されてからこの値（秒）の時間を過ぎると\n'
+                'その時点で実行中の解析を最後に最適化を終了します。')
+
+    @enum.member
+    class history_path(AbstractConfigItem):
+        name = 'csv ファイル名'
+        default_display = ''
+        default_internal = None  # 使わない
+        note = ('最適化結果を記録する csv のファイル名です。\n'
+                '空欄又にすると日時に基づいてファイル名を決定します。\n'
+                '既存のファイルパスを指定すると、その csv ファイルの内容を\n'
+                '読み込んで続きから最適化を行います（アルゴリズムが対応し\n'
+                'ている場合）。このとき、設計変数、拘束式、目的関数は元の\n'
+                'csv ファイルを生成した最適化の設定と一致させてください。')
 
     @enum.member
     class algorithm(Algorithm):
@@ -247,15 +267,74 @@ class QConfigTreeViewDelegate(QStyledItemDelegateWithCombobox):
                 model.setData(index, value, Qt.ItemDataRole.UserRole)
                 return
 
+            # history_path である
+            if vhd == ConfigItemClassEnum.history_path.value.name:
+                editor: QLineEdit
+                text = editor.text()
+
+                # 空欄である
+                if text == '':
+                    return super().setModelData(editor, model, index)
+
+                # そうでない場合、エラーチェックする
+                try:
+                    # 使用できない文字が含まれているなどすれば OSError
+                    # 正しいが存在しないなら FileNotFoundError
+                    Path(text).resolve(strict=True)
+
+                    # 存在するファイルである場合
+                    pass
+
+                # 存在しないファイルである場合
+                except FileNotFoundError:
+                    pass
+
+                # 間違っている場合
+                except OSError:
+                    ret_msg = ReturnMsg.Error.invalid_file_name
+                    can_continue(ret_msg, self.parent())
+                    return
+
+                finally:
+                    if text.endswith('.csv'):
+                        text = text + '.csv'
+                    model.setData(index, text, Qt.ItemDataRole.DisplayRole)
+                    return
+
         # その他の場合
         super().setModelData(editor, model, index)
 
 
 # 大元の ItemModel
+# noinspection PyPropertyDefinition,PyRedeclaration
 class ConfigItemModel(StandardItemModelWithHeader):
     ColumnNames = ConfigHeaderNames
     RowNames = [enum_item.value.name for enum_item in ConfigItemClassEnum]
     algorithm_model: QAbstractAlgorithmItemModel
+
+    # algorithm_model と SortFilterProxyModel が
+    # Vertical に recurse してくれない仕様のせいで
+    # ConfigItemModel は完全な singleton ではないので
+    # これはクラス変数にする
+    _history_path: str = None
+
+    @property
+    @classmethod
+    def history_path(cls):
+        return cls._history_path
+
+    @classmethod
+    @history_path.setter
+    def history_path(cls, value):
+        cls._history_path = value
+
+    @property
+    def history_path(self):
+        return type(self).history_path
+
+    @history_path.setter
+    def history_path(self, value):
+        type(self).history_path = value
 
     def __init__(self, parent=None, _with_dummy=True, original_model: 'ConfigItemModel' = None):
         super().__init__(parent, _with_dummy)
@@ -502,6 +581,7 @@ class ConfigItemModel(StandardItemModelWithHeader):
         femopt.optimize(
             n_trials=...,
             timeout=...,
+            _port_record_path=...,
         )
 
         """
@@ -513,7 +593,6 @@ class ConfigItemModel(StandardItemModelWithHeader):
 
         # set_random_seed
         with nullcontext():
-
             out = dict(
                 command='femopt.set_random_seed',
             )
@@ -538,7 +617,6 @@ class ConfigItemModel(StandardItemModelWithHeader):
 
         # femopt.optimize
         with nullcontext():
-
             out = dict(
                 command='femopt.optimize',
             )
@@ -575,6 +653,62 @@ class ConfigItemModel(StandardItemModelWithHeader):
         import json
         return json.dumps(out_)
 
+    def output_femopt_json(self):
+        # femopt = FEMOpt(fem=fem, opt=opt, history_path=history_path)
+
+        # 「設定値」列の番号
+        c_value = self.get_column_by_header_data(self.ColumnNames.value)
+
+        # history_path 行
+        with nullcontext():
+            out = dict(
+                ret='femopt',
+                command='FEMOpt',
+            )
+            out_args = dict()
+
+            # seed
+            cls = ConfigItemClassEnum.history_path.value
+            with nullcontext():
+                # 行番号
+                vhd = cls.name
+                r = self.get_row_by_header_data(vhd)
+
+                # 値
+                history_path = self.item(r, c_value).data(Qt.ItemDataRole.DisplayRole)
+
+                # GUI から停止信号を出すための
+                # host, port 情報にアクセスするため
+                # history_path が exec() 内で生成されたら困るので
+                # スクリプトに None が渡らないように
+                # ここで自動作成する
+                if history_path == '':
+                    history_path = datetime.datetime.now().strftime('最適化_%Y%m%d_%H%M%S.csv')
+
+                # GUI が history_path にアクセスできるよう
+                # 自身に与えられるパスを持っておく
+                # これが呼ばれるときには chdir が動いているので
+                # 相対パスでも問題ないはず
+                self.history_path = history_path
+
+                # 引数
+                out_args.update(
+                    dict(
+                        fem='fem',
+                        opt='opt',
+                        history_path=f'"{history_path}"'
+                    )
+                )
+
+            # command update
+            out.update(dict(args=out_args))
+
+            import json
+            return json.dumps([out])
+
+    def reset_history_path(self):
+        self.history_path = None
+
 
 # 一覧 Problem ページに表示される StandardItemModelAsStandardItem 用 ItemModel
 class QConfigItemModelForProblem(QSortFilterProxyModelOfStandardItemModel):
@@ -590,6 +724,41 @@ class QConfigItemModelForProblem(QSortFilterProxyModelOfStandardItemModel):
             return False
 
         return True
+
+    def reset_history_path(self):
+        model = self.sourceModel()
+        assert isinstance(model, ConfigItemModel)
+        model.reset_history_path()
+
+    def get_monitor_host_info(self) -> tuple[dict | None, ReturnMsg]:
+
+        # ConfigModel 取得
+        model = self.sourceModel()
+        assert isinstance(model, ConfigItemModel)
+
+        # まだスクリプトが生成されていない場合をチェック
+        # しかしこれが呼ばれるのはスクリプト生成の後のはず
+        assert model.history_path is not None
+
+        # history_path を取得
+        history_path = model.history_path
+
+        # history_path が存在しない
+        #  <= まだ最適化が始まっていない
+        if not os.path.exists(history_path):
+            return None, ReturnMsg.Error.history_path_not_found
+
+        # 存在はするが metadata に情報がない
+        #  <= pyfemtet 0.8.5 未満である
+        with open(history_path, 'r', encoding='932', newline='\n') as f:
+            reader = csv.reader(f, delimiter=',')
+            meta_columns = reader.__next__()
+        extra_data = json.loads(meta_columns[0])
+        if 'host' not in extra_data.keys() or 'port' not in extra_data.keys():
+            return None, ReturnMsg.Error.host_info_not_found
+
+        # port 情報を見つけた
+        return extra_data
 
 
 # 個別ページに表示される first row のない ItemModel

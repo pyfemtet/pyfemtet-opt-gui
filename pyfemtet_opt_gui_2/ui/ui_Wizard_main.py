@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'Wizard_mainrqQZbO.ui'
+## Form generated from reading UI file 'Wizard_mainmhgfdm.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.7.2
 ##
@@ -23,8 +23,9 @@ class Ui_Wizard(object):
     def setupUi(self, Wizard):
         if not Wizard.objectName():
             Wizard.setObjectName(u"Wizard")
-        Wizard.resize(712, 392)
+        Wizard.resize(789, 570)
         Wizard.setWizardStyle(QWizard.WizardStyle.ModernStyle)
+        Wizard.setOptions(QWizard.WizardOption.HelpButtonOnRight|QWizard.WizardOption.NoCancelButtonOnLastPage)
         self.wizardPage_init = QWizardPage()
         self.wizardPage_init.setObjectName(u"wizardPage_init")
         self.gridLayout = QGridLayout(self.wizardPage_init)
@@ -35,6 +36,7 @@ class Ui_Wizard(object):
 
         self.label_connectionState = QLabel(self.wizardPage_init)
         self.label_connectionState.setObjectName(u"label_connectionState")
+        self.label_connectionState.setMinimumSize(QSize(0, 40))
         self.label_connectionState.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self.gridLayout.addWidget(self.label_connectionState, 3, 1, 1, 1)

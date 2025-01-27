@@ -124,7 +124,7 @@ class ConstraintModel(StandardItemModelWithHeader):
 
     def get_unique_name(self):
         # get constraint names
-        c = self.ColumnNames.name
+        c = self.get_column_by_header_data(self.ColumnNames.name)
         if self.with_first_row:
             iterable = range(1, self.rowCount())
         else:
@@ -154,7 +154,26 @@ class ConstraintModel(StandardItemModelWithHeader):
 
         return out
 
-    def set_constraint(self, constraint: Constraint):
+    def set_constraint(self, constraint: Constraint, replacing_name: str = None):
+
+        # replacing_name が与えられていれば
+        # その item を constraint.name に変名
+        if replacing_name is not None:
+
+            # 名前を探す
+            for r in self.get_row_iterable():
+
+                # 一致する名前を探す
+                c_name = self.get_column_by_header_data(self.ColumnNames.name)
+                name = self.item(r, c_name).text()
+                if name == replacing_name:
+                    # constraint.name に変名
+                    self.item(r, c_name).setText(constraint.name)
+
+            # 存在しなければ何かおかしいが、
+            # 内部エラーにするほどではない
+            else:
+                pass
 
         # 名前が存在しないなら行追加
         if constraint.name not in self.get_constraint_names():
@@ -168,12 +187,8 @@ class ConstraintModel(StandardItemModelWithHeader):
                 c = self.get_column_by_header_data(_h)
                 self.setItem(r, c, QStandardItem(constraint.name))
 
-        if self.with_first_row:
-            iterable = range(1, self.rowCount())
-        else:
-            iterable = range(0, self.rowCount())
-
-        for r in iterable:
+        # 名前をキーにして処理すべき行を探索
+        for r in self.get_row_iterable():
 
             # 一致する名前を探して constraint を parse
             _h = self.ColumnNames.name
@@ -321,11 +336,20 @@ class ConstraintModel(StandardItemModelWithHeader):
         else:
             raise RuntimeError(f'constraint named `{name}` is not found.')
 
-    def output_json(self):
+    def _output_json(self):
         """
+
+        def constraint_0(_, opt_):
+            var = opt_.variables.get_variables()
+            a = var['a']
+            b = var['b']
+            c = var['c']
+            return a * (b + c)
+
+
         add_constraint(
             name=name,
-            fun=lambda a, b, c: a * (b + c),
+            fun=constraint_0,
             lower_bound = 1.
             upper_bound = None,
             strict=True,
@@ -334,31 +358,80 @@ class ConstraintModel(StandardItemModelWithHeader):
 
         constraints: list[Constraint] = [self.get_constraint(name) for name in self.get_constraint_names()]
 
+        out_funcdef = []
         out = []
 
+        fun_name_counter = 0
+
         for constraint in constraints:
+
             if not constraint.use:
                 continue
 
-            cmd = dict(command='femopt.add_constraint')
-            args = dict()
-
+            # 式と使う変数名を取得
             expression = constraint.expression.replace('\n', '')
             expr = Expression(expression)
-            s = expr._s_expr
+            variable_names = [_s.name for _s in expr._s_expr.free_symbols]
 
-            args.update(
-                dict(
-                    name=f'"{constraint.name}"',
-                    fun='lambda ' + ', '.join([_s.name for _s in s.free_symbols]) + ': ' + expression,
-                    lower_bound=constraint.lb,
-                    upper_bound=constraint.ub,
-                    strict=True,
+            # def constraint_0 を定義
+            fun_name = f'constraint_{fun_name_counter}'
+            with nullcontext():
+                funcdef = dict(
+                    function=fun_name,
+                    args=['_', 'opt_'],
+                    commands=None,  # 今から足していく
+                    ret=expression,
                 )
-            )
 
-            cmd.update({'args': args})
-            out.append(cmd)
+                # def の中身を作成
+                commands = []
+                with nullcontext():
+                    # var = opt_.variables.get_variables()
+                    command = dict(
+                        ret='var',
+                        command='opt_.variables.get_variables',
+                        args=dict(),
+                    )
+                    commands.append(command)
 
+                    # a = var['a']
+                    for variable_name in variable_names:
+                        command = dict(
+                            ret=variable_name,
+                            command=f'var["{variable_name}"]'
+                        )
+                        commands.append(command)
+
+                funcdef.update({'commands': commands})
+                out_funcdef.append(funcdef)
+
+            # femopt.add_constraint
+            with nullcontext():
+                cmd = dict(command='femopt.add_constraint')
+                args = dict()
+
+                args.update(
+                    dict(
+                        name=f'"{constraint.name}"',
+                        fun=fun_name,
+                        lower_bound=constraint.lb,
+                        upper_bound=constraint.ub,
+                        strict=True,
+                        args=['femopt.opt'],
+                    )
+                )
+
+                cmd.update({'args': args})
+                out.append(cmd)
+
+            fun_name_counter += 1
+
+        return out_funcdef, out
+
+    def output_json(self):
         import json
-        return json.dumps(out)
+        return json.dumps(self._output_json()[1])
+
+    def output_funcdef_json(self):
+        import json
+        return json.dumps(self._output_json()[0])

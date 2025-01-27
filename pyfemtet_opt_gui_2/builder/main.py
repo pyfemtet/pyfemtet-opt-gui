@@ -8,16 +8,22 @@ from pyfemtet_opt_gui_2.models.objectives.obj import get_obj_model, ObjectiveTab
 from pyfemtet_opt_gui_2.models.constraints.model import get_cns_model, ConstraintModel
 
 
-def create_from_model(model):
-    commands_json = model.output_json()
+def create_from_model(model, method='output_json', n_indent=1):
+    code = ''
+
+    commands_json = getattr(model, method)()
     commands = json.loads(commands_json)
     assert isinstance(commands, list | tuple)
     for command in commands:
-        line = create_command_line(json.dumps(command))
-        print(line)
+        line = create_command_line(json.dumps(command), n_indent)
+        code += line
+
+    return code
 
 
 def create_fem_script():
+    code = ''
+
     am_model: FemprjModel = get_am_model(None)
     femprj_path, model_name = am_model.get_current_names()
 
@@ -36,41 +42,72 @@ def create_fem_script():
     )
 
     line = create_command_line(json.dumps(cmd_obj))
-    print(line)
+    code += line
+
+    return code
 
 
 def create_opt_script():
     model_: ConfigItemModel = get_config_model(None)
     model = model_.algorithm_model
-    create_from_model(model)
+    return create_from_model(model)
 
 
 def create_var_script():
     model: VariableItemModel = get_var_model(None)
-    create_from_model(model)
+    return create_from_model(model)
 
 
 def create_cns_script():
     model: ConstraintModel = get_cns_model(None)
-    create_from_model(model)
+    return create_from_model(model)
 
 
 def create_optimize_script():
     model: ConfigItemModel = get_config_model(None)
-    create_from_model(model)
+    return create_from_model(model)
 
 
-def create_script():
-    print(create_header())
-    print(create_main())
-    create_fem_script()
-    create_opt_script()
-    print(create_femopt())
-    create_var_script()
-    create_cns_script()
-    create_optimize_script()
-    # create_constraint_script()
-    print(create_footer())
+def create_cns_function_def():
+    model: ConstraintModel = get_cns_model(None)
+    return create_from_model(model, method='output_funcdef_json', n_indent=0)
+
+
+# femopt = FEMOpt(fem, opt, history_path)
+def create_femopt(n_indent=1):
+    model = get_config_model(None)
+    code = create_from_model(model, 'output_femopt_json')
+    return code
+
+
+def create_script(path=None):
+    code = ''
+    code += create_message()
+    code += '\n\n'
+    code += create_header()
+    code += '\n\n'
+    if len(create_cns_function_def()) > 0:
+        code += create_cns_function_def()
+        code += '\n\n'
+    code += create_main()
+    code += '\n'
+    code += create_fem_script()
+    code += '\n'
+    code += create_opt_script()
+    code += '\n'
+    code += create_femopt()
+    code += '\n'
+    code += create_var_script()
+    code += '\n'
+    code += create_cns_script()
+    code += '\n'
+    code += create_optimize_script()
+    code += '\n\n'
+    code += create_footer()
+
+    if path is not None:
+        with open(path, 'w', encoding='utf-8') as f:
+            f.write(code)
 
 
 if __name__ == '__main__':

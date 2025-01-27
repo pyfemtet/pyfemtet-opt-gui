@@ -25,6 +25,8 @@ class ReturnMsg:
     class Info(enum.StrEnum):
         _test = 'This is a test information.'
 
+        interrupt_signal_emitted = '中断信号を送信しました。現在の解析を最後に最適化を終了します。'
+
     class Warn(enum.StrEnum):
         _test = 'This is a test warning message.'
         update_lb_automatically = '値と下限の関係が正しくなくなったため、下限を更新します。'
@@ -60,6 +62,23 @@ class ReturnMsg:
         inconsistent_value_ub = '値と上限の大小関係が正しくありません。'
         inconsistent_value_lb = '値と下限の大小関係が正しくありません。'
         no_bounds = '上下限のいずれかを設定してください。'
+
+        # others
+        duplicated_constraint_name = '拘束式名が既存のものと重複しています。別の名前を指定してください。'
+        filepath_in_not_existing_dir = '存在しないフォルダのファイルパスが指定されました。'
+        invalid_py_file_name = 'ファイル名は以下の条件を満たしてください。\n- 半角英数字又は _ 以外を含まない\n- 数字で始まらない'
+        invalid_file_name = 'ファイルパスに使用できない文字が含まれています。'
+        history_path_not_found = '記録 csv ファイルが見つかりません。まだ最適化が始まっていない可能性があります。お手数ですが、最適化が始まってから中断を行ってください。'
+        host_info_not_found = ('記録 csv にプロセスモニターのポート情報が見つかりません。pyfemtet のバージョンが古い可能性があります。\n'
+                               '最適化を中断する場合は、ブラウザでプロセスモニターにアクセス（既定は「http://localhost:8080」）して'
+                               '中断ボタンを押してください。')
+        failed_to_emit_interrupt_signal = ('最適化終了信号を送信しましたが、エラーが発生しました。最適化が始まっていないか可能性があります。\n'
+                                           '最適化が始まっていない場合は、お手数ですが最適化が始まってから中断を行ってください。\n'
+                                           '最適化が始まっているのにこのエラーが表示される場合は、ブラウザでプロセスモニターにアクセス（既定は「http://localhost:8080」）して'
+                                           '中断ボタンを押してください。')
+        failed_to_connect_process_monitor = ('プロセスモニターのポートが見つかりませんでした。最適化が開始されていないか、ポート情報が間違っている可能性があります。\n'
+                                             '最適化を中断する場合は、ブラウザでプロセスモニターにアクセス（既定は「http://localhost:8080」）して'
+                                             '中断ボタンを押してください。')
 
 
 # ReturnMsg を受け取ってダイアログ表示し

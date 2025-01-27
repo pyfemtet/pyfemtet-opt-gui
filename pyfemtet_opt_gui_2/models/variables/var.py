@@ -538,22 +538,55 @@ class VariableItemModel(StandardItemModelWithHeader):
 
         for r in self.get_row_iterable():
 
-            command_object = dict()
-
+            # 必要な列の logicalIndex を取得
             hd = self.ColumnNames.use
             c = self.get_column_by_header_data(hd)
 
+            # 出力オブジェクトの準備
+            command_object = dict()
+            args_object = dict()
+
+            # 最適化に関与しない数式。pass_to_fem を False にしないと
+            # Femtet の数式を数値で上書きしてしまうが、
+            # これを追加しないとこの数式を参照した拘束式などが
+            # 評価できない
+            # add_expression(pass_to_fem=False)
             if not self.item(r, c).isCheckable():
-                continue
 
+                command_object.update(
+                    {'command': 'femopt.add_expression'}
+                )
 
-            # FIXME: 拘束の式で使えるようにするには
-            #   add_expression しないといけないが
-            #   そうすると femprj の数式を壊すことになる
-            #   use_variable とかで fem から変数値を
-            #   取得する仕組みを考えたほうがいいと思う
+                # name
+                with nullcontext():
+                    item = self.item(r, self.get_column_by_header_data(self.ColumnNames.name))
+                    args_object.update(
+                        dict(name=f'"{item.text()}"')
+                    )
+
+                # fun
+                with nullcontext():
+                    item = self.item(r, self.get_column_by_header_data(self.ColumnNames.initial_value))
+                    expr: Expression = item.data(Qt.ItemDataRole.UserRole)
+                    if expr.is_number():
+                        value = f'lambda: {expr.value}'
+                    else:
+                        args = [symbol.name for symbol in expr._s_expr.free_symbols]
+                        # lambda <args>: <expr>
+                        value = 'lambda ' + ', '.join(args) + ': ' + expr.expr
+                    args_object.update(
+                        dict(fun=value)
+                    )
+
+                # pass_to_fem
+                with nullcontext():
+                    args_object.update(
+                        dict(pass_to_fem=False)
+                    )
+
+            # 数式でなくて Check されている場合: 通常の Parameter
             # add_parameter
-            if self.item(r, c).checkState() == Qt.CheckState.Checked:
+            elif self.item(r, c).checkState() == Qt.CheckState.Checked:
 
                 command_object.update(
                     {'command': 'femopt.add_parameter'}
@@ -595,13 +628,15 @@ class VariableItemModel(StandardItemModelWithHeader):
                         dict(upper_bound=expr.value)
                     )
 
+            # 数式でなくて Check されていない場合: Expression (pass_to_fem=True)
+            # GUI 画面と Femtet の定義に万一差があっても
+            # pass_to_fem が True なら上書きできる。
             # add_expression
             else:
+
                 command_object.update(
                     {'command': 'femopt.add_expression'}
                 )
-
-                args_object = dict()
 
                 # name
                 with nullcontext():

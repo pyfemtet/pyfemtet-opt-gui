@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>712</width>
-    <height>392</height>
+    <width>789</width>
+    <height>570</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,6 +15,9 @@
   </property>
   <property name="wizardStyle">
    <enum>QWizard::WizardStyle::ModernStyle</enum>
+  </property>
+  <property name="options">
+   <set>QWizard::WizardOption::HelpButtonOnRight|QWizard::WizardOption::NoCancelButtonOnLastPage</set>
   </property>
   <widget class="QWizardPage" name="wizardPage_init">
    <layout class="QGridLayout" name="gridLayout">
@@ -33,6 +36,12 @@
     </item>
     <item row="3" column="1">
      <widget class="QLabel" name="label_connectionState">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>40</height>
+       </size>
+      </property>
       <property name="accessibleName">
        <string/>
       </property>

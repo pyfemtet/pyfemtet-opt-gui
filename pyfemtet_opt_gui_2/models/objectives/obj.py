@@ -303,7 +303,7 @@ class ObjectiveTableItemModel(StandardItemModelWithHeader):
 
                 # index に対して minimize 又は maximize を入れる
                 parametric_output_indexes_use_as_objective.update(
-                    {parametric_output_index: direction}
+                    {parametric_output_index: f'"{direction}"'}
                 )
 
         return parametric_output_indexes_use_as_objective

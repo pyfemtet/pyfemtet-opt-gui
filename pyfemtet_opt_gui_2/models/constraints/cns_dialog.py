@@ -46,10 +46,11 @@ class ConstraintEditorDialog(QDialog):
             existing_constraint_name: str = None
     ):
         super().__init__(parent, f)
+        self.existing_constraint_name = existing_constraint_name
 
         self.setup_ui()
         self.setup_model()
-        self.setup_view(existing_constraint_name)
+        self.setup_view()
         self.setup_signal(load_femtet_fun)
 
     def setup_ui(self):
@@ -65,7 +66,7 @@ class ConstraintEditorDialog(QDialog):
         self.var_model = VariableItemModelForTableView(self)
         self.var_model.setSourceModel(self.original_var_model)
 
-    def setup_view(self, existing_constraint_name):
+    def setup_view(self):
         view = self.ui.tableView_prmsOnCns
         view.setModel(self.var_model)
         # view.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
@@ -79,8 +80,8 @@ class ConstraintEditorDialog(QDialog):
         )
 
         # constraint
-        if existing_constraint_name is not None:
-            cns: Constraint = self.constraints.get_constraint(name=existing_constraint_name)
+        if self.existing_constraint_name is not None:
+            cns: Constraint = self.constraints.get_constraint(name=self.existing_constraint_name)
 
             self.ui.lineEdit_name.setText(cns.name)
             if cns.lb is not None:
@@ -245,35 +246,41 @@ class ConstraintEditorDialog(QDialog):
         # ret_msg, a_msg = ReturnMsg.Error._test, ''
         # ret_msg, a_msg = ReturnMsg.Warn._test, ''
 
-        lb = self.ui.lineEdit_lb.text()
-        if lb != '':
-            try:
-                lb_value = float(lb)
-            except ValueError:
-                show_return_msg(ReturnMsg.Error.not_a_pure_number, parent=self, additional_message=': ' + lb)
-                return
-        else:
-            lb_value = None
+        # 上下限の設定がされているかどうか
+        with nullcontext():
+            lb = self.ui.lineEdit_lb.text()
+            if lb != '':
+                try:
+                    lb_value = float(lb)
+                except ValueError:
+                    show_return_msg(ReturnMsg.Error.not_a_pure_number, parent=self, additional_message=': ' + lb)
+                    return None
+            else:
+                lb_value = None
 
-        ub = self.ui.lineEdit_ub.text()
-        if ub != '':
-            try:
-                ub_value = float(ub)
-            except ValueError:
-                show_return_msg(ReturnMsg.Error.not_a_pure_number, parent=self, additional_message=': ' + ub)
-                return
-        else:
-            ub_value = None
+            ub = self.ui.lineEdit_ub.text()
+            if ub != '':
+                try:
+                    ub_value = float(ub)
+                except ValueError:
+                    show_return_msg(ReturnMsg.Error.not_a_pure_number, parent=self, additional_message=': ' + ub)
+                    return None
+            else:
+                ub_value = None
 
-
+        # Constraint オブジェクトを初期化
         constraint: Constraint = Constraint(self.original_var_model)
-        constraint.name = self.ui.lineEdit_name.text() if self.ui.lineEdit_name.text() != '' else self.constraints.get_unique_name()
-        constraint.expression = self.ui.plainTextEdit_cnsFormula.toPlainText()
-        constraint.lb = lb_value
-        constraint.ub = ub_value
+        with nullcontext():
+            constraint.name = self.ui.lineEdit_name.text() if self.ui.lineEdit_name.text() != '' else self.constraints.get_unique_name()
+            constraint.expression = self.ui.plainTextEdit_cnsFormula.toPlainText()
+            constraint.lb = lb_value
+            constraint.ub = ub_value
 
+        # 拘束式の設定として正しいかどうかを判定
         ret_msg, a_msg = constraint.finalize_check()
 
+        # 正しくなければ or 危ういならばダイアログを表示
+        # して処理を続行するかどうかを分岐
         if not can_continue(
             return_msg=ret_msg,
             parent=self,
@@ -283,7 +290,22 @@ class ConstraintEditorDialog(QDialog):
         ):
             return None
 
-        self.constraints.set_constraint(constraint)
+        # 1. 「編集」からダイアログに来ているが、
+        # 2. name が変更されており、
+        # 3. かつ新しい name が既存の ConstraintModel に
+        # 含まれる場合、名前が重複していますエラー
+        if self.existing_constraint_name is not None:  # 1.
+            if self.existing_constraint_name != constraint.name:  # 2.
+                if constraint.name in self.constraints.get_constraint_names():  # 3.
+                    can_continue(
+                        ReturnMsg.Error.duplicated_constraint_name,
+                        parent=self,
+                        additional_message=f'拘束式名: {constraint.name}',
+                    )
+                    return None
+
+        # ConstraintModel モデルに書き戻す
+        self.constraints.set_constraint(constraint, self.existing_constraint_name)
 
         super().accept()
 
