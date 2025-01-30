@@ -30,7 +30,7 @@ class PageSubTitles(enum.StrEnum):
 
 
 def get_html_title(sub_title: PageSubTitles):
-    return f'現在の項目: {[s for s in PageSubTitles].index(sub_title)}/{len(PageSubTitles)}'
+    return f'現在の項目: {[s for s in PageSubTitles].index(sub_title)}/{len(PageSubTitles) - 1}'
 
 
 def get_html_subtitle(sub_title: PageSubTitles):

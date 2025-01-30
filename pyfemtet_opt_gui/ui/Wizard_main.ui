@@ -17,7 +17,7 @@
    <enum>QWizard::WizardStyle::ModernStyle</enum>
   </property>
   <property name="options">
-   <set>QWizard::WizardOption::HelpButtonOnRight|QWizard::WizardOption::NoCancelButtonOnLastPage</set>
+   <set>QWizard::WizardOption::HaveNextButtonOnLastPage|QWizard::WizardOption::HelpButtonOnRight|QWizard::WizardOption::NoCancelButtonOnLastPage</set>
   </property>
   <property name="titleFormat">
    <enum>Qt::TextFormat::RichText</enum>

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'Wizard_mainbeavrO.ui'
+## Form generated from reading UI file 'Wizard_mainaqqwsQ.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.7.2
+## Created by: Qt User Interface Compiler version 6.8.1
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -25,7 +25,7 @@ class Ui_Wizard(object):
             Wizard.setObjectName(u"Wizard")
         Wizard.resize(789, 570)
         Wizard.setWizardStyle(QWizard.WizardStyle.ModernStyle)
-        Wizard.setOptions(QWizard.WizardOption.HelpButtonOnRight|QWizard.WizardOption.NoCancelButtonOnLastPage)
+        Wizard.setOptions(QWizard.WizardOption.HaveNextButtonOnLastPage|QWizard.WizardOption.HelpButtonOnRight|QWizard.WizardOption.NoCancelButtonOnLastPage)
         Wizard.setTitleFormat(Qt.TextFormat.RichText)
         Wizard.setSubTitleFormat(Qt.TextFormat.RichText)
         self.wizardPage_init = QWizardPage()
