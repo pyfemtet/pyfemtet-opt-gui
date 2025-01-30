@@ -40,8 +40,11 @@ class CommonItemColumnName(enum.StrEnum):
 # header data をつけるためのクラス
 class StandardItemModelWithHeader(StandardItemModelWithHeaderSearch):
     with_first_row = True  # True なら一行目を header と同じにする
+
     ColumnNames = CommonItemColumnName
     RowNames = None
+
+    column_name_display_map = dict()
 
     def __init__(self, parent=None, _with_dummy=True, with_first_row=True):
         super().__init__(parent)
@@ -61,11 +64,14 @@ class StandardItemModelWithHeader(StandardItemModelWithHeaderSearch):
 
             self.setColumnCount(len(HeaderNames))
             for c, name in enumerate(HeaderNames):
+
+                display_name = self.column_name_display_map[name] if name in self.column_name_display_map else name
+
                 # displayData
                 self.setHeaderData(
                     _section := c,
                     _orientation := Qt.Orientation.Horizontal,
-                    _value := name,
+                    _value := display_name,
                     _role := Qt.ItemDataRole.DisplayRole
                 )
                 # headerData
@@ -81,8 +87,9 @@ class StandardItemModelWithHeader(StandardItemModelWithHeaderSearch):
                 # likely to same as displayData
                 self.setRowCount(1)
                 for c, name in enumerate(HeaderNames):
+                    display_name = self.column_name_display_map[name] if name in self.column_name_display_map else name
                     item = QStandardItem()
-                    item.setText(name)
+                    item.setText(display_name)
                     self.setItem(0, c, item)
 
     def setup_vertical_header_data(self):

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'Wizard_mainmhgfdm.ui'
+## Form generated from reading UI file 'Wizard_mainYfAGFR.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.7.2
 ##
@@ -26,6 +26,8 @@ class Ui_Wizard(object):
         Wizard.resize(789, 570)
         Wizard.setWizardStyle(QWizard.WizardStyle.ModernStyle)
         Wizard.setOptions(QWizard.WizardOption.HelpButtonOnRight|QWizard.WizardOption.NoCancelButtonOnLastPage)
+        Wizard.setTitleFormat(Qt.TextFormat.RichText)
+        Wizard.setSubTitleFormat(Qt.TextFormat.RichText)
         self.wizardPage_init = QWizardPage()
         self.wizardPage_init.setObjectName(u"wizardPage_init")
         self.gridLayout = QGridLayout(self.wizardPage_init)
@@ -89,7 +91,7 @@ class Ui_Wizard(object):
     # setupUi
 
     def retranslateUi(self, Wizard):
-        Wizard.setWindowTitle(QCoreApplication.translate("Wizard", u"Wizard", None))
+        Wizard.setWindowTitle(QCoreApplication.translate("Wizard", u"pyfemtet.opt Script Builder", None))
 #if QT_CONFIG(accessibility)
         self.label_connectionState.setAccessibleName("")
 #endif // QT_CONFIG(accessibility)

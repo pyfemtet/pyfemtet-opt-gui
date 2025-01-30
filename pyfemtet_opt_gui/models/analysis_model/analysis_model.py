@@ -23,6 +23,7 @@ from pyfemtet_opt_gui.common.qt_util import *
 from pyfemtet_opt_gui.common.pyfemtet_model_bases import *
 from pyfemtet_opt_gui.common.return_msg import *
 from pyfemtet_opt_gui.common.expression_processor import *
+from pyfemtet_opt_gui.common.titles import *
 from pyfemtet_opt_gui.femtet.femtet import *
 
 # ===== model =====
@@ -43,6 +44,10 @@ def get_am_model_for_problem(parent) -> 'FemprjModelForProblem':
         _FEMPRJ_MODEL_FOR_PROBLEM = FemprjModelForProblem(parent)
         _FEMPRJ_MODEL_FOR_PROBLEM.setSourceModel(get_am_model(parent))
     return _FEMPRJ_MODEL_FOR_PROBLEM
+
+
+# ===== warning dialog =====
+_WARNED = False
 
 
 # original model
@@ -231,11 +236,13 @@ class FemprjModelForProblem(ProxyModelWithForProblem):
 
 
 # page
-class AnalysisModelWizardPage(QWizardPage):
+class AnalysisModelWizardPage(TitledWizardPage):
     ui: Ui_WizardPage
     source_model: FemprjModel
     proxy_model: StandardItemModelWithoutFirstRow
     column_resizer: ResizeColumn
+
+    page_name = PageSubTitles.analysis_model
 
     def __init__(self, parent=None, load_femtet_fun=None):
         super().__init__(parent)
@@ -277,9 +284,16 @@ class AnalysisModelWizardPage(QWizardPage):
         return self.source_model.is_valid()
 
     def validatePage(self):
+        """Next を押されたとき"""
+
+        # 再度モデルを確認する
         self.completeChanged.emit()
+
+        # モデルが valid
         if self.isComplete():
             return True
+
+        # モデルが invalid
         else:
             ret_msg = ReturnMsg.Error.femprj_or_model_inconsistent
             can_continue(ret_msg, parent=self)

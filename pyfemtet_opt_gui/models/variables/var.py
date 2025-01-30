@@ -23,7 +23,10 @@ from pyfemtet_opt_gui.common.qt_util import *
 from pyfemtet_opt_gui.common.pyfemtet_model_bases import *
 from pyfemtet_opt_gui.common.return_msg import *
 from pyfemtet_opt_gui.common.expression_processor import *
+from pyfemtet_opt_gui.common.titles import *
 from pyfemtet_opt_gui.femtet.femtet import *
+
+from pyfemtet_opt_gui.models.constraints.model import Constraint
 
 # ===== model =====
 _VAR_MODEL = None
@@ -50,7 +53,7 @@ def get_var_model_for_problem(parent, _with_dummy=None):
 
 # ===== constants =====
 class VariableColumnNames(enum.StrEnum):
-    use = CommonItemColumnName.use
+    use = CommonItemColumnName.use  # 基幹なので見た目を変更するときは column_name_display_map で
     name = '変数名'
     initial_value = '初期値 または\n文字式'
     lower_bound = '下限'
@@ -63,7 +66,106 @@ class VariableColumnNames(enum.StrEnum):
 # 個別ページに表示される TableView の Delegate
 class VariableTableViewDelegate(QStyledItemDelegate):
 
-    def setModelData(self, editor, model, index):
+    def get_expression(self, header_data_, model, index) -> Expression | None:
+        # get expression of initial_value
+        c_ = get_column_by_header_data(model, header_data_)
+        index_ = model.index(index.row(), c_)
+        expression_: Expression | None = model.data(index_, Qt.ItemDataRole.UserRole)
+        return expression_
+
+    def check_bounds(self, new_expression, header_data, model, index) -> tuple[ReturnMsg, str]:
+
+        # get current value
+        init: Expression = self.get_expression(VariableColumnNames.initial_value, model, index)
+        lb: Expression | None = self.get_expression(VariableColumnNames.lower_bound, model, index)
+        ub: Expression | None = self.get_expression(VariableColumnNames.upper_bound, model, index)
+        assert isinstance(init, Expression)
+
+        # overwrite it with the new user-input
+        with nullcontext():
+            if header_data == VariableColumnNames.initial_value:
+                init = new_expression
+                assert isinstance(init, Expression)
+
+            elif header_data == VariableColumnNames.lower_bound:
+                lb = new_expression
+
+            elif header_data == VariableColumnNames.upper_bound:
+                ub = new_expression
+
+            else:
+                raise NotImplementedError
+
+        # if lb and ub are None, check nothing
+        if lb is None and ub is None:
+            return ReturnMsg.no_message, None
+
+        # initialize Constraint
+        with nullcontext():
+            constraint: Constraint = Constraint(get_var_model(None))
+            constraint.expression = init.expr
+            constraint.lb = lb.value if lb is not None else None
+            constraint.ub = ub.value if ub is not None else None
+
+        return constraint.finalize_check()
+
+    def check_valid(self, text, header_data, model, index) -> tuple[ReturnMsg, Expression | None]:
+
+        new_expression: Expression | None = None
+
+        # Femtet に文字式が書いている場合は
+        # ub, lb は constraint 扱いなので
+        # None でもよい
+        expression = self.get_expression(VariableColumnNames.initial_value, model, index)
+        assert isinstance(expression, Expression)
+        if expression.is_expression():
+            if (
+                    header_data == VariableColumnNames.lower_bound
+                    or header_data == VariableColumnNames.upper_bound
+            ):
+                if text == '':
+                    return ReturnMsg.no_message, new_expression
+
+        # text をチェックする
+        try:
+            new_expression: Expression = Expression(text)
+
+        # Not a valid expression
+        except Exception:
+            ret_msg = ReturnMsg.Error.cannot_recognize_as_an_expression
+            return ret_msg, None
+
+        # Valid expression
+        if new_expression is not None:
+
+            #  but not a number
+            if not new_expression.is_number():
+
+                # if initial_value or test_value, it must be a number.
+                if (
+                        header_data == VariableColumnNames.initial_value
+                        or header_data == VariableColumnNames.test_value
+                ):
+                    ret_msg = ReturnMsg.Error.not_a_number
+
+                # lower_bound or upper_bound must be a number too,
+                # but it can be set later, so switch ret_msg.
+                elif (
+                        header_data == VariableColumnNames.lower_bound
+                        or header_data == VariableColumnNames.upper_bound
+                ):
+                    ret_msg = ReturnMsg.Error.not_a_number_expression_setting_is_enable_in_constraint
+
+                else:
+                    raise RuntimeError('Internal Error! Unexpected header_data in VariableTableDelegate.')
+
+                # show error dialog
+                return ret_msg, None
+
+        # check end
+        return ReturnMsg.no_message, new_expression
+
+    def setModelData(self, editor, model, index) -> None:
 
         # QLineEdit を使いたいので str を setText すること
 
@@ -76,38 +178,12 @@ class VariableTableViewDelegate(QStyledItemDelegate):
                 or header_data == VariableColumnNames.test_value
         ):
             editor: QLineEdit
-
-            def get_value(header_data_) -> float:
-                c_ = get_column_by_header_data(model, header_data_)
-                index_ = model.index(index.row(), c_)
-                data_: Expression = model.data(index_, Qt.ItemDataRole.UserRole)
-                return data_.value
-
-            # get current value
-            init: float = get_value(VariableColumnNames.initial_value)
-            lb: float = get_value(VariableColumnNames.lower_bound)
-            ub: float = get_value(VariableColumnNames.upper_bound)
-
-            # Validate to be an expression
             text = editor.text()
-            try:
-                new_expression: Expression = Expression(text)
 
-            # Not a valid expression
-            except Exception:
-                ret_msg = ReturnMsg.Error.cannot_recognize_as_an_expression
-                if not can_continue(ret_msg, parent=self.parent(), additional_message=text):
-                    return
-                else:
-                    raise RuntimeError('Internal Error!')
-
-            # Valid expression but not a number
-            if not new_expression.is_number():
-                ret_msg = ReturnMsg.Error.not_a_number
-                if not can_continue(ret_msg, parent=self.parent(), additional_message=text):
-                    return
-                else:
-                    raise RuntimeError('Internal Error!')
+            # check valid input or not
+            ret_msg, new_expression = self.check_valid(text, header_data, model, index)
+            if not can_continue(ret_msg, parent=self.parent(), additional_message=text):
+                return
 
             # if init or lb or ub, check bounds
             if (
@@ -115,36 +191,26 @@ class VariableTableViewDelegate(QStyledItemDelegate):
                     or header_data == VariableColumnNames.lower_bound
                     or header_data == VariableColumnNames.upper_bound
             ):
+                ret_msg, a_msg = self.check_bounds(new_expression, header_data, model, index)
+                if not can_continue(ret_msg, parent=self.parent(), additional_message=a_msg):
+                    return
 
-                # overwrite it with the new user-input
-                if header_data == VariableColumnNames.initial_value:
-                    init = new_expression.value
+            # if OK, update model
+            display = new_expression.expr if new_expression is not None else ''
+            model.setData(index, display, Qt.ItemDataRole.DisplayRole)
+            model.setData(index, new_expression, Qt.ItemDataRole.UserRole)
+            return
 
-                elif header_data == VariableColumnNames.lower_bound:
-                    lb = new_expression.value
-
-                elif header_data == VariableColumnNames.upper_bound:
-                    ub = new_expression.value
-
-                else:
-                    raise NotImplementedError
-
-                ret_msg, error_numbers = check_bounds(init, lb, ub)
-                if not can_continue(ret_msg, parent=self.parent(), additional_message=error_numbers):
-                    return  # cancel Editing
-
-            # finally, update the model.
-            with EditModel(model):
-                model.setData(index, new_expression.expr, Qt.ItemDataRole.DisplayRole)
-                model.setData(index, new_expression, Qt.ItemDataRole.UserRole)
-
-        else:
-            super().setModelData(editor, model, index)
+        return super().setModelData(editor, model, index)
 
 
 # 大元の ItemModel
 class VariableItemModel(StandardItemModelWithHeader):
     ColumnNames = VariableColumnNames
+
+    column_name_display_map = {
+        CommonItemColumnName.use: 'パラメータ\nとして使用'
+    }
 
     def _set_dummy_data(self, n_rows=None):
         rows = n_rows if n_rows is not None else 3
@@ -276,7 +342,7 @@ class VariableItemModel(StandardItemModelWithHeader):
                             item.setCheckState(Qt.CheckState.Checked)
                     else:
                         # disabled は行全体に適用するので flags() で定義
-                        pass
+                        item.setToolTip('式が文字式であるため選択できません。')
                     c = self.get_column_by_header_data(self.ColumnNames.use)
                     item.setEditable(False)
                     self.setItem(r, c, item)
@@ -296,6 +362,8 @@ class VariableItemModel(StandardItemModelWithHeader):
                     item = QStandardItem()
                     item.setText(expression.expr)
                     item.setData(expression, Qt.ItemDataRole.UserRole)
+                    if expression.is_expression():
+                        item.setToolTip('式が文字式であるため編集できません。')
                     self.setItem(r, c, item)
 
                 # ===== lb =====
@@ -466,14 +534,24 @@ class VariableItemModel(StandardItemModelWithHeader):
 
     def flags(self, index):
         r = index.row()
+        c = index.column()
 
-        # ===== 行全体 =====
-        # initial が expression なら disabled
+        # ===== 行全体を Un-selectable =====
+
+        # ただし lb、ub、note は除く
+        if (
+                c == self.get_column_by_header_data(self.ColumnNames.lower_bound)
+                or c == self.get_column_by_header_data(self.ColumnNames.upper_bound)
+                or c == self.get_column_by_header_data(self.ColumnNames.note)
+        ):
+            return super().flags(index)
+
+        # initial が expression なら enabled (not editable)
         c_initial_value = self.get_column_by_header_data(value=self.ColumnNames.initial_value)
         expression: Expression = self.item(r, c_initial_value).data(Qt.ItemDataRole.UserRole)
         if expression is not None:
             if expression.is_expression():
-                return ~Qt.ItemFlag.ItemIsEnabled
+                return Qt.ItemFlag.ItemIsEnabled
 
         return super().flags(index)
 
@@ -671,6 +749,85 @@ class VariableItemModel(StandardItemModelWithHeader):
         import json
         return json.dumps(out_object)
 
+    def output_expression_constraint_json(self) -> str:
+        """
+        femopt.add_constraint(
+            name='var_name',
+            fun=lambda opt_: opt['var_name'],  # output_json で add_expression しているのでこれで動作する
+            lower_bound=...,
+            upper_bound=...,
+            strict=True,
+            args=(opt,)
+        )
+        """
+
+        out_object = list()
+
+        for r in self.get_row_iterable():
+
+            # 必要な列の logicalIndex を取得
+            with nullcontext():
+
+                hd = self.ColumnNames.name
+                c_name = self.get_column_by_header_data(hd)
+
+                hd = self.ColumnNames.initial_value
+                c_initial_value = self.get_column_by_header_data(hd)
+
+                hd = self.ColumnNames.lower_bound
+                c_lb = self.get_column_by_header_data(hd)
+
+                hd = self.ColumnNames.upper_bound
+                c_ub = self.get_column_by_header_data(hd)
+
+            # 出力オブジェクトの準備
+            command_object = dict()
+            args_object = dict()
+
+            # item を取得
+            item_name = self.item(r, c_name)
+            item_expression = self.item(r, c_initial_value)
+            item_lb = self.item(r, c_lb)
+            item_ub = self.item(r, c_ub)
+
+            # item が expression でなければ無視
+            if not Expression(item_expression.text()).is_expression():
+                continue
+
+            # lb, ub
+            expression = item_lb.data(Qt.ItemDataRole.UserRole)
+            lb = expression.value if expression is not None else None
+            expression = item_ub.data(Qt.ItemDataRole.UserRole)
+            ub = expression.value if expression is not None else None
+
+            # ub, lb が None なら無視
+            if ub is None and lb is None:
+                continue
+
+            # command object の組立
+            args_object.update(
+                dict(
+                    name=f'"constraint_{item_name.text()}"',
+                    fun=f'lambda opt_: opt_["{item_name.text()}"]',
+                    lower_bound=lb,
+                    upper_bound=ub,
+                    strict=True,
+                    args=['femopt.opt']
+                )
+            )
+
+            command_object.update(
+                {
+                    'command': 'femopt.add_constraint',
+                    'args': args_object
+                }
+            )
+
+            out_object.append(command_object)
+
+        import json
+        return json.dumps(out_object)
+
 
 # 個別ページに表示される ItemModel
 class VariableItemModelForTableView(StandardItemModelWithoutFirstRow):
@@ -694,12 +851,14 @@ class QVariableItemModelForProblem(ProxyModelWithForProblem):
 
 
 # 個別ページ
-class VariableWizardPage(QWizardPage):
+class VariableWizardPage(TitledWizardPage):
     ui: Ui_WizardPage
     source_model: VariableItemModel
     proxy_model: VariableItemModelForTableView
     delegate: VariableTableViewDelegate
     column_resizer: ResizeColumn
+
+    page_name = PageSubTitles.var
 
     def __init__(self, parent=None, load_femtet_fun: callable = None):
         super().__init__(parent)

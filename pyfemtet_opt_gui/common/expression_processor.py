@@ -18,7 +18,7 @@ def get_valid_functions(expressions=None):
     }
 
 
-def check_bounds(value=None, lb=None, ub=None) -> tuple[ReturnMsg, str]:
+def check_bounds(value=None, lb=None, ub=None) -> tuple[ReturnMsg, str | None]:
     if value is None:
         if lb is None:
             return ReturnMsg.no_message, None

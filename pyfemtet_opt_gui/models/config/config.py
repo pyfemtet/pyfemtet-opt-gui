@@ -28,6 +28,7 @@ from pyfemtet_opt_gui.ui.ui_WizardPage_config import Ui_WizardPage
 from pyfemtet_opt_gui.common.qt_util import *
 from pyfemtet_opt_gui.common.pyfemtet_model_bases import *
 from pyfemtet_opt_gui.common.return_msg import *
+from pyfemtet_opt_gui.common.titles import *
 
 from pyfemtet_opt_gui.models.config.algorithm.base import (
     QAbstractAlgorithmItemModel,
@@ -790,8 +791,8 @@ class ConfigItemModel(StandardItemModelWithHeader):
 
                 # GUI が history_path にアクセスできるよう
                 # 自身に与えられるパスを持っておく
-                # これが呼ばれるときには chdir が動いているので
-                # 相対パスでも問題ないはず
+                # 現在の実装では run_script() の中で
+                # chdir しているので相対パスでも問題ない
                 self.history_path = history_path
 
                 # 引数
@@ -869,13 +870,15 @@ class ConfigItemModelForIndividualView(StandardItemModelWithoutFirstRow):
     pass
 
 
-class ConfigWizardPage(QWizardPage):
+class ConfigWizardPage(TitledWizardPage):
     ui: Ui_WizardPage
     source_model: ConfigItemModel
     proxy_model: ConfigItemModelForIndividualView
     delegate: QConfigTreeViewDelegate
     expand_keeper: ExpandStateKeeper
     column_resizer: ResizeColumn
+
+    page_name = PageSubTitles.cfg
 
     def __init__(self, parent=None):
         super().__init__(parent)

@@ -28,6 +28,7 @@ __all__ = [
     'apply_variables',
     'open_help',
     'get_name',
+    'save_femprj',
 ]
 
 
@@ -297,7 +298,7 @@ def open_help(partial_url):
     webbrowser.open(_get_help_url(partial_url))
 
 
-# ===== project name =====
+# ===== project handling =====
 def get_name() -> tuple[tuple[str, str] | None, ReturnMsg]:
 
     # check Femtet Connection
@@ -311,3 +312,29 @@ def get_name() -> tuple[tuple[str, str] | None, ReturnMsg]:
 
     # else, return them
     return (_Femtet.Project, _Femtet.AnalysisModelName), ReturnMsg.no_message
+
+
+def save_femprj() -> tuple[bool, tuple[ReturnMsg, str]]:
+    a_msg = ''
+
+    # check Femtet Connection
+    ret = get_connection_state()
+    if ret != ReturnMsg.no_message:
+        return False, (ret, a_msg)
+
+    (femprj_path, model_name), ret = get_name()
+    if ret != ReturnMsg.no_message:
+        return False, (ret, a_msg)
+
+    # SaveProject(ProjectFile As String, bForce As Boolean) As Boolean
+    succeeded = _Femtet.SaveProject(femprj_path, True)
+    if not succeeded:
+        ret = ReturnMsg.Error.femtet_save_failed
+        a_msg = 'Error message: '
+        try:
+            Femtet_.ShowLastError()
+        except Exception as e:
+            a_msg += ' '.join(e.args)
+        return False, (ret, a_msg)
+
+    return True, (ReturnMsg.no_message, a_msg)

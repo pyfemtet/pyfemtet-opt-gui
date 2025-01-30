@@ -13,17 +13,18 @@ from PySide6.QtGui import *
 # noinspection PyUnresolvedReferences
 from PySide6 import QtWidgets, QtCore, QtGui
 
-from pyfemtet_opt_gui.ui.ui_WizardPage_cns import Ui_WizardPage
-
 from pyfemtet_opt_gui.common.qt_util import *
 from pyfemtet_opt_gui.common.expression_processor import *
 from pyfemtet_opt_gui.common.pyfemtet_model_bases import *
 from pyfemtet_opt_gui.common.return_msg import *
-from pyfemtet_opt_gui.femtet.femtet import *
 
 import enum
-import sys
 from contextlib import nullcontext
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from pyfemtet_opt_gui.models.variables.var import VariableItemModel
 
 # ===== model singleton pattern =====
 _CNS_MODEL = None
@@ -53,19 +54,14 @@ class ConstraintColumnNames(enum.StrEnum):
 # ===== intermediate data =====
 
 class Constraint:
-    use: bool
-    name: str | None
-    expression: str | None
-    lb: float | None
-    ub: float | None
 
-    def __init__(self, var_model):
-        self.use = None
-        self.name = None
-        self.expression = None
-        self.lb = None
-        self.ub = None
-        self.var_model = var_model
+    def __init__(self, var_model: 'VariableItemModel'):
+        self.use: bool = None
+        self.name: str = None
+        self.expression: str = None
+        self.lb: float | None = None
+        self.ub: float | None = None
+        self.var_model: 'VariableItemModel' = var_model
 
     def finalize_check(self) -> tuple[ReturnMsg, str]:
         # 両方とも指定されていなければエラー

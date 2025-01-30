@@ -63,6 +63,11 @@ def create_cns_script():
     return create_from_model(model)
 
 
+def create_expr_cns_script():
+    model: VariableItemModel = get_var_model(None)
+    return create_from_model(model, 'output_expression_constraint_json')
+
+
 def create_optimize_script():
     model: ConfigItemModel = get_config_model(None)
     return create_from_model(model)
@@ -100,6 +105,8 @@ def create_script(path=None):
     code += create_var_script()
     code += '\n'
     code += create_cns_script()
+    code += '\n'
+    code += create_expr_cns_script()
     code += '\n'
     code += create_optimize_script()
     code += '\n\n'

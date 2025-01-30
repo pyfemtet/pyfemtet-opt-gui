@@ -24,9 +24,6 @@ from pyfemtet_opt_gui.femtet.femtet import *
 from pyfemtet_opt_gui.models.variables.var import get_var_model, VariableItemModelForTableView, VariableItemModel, VariableTableViewDelegate
 from pyfemtet_opt_gui.models.constraints.model import get_cns_model, ConstraintModel, Constraint
 
-
-import enum
-import sys
 from contextlib import nullcontext
 
 
@@ -269,8 +266,8 @@ class ConstraintEditorDialog(QDialog):
                 ub_value = None
 
         # Constraint オブジェクトを初期化
-        constraint: Constraint = Constraint(self.original_var_model)
         with nullcontext():
+            constraint: Constraint = Constraint(self.original_var_model)
             constraint.name = self.ui.lineEdit_name.text() if self.ui.lineEdit_name.text() != '' else self.constraints.get_unique_name()
             constraint.expression = self.ui.plainTextEdit_cnsFormula.toPlainText()
             constraint.lb = lb_value
@@ -282,11 +279,9 @@ class ConstraintEditorDialog(QDialog):
         # 正しくなければ or 危ういならばダイアログを表示
         # して処理を続行するかどうかを分岐
         if not can_continue(
-            return_msg=ret_msg,
-            parent=self,
-            with_cancel_button='auto',
-            additional_message=a_msg,
-            no_dialog_if_info=False,
+                return_msg=ret_msg,
+                parent=self,
+                additional_message=a_msg,
         ):
             return None
 

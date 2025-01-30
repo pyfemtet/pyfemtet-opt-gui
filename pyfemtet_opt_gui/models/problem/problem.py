@@ -14,6 +14,8 @@ from pyfemtet_opt_gui.ui.ui_WizardPage_confirm import Ui_WizardPage
 from pyfemtet_opt_gui.common.qt_util import *
 from pyfemtet_opt_gui.common.pyfemtet_model_bases import *
 from pyfemtet_opt_gui.common.return_msg import *
+from pyfemtet_opt_gui.common.titles import *
+from pyfemtet_opt_gui.femtet.femtet import *
 
 from pyfemtet_opt_gui.models.analysis_model.analysis_model import get_am_model_for_problem
 from pyfemtet_opt_gui.models.variables.var import get_var_model_for_problem
@@ -33,6 +35,8 @@ import pyfemtet
 
 SUB_MODELS = None
 PROBLEM_MODEL = None
+
+_REMOVING_SWEEP_WARNED = False  # スイープテーブル削除の警告
 
 
 # ===== rules =====
@@ -91,12 +95,14 @@ class QProblemItemModelWithoutUseUnchecked(QSortFilterProxyModelOfStandardItemMo
     pass
 
 
-class ConfirmWizardPage(QWizardPage):
+class ConfirmWizardPage(TitledWizardPage):
     ui: Ui_WizardPage
     source_model: ProblemTableItemModel
     proxy_model: QProblemItemModelWithoutUseUnchecked
     column_resizer: ResizeColumn
     worker: OptimizationWorker
+
+    page_name = PageSubTitles.confirm
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -170,38 +176,59 @@ class ConfirmWizardPage(QWizardPage):
             self.run_script(path)
 
     def run_script(self, path):
+        global _REMOVING_SWEEP_WARNED
+
+        # 未了解ならスイープテーブル削除の警告を行う
+        if not _REMOVING_SWEEP_WARNED:
+            # TODO: 永続化する
+            if can_continue(
+                    ReturnMsg.Warn.notify_to_sweep_table_remove,
+                    parent=self,
+            ):
+                # 了解したものとして起動中今後は警告しない
+                _REMOVING_SWEEP_WARNED = True
+
+            else:
+                # 了解を得られなかったので実行しない
+                return
+
+        save_femprj()
+
         self.worker = OptimizationWorker(self.parent(), path)
-        self.worker.started.connect(lambda: self.switch_button(True))
-        self.worker.finished.connect(lambda: self.switch_button(False))
+        self.worker.started.connect(lambda: self.switch_save_script_button(True))
+        self.worker.finished.connect(lambda: self.switch_save_script_button(False))
         self.worker.start()
 
-    def switch_button(self, running: bool):
+    def switch_save_script_button(self, running: bool):
         # worker が実行ならば button を disabled にするなど
         button = self.ui.pushButton_save_script
 
-        if Version(pyfemtet.__version__) >= Version("0.8.5"):
-            if running:
+        if running:
+            # version 0.8.6 以降、この GUI 経由で最適化を停止できる
+            if Version(pyfemtet.__version__) >= Version("0.8.5"):
                 button.clicked.disconnect(self.save_script)
                 button.clicked.connect(self.stop_optimization)
                 button.setText('現在の解析を最後にして最適化を停止する')
+
             else:
-                # 元に戻す
+                button.setText('最適化の実行中はスクリプトを保存できません')
+
+            button.setDisabled(True)
+
+        else:
+            if Version(pyfemtet.__version__) >= Version("0.8.5"):
+                # signal を元に戻す
                 button.clicked.disconnect(self.stop_optimization)
                 button.clicked.connect(self.save_script)
-                button.setText(button.accessibleName())
 
-                # history_path の情報を model から消す（初期化）
+                # output_json で set したhistory_path の
+                # 情報を model から消す（初期化）
                 model = get_config_model_for_problem(self)
                 model.reset_history_path()
 
-        else:
-            if running:
-                button.setText('最適化の実行中はスクリプトを保存できません')
-                button.setDisabled(True)
-            else:
-                # 元に戻す
-                button.setText(button.accessibleName())
-                button.setDisabled(False)
+            # 元に戻す
+            button.setText(button.accessibleName())
+            button.setDisabled(False)
 
     def stop_optimization(self):
         # port record が存在するかチェックする
@@ -236,6 +263,16 @@ class ConfirmWizardPage(QWizardPage):
             # print("Failed to connect server.")
             ret_msg = ReturnMsg.Error.failed_to_connect_process_monitor
             show_return_msg(ret_msg, parent=self)
+
+    def validatePage(self) -> bool:
+
+        if self.worker.isRunning():
+            ret_msg = ReturnMsg.Error.cannot_finish_during_optimization
+
+        else:
+            ret_msg = ReturnMsg.Warn.confirm_finish
+
+        return can_continue(ret_msg, parent=self)
 
 
 if __name__ == '__main__':

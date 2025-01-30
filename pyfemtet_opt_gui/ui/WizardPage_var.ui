@@ -55,6 +55,9 @@
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&amp;lt;用語の説明&amp;gt;&lt;/p&gt;&lt;p&gt;「変数」...Femtet 解析モデルで定義されている変数です。 (例：&amp;quot;coil_height&amp;quot;)&lt;/p&gt;&lt;p&gt;「パラメータ」...「変数」のうち、最適化の際に値を変更するものです。&lt;/p&gt;&lt;p&gt;「式」...「変数」の値を決めるための数式です。Femtet のプロジェクトツリーに表示されているものです。 (例: &amp;quot;coil_pitch * n * 3&amp;quot;, &amp;quot;1 * 2&amp;quot;)&lt;/p&gt;&lt;p&gt;「文字式」...「変数」の「式」のうち、他の「変数」を参照しているものです。 (例: &amp;quot;coil_pitch * n * 3&amp;quot;)&lt;/p&gt;&lt;p&gt;「数式」...「変数」の「式」のうち「文字式」以外のもの、つまり数字のみで定義されている「式」です。 (例: &amp;quot;1 * 2&amp;quot;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
      <property name="sizeAdjustPolicy">
       <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents</enum>
      </property>

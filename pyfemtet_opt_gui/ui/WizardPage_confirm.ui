@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>539</width>
+    <height>412</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -49,16 +49,6 @@ li.checked::marker { content: &quot;\2612&quot;; }
      </property>
     </widget>
    </item>
-   <item row="2" column="0">
-    <widget class="QPushButton" name="pushButton_save_script">
-     <property name="accessibleName">
-      <string>スクリプトを保存する</string>
-     </property>
-     <property name="text">
-      <string>スクリプトを保存する</string>
-     </property>
-    </widget>
-   </item>
    <item row="2" column="1">
     <widget class="QCheckBox" name="checkBox_save_with_run">
      <property name="sizePolicy">
@@ -69,6 +59,19 @@ li.checked::marker { content: &quot;\2612&quot;; }
      </property>
      <property name="text">
       <string>スクリプトの保存後、すぐ実行する</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QPushButton" name="pushButton_save_script">
+     <property name="accessibleName">
+      <string>スクリプトを保存する</string>
+     </property>
+     <property name="text">
+      <string>スクリプトを保存する</string>
      </property>
     </widget>
    </item>

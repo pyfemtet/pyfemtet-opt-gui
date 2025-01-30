@@ -39,6 +39,11 @@ class ReturnMsg:
         no_params_selected = '少なくともひとつの変数を選択してください。'
         no_objs_selected = '少なくともひとつの目的関数を選択してください。'
         no_finish_conditions = '最適化の終了条件が指定されていません。この場合、手動で最適化を停止するまで計算を続けます。よろしいですか？'
+        notify_to_sweep_table_remove = ('最適化実施時、対象の解析モデルからはパラメトリック解析のスイープテーブルが削除されます。\n'
+                                        '必要な場合、femprj ファイルのコピーを保存してから実行してください。\n'
+                                        'ただし、Femtet 上で「別名として保存」は行わないでください。')
+        confirm_finish = '最適化スクリプト作成・実行を終了しますか？'
+
 
     class Error(enum.StrEnum):
         _test = 'This is a test Error message.'
@@ -52,11 +57,13 @@ class ReturnMsg:
         cannot_open_sample_femprj = 'サンプルファイルのオープンに失敗しました'
         femtet_macro_failed = 'Femtet マクロの実行に失敗しました。'
         femprj_or_model_inconsistent = 'Femtet で開かれている解析モデルが上記のモデルと一致しません。Femtet で開かれているモデルを確認し、「Load」ボタンを押してください。'
+        femtet_save_failed = 'femprj ファイルの保存に失敗しました。'
 
         # expressions
         cannot_recognize_as_an_expression = '文字式の認識に失敗しました。'
         not_a_number = '数値または数式の認識に失敗しました。'
-        not_a_pure_number = '数値または数式の認識に失敗しました。'
+        not_a_number_expression_setting_is_enable_in_constraint = '数値が入力されていません。計算式を設定したい場合、「拘束式の設定」ページで設定してください。。'
+        not_a_pure_number = '数値を入力してください。'
         evaluated_expression_not_float = '式が計算できないか、計算結果に実数以外の数が含まれています'  # 句読点なし
         inconsistent_lb_ub = '上下限の大小関係が正しくありません。'
         inconsistent_value_ub = '値と上限の大小関係が正しくありません。'
@@ -79,6 +86,7 @@ class ReturnMsg:
         failed_to_connect_process_monitor = ('プロセスモニターのポートが見つかりませんでした。最適化が開始されていないか、ポート情報が間違っている可能性があります。\n'
                                              '最適化を中断する場合は、ブラウザでプロセスモニターにアクセス（既定は「http://localhost:8080」）して'
                                              '中断ボタンを押してください。')
+        cannot_finish_during_optimization = '最適化の実行中は終了できません。先に最適化を終了してください。'
 
 
 # ReturnMsg を受け取ってダイアログ表示し

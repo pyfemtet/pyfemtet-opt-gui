@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'WizardPage_varJQMuhS.ui'
+## Form generated from reading UI file 'WizardPage_varpqLAqA.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.8.1
+## Created by: Qt User Interface Compiler version 6.7.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -73,6 +73,10 @@ class Ui_WizardPage(object):
         WizardPage.setWindowTitle(QCoreApplication.translate("WizardPage", u"WizardPage", None))
         self.pushButton_load_prm.setText(QCoreApplication.translate("WizardPage", u"[F\u27a1] Load", None))
         self.pushButton_test_prm.setText(QCoreApplication.translate("WizardPage", u"[\u27a1F] Test", None))
+#if QT_CONFIG(tooltip)
+        self.textEdit.setToolTip(QCoreApplication.translate("WizardPage", u"<html><head/><body><p>&lt;\u7528\u8a9e\u306e\u8aac\u660e&gt;</p><p>\u300c\u5909\u6570\u300d...Femtet \u89e3\u6790\u30e2\u30c7\u30eb\u3067\u5b9a\u7fa9\u3055\u308c\u3066\u3044\u308b\u5909\u6570\u3067\u3059\u3002 (\u4f8b\uff1a&quot;coil_height&quot;)</p><p>\u300c\u30d1\u30e9\u30e1\u30fc\u30bf\u300d...\u300c\u5909\u6570\u300d\u306e\u3046\u3061\u3001\u6700\u9069\u5316\u306e\u969b\u306b\u5024\u3092\u5909\u66f4\u3059\u308b\u3082\u306e\u3067\u3059\u3002</p><p>\u300c\u5f0f\u300d...\u300c\u5909\u6570\u300d\u306e\u5024\u3092\u6c7a\u3081\u308b\u305f\u3081\u306e\u6570\u5f0f\u3067\u3059\u3002Femtet \u306e\u30d7\u30ed\u30b8\u30a7\u30af\u30c8\u30c4\u30ea\u30fc\u306b\u8868\u793a\u3055\u308c\u3066\u3044\u308b\u3082\u306e\u3067\u3059\u3002 (\u4f8b: &quot;coil_pitch * n * 3&quot;, &quot;1 * 2&quot;)</p><p>\u300c\u6587\u5b57\u5f0f\u300d...\u300c\u5909\u6570\u300d\u306e\u300c\u5f0f\u300d\u306e\u3046\u3061\u3001\u4ed6\u306e\u300c\u5909\u6570\u300d\u3092\u53c2\u7167\u3057\u3066\u3044\u308b\u3082\u306e\u3067\u3059\u3002 (\u4f8b: &quot"
+                        ";coil_pitch * n * 3&quot;)</p><p>\u300c\u6570\u5f0f\u300d...\u300c\u5909\u6570\u300d\u306e\u300c\u5f0f\u300d\u306e\u3046\u3061\u300c\u6587\u5b57\u5f0f\u300d\u4ee5\u5916\u306e\u3082\u306e\u3001\u3064\u307e\u308a\u6570\u5b57\u306e\u307f\u3067\u5b9a\u7fa9\u3055\u308c\u3066\u3044\u308b\u300c\u5f0f\u300d\u3067\u3059\u3002 (\u4f8b: &quot;1 * 2&quot;)</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
         self.textEdit.setMarkdown(QCoreApplication.translate("WizardPage", u"\u6700\u9069\u5316\u306e\u969b\u306b\u8abf\u6574\u3059\u308b\u30d1\u30e9\u30e1\u30fc\u30bf\u3092\u9078\u629e\u3057\u3001\u521d\u671f\u5024\u3001\u4e0b\u9650\u3001\u4e0a\u9650\u3092\u8a2d\u5b9a\u30fb\u78ba\u8a8d\u3057\u3066\u304f\u3060\u3055\u3044\u3002\n"
 "\n"
 "Femtet \u3067\u5909\u6570\u3084\u5f0f\u306e\u8a2d\u5b9a\u3092\u5909\u66f4\u3057\u305f\u5834\u5408\u306f\u300cLoad\u300d\u30dc\u30bf\u30f3\u3092\u62bc\u3057\u3066\u304f\u3060\u3055\u3044\u3002\n"

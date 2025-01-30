@@ -18,6 +18,7 @@ from pyfemtet_opt_gui.ui.ui_WizardPage_cns import Ui_WizardPage
 from pyfemtet_opt_gui.common.qt_util import *
 from pyfemtet_opt_gui.common.pyfemtet_model_bases import *
 from pyfemtet_opt_gui.common.return_msg import *
+from pyfemtet_opt_gui.common.titles import *
 from pyfemtet_opt_gui.femtet.femtet import *
 
 from pyfemtet_opt_gui.models.constraints.model import get_cns_model, ConstraintModel
@@ -45,12 +46,14 @@ class ConstraintModelWithoutFirstRow(StandardItemModelWithoutFirstRow):
 
 
 # UI
-class ConstraintWizardPage(QWizardPage):
+class ConstraintWizardPage(TitledWizardPage):
     ui: Ui_WizardPage
     source_model: ConstraintModel
     proxy_model: ConstraintModelWithoutFirstRow
     column_resizer: ResizeColumn
     view: QTableView
+
+    page_name = PageSubTitles.cns
 
     def __init__(self, parent=None, load_femtet_fun=None):
         super().__init__(parent)

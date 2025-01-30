@@ -22,6 +22,7 @@ from pyfemtet_opt_gui.ui.ui_WizardPage_obj import Ui_WizardPage_obj
 from pyfemtet_opt_gui.common.qt_util import *
 from pyfemtet_opt_gui.common.pyfemtet_model_bases import *
 from pyfemtet_opt_gui.common.return_msg import *
+from pyfemtet_opt_gui.common.titles import *
 from pyfemtet_opt_gui.femtet.femtet import *
 
 # ===== model =====
@@ -327,12 +328,14 @@ class ObjectiveItemModelWithoutFirstRow(StandardItemModelWithoutFirstRow):
     pass
 
 
-class ObjectiveWizardPage(QWizardPage):
+class ObjectiveWizardPage(TitledWizardPage):
     ui: Ui_WizardPage_obj
     source_model: ObjectiveTableItemModel
     proxy_model: ObjectiveItemModelWithoutFirstRow
     delegate: ObjectiveItemDelegate
     column_resizer: ResizeColumn
+
+    page_name = PageSubTitles.obj
 
     def __init__(self, parent=None, load_femtet_fun: callable = None):
         super().__init__(parent)
