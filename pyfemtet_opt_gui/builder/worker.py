@@ -1,3 +1,6 @@
+import os
+from time import sleep, time
+
 # noinspection PyUnresolvedReferences
 from PySide6 import QtWidgets, QtCore, QtGui
 
@@ -13,11 +16,27 @@ from PySide6.QtWidgets import *
 from traceback import print_exception
 
 
-# noinspection PyAttributeOutsideInit
-class OptimizationWorker(QThread):
+class HistoryFinder(QThread):
 
-    def __init__(self, parent, script_path):
+    def __init__(self, parent, history_path):
+        assert isinstance(parent, OptimizationWorker)
         super().__init__(parent)
+        self.path = history_path
+
+    def run(self):
+        # history_path を UI に通知するついでに
+        # 起動までのカウントアップを行う、
+        s = time()
+        while not os.path.exists(self.path):
+            sleep(1)
+            print(f'立上げからの経過時間: {int(time()-s)} 秒')
+        print(f'最適化が開始されます。')
+
+
+class OptimizationWorker(QThread):
+    path: str
+
+    def set_path(self, script_path):
         self.path = script_path
 
     def run(self):  # Override the run method to execute your long-time function

@@ -25,7 +25,7 @@ from pyfemtet_opt_gui.models.config.config import get_config_model_for_problem
 
 from pyfemtet_opt_gui.builder.main import create_script
 from pyfemtet_opt_gui.builder.file_dialog import ScriptBuilderFileDialog
-from pyfemtet_opt_gui.builder.worker import OptimizationWorker
+from pyfemtet_opt_gui.builder.worker import OptimizationWorker, HistoryFinder
 
 import requests
 from requests.exceptions import ConnectionError
@@ -101,11 +101,13 @@ class ConfirmWizardPage(TitledWizardPage):
     proxy_model: QProblemItemModelWithoutUseUnchecked
     column_resizer: ResizeColumn
     worker: OptimizationWorker
+    history_finder: HistoryFinder
 
     page_name = PageSubTitles.confirm
 
     def __init__(self, parent=None):
         super().__init__(parent)
+        self.worker = OptimizationWorker(self.parent())
         self.setup_ui()
         self.setup_model()
         self.setup_view()
@@ -194,10 +196,19 @@ class ConfirmWizardPage(TitledWizardPage):
 
         save_femprj()
 
-        self.worker = OptimizationWorker(self.parent(), path)
+        self.worker.set_path(path)
         self.worker.started.connect(lambda: self.switch_save_script_button(True))
         self.worker.finished.connect(lambda: self.switch_save_script_button(False))
+        self.worker.started.connect(lambda: self.switch_explanation_text('started'))
+        self.worker.finished.connect(lambda: self.switch_explanation_text('finished'))
         self.worker.start()
+
+        proxy_model = get_config_model_for_problem(self)
+        history_path = proxy_model.get_history_path()
+        assert history_path is not None
+        self.history_finder = HistoryFinder(self.worker, history_path)
+        self.history_finder.finished.connect(lambda: self.switch_explanation_text('history found'))
+        self.history_finder.start()
 
     def switch_save_script_button(self, running: bool):
         # worker が実行ならば button を disabled にするなど
@@ -229,6 +240,65 @@ class ConfirmWizardPage(TitledWizardPage):
             # 元に戻す
             button.setText(button.accessibleName())
             button.setDisabled(False)
+
+    def switch_explanation_text(self, state: str):
+        # worker が実行ならば button を disabled にするなど
+        text_edit: QTextBrowser = self.ui.textBrowser
+
+        if state == 'started':
+            buff = text_edit.toHtml()
+            text_edit._buff = buff
+            text_edit.setText('開始しています。1 分程度お待ちください。\n'
+                              '最適化が始まるとプロセスモニターを起動します。\n'
+                              '最適化の確認・中断はプロセスモニターから行います。')
+
+        elif state == 'history found':
+
+            # version 0.8.6 以降、host 情報にアクセスできる
+            proxy_model = get_config_model_for_problem(self)
+            data, ret_msg = proxy_model.get_monitor_host_info()
+
+
+            text = (f'\nブラウザで上の URL にアクセスすると'
+                    f'プロセスモニターを開くことができます。')
+
+            if ret_msg == ReturnMsg.no_message:
+                url = f'http://{data["host"]}:{data["port"]}'
+
+            else:
+                from pyfemtet.opt.visualization._process_monitor.application import ProcessMonitorApplication
+                port = ProcessMonitorApplication.DEFAULT_PORT
+                # port = 8080
+                url = f'http://localhost:{port}'
+                text = text + '※ pyfemtet のバージョンが古いのでデフォルトのポート値を取得しています。\n'
+
+            text += (f'最適化が停止したらコンソール画面で「Enter」を押してください。\n'
+                     f'それまでの間はモニターを停止しないので分析作業を行うことができます。')
+
+            text_edit.setText(text)
+
+            # setText の後に cursor は始点にある？
+            text_edit.insertHtml(
+                f'<p style='
+                f'" margin-top:0px;'
+                f' margin-bottom:0px;'
+                f' margin-left:0px;'
+                f' margin-right:0px;'
+                f' -qt-block-indent:0;'
+                f' text-indent:0px;">'
+                f'<a href="{url}">'
+                f'<span style="'
+                f' text-decoration: underline;'
+                f' color:#c7bba5;">'
+                f'{url}</span></a></p></body></html>'
+            )
+
+        elif state == 'finished':
+            # 元に戻す
+            text_edit.setHtml(text_edit._buff)
+
+        else:
+            raise NotImplementedError
 
     def stop_optimization(self):
         # port record が存在するかチェックする

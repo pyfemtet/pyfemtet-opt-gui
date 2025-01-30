@@ -829,6 +829,11 @@ class QConfigItemModelForProblem(QSortFilterProxyModelOfStandardItemModel):
 
         return True
 
+    def get_history_path(self) -> str | None:
+        model = self.sourceModel()
+        assert isinstance(model, ConfigItemModel)
+        return model.history_path
+
     def reset_history_path(self):
         model = self.sourceModel()
         assert isinstance(model, ConfigItemModel)
