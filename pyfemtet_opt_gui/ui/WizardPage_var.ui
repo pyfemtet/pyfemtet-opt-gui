@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>WizardPage</class>
+ <widget class="QWizardPage" name="WizardPage">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>634</width>
+    <height>319</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>WizardPage</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QPushButton" name="pushButton_load_prm">
+     <property name="text">
+      <string>Load</string>
+     </property>
+     <property name="icon">
+      <iconset theme="QIcon::ThemeIcon::GoDown"/>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QTableView" name="tableView">
+     <property name="editTriggers">
+      <set>QAbstractItemView::EditTrigger::AnyKeyPressed|QAbstractItemView::EditTrigger::DoubleClicked|QAbstractItemView::EditTrigger::EditKeyPressed</set>
+     </property>
+     <property name="horizontalScrollMode">
+      <enum>QAbstractItemView::ScrollMode::ScrollPerPixel</enum>
+     </property>
+     <attribute name="horizontalHeaderCascadingSectionResizes">
+      <bool>true</bool>
+     </attribute>
+     <attribute name="horizontalHeaderStretchLastSection">
+      <bool>true</bool>
+     </attribute>
+     <attribute name="verticalHeaderVisible">
+      <bool>false</bool>
+     </attribute>
+    </widget>
+   </item>
+   <item row="0" column="2">
+    <widget class="QPushButton" name="pushButton_test_prm">
+     <property name="text">
+      <string>Test</string>
+     </property>
+     <property name="icon">
+      <iconset theme="QIcon::ThemeIcon::GoUp"/>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="3">
+    <widget class="QTextEdit" name="textEdit">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&amp;lt;用語の説明&amp;gt;&lt;/p&gt;&lt;p&gt;「変数」...Femtet 解析モデルで定義されている変数です。 (例：&amp;quot;coil_height&amp;quot;)&lt;/p&gt;&lt;p&gt;「パラメータ」...「変数」のうち、最適化の際に値を変更するものです。&lt;/p&gt;&lt;p&gt;「式」...「変数」の値を決めるための数式です。Femtet のプロジェクトツリーに表示されているものです。 (例: &amp;quot;coil_pitch * n * 3&amp;quot;, &amp;quot;1 * 2&amp;quot;)&lt;/p&gt;&lt;p&gt;「文字式」...「変数」の「式」のうち、他の「変数」を参照しているものです。 (例: &amp;quot;coil_pitch * n * 3&amp;quot;)&lt;/p&gt;&lt;p&gt;「数式」...「変数」の「式」のうち「文字式」以外のもの、つまり数字のみで定義されている「式」です。 (例: &amp;quot;1 * 2&amp;quot;)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+     <property name="sizeAdjustPolicy">
+      <enum>QAbstractScrollArea::SizeAdjustPolicy::AdjustToContents</enum>
+     </property>
+     <property name="readOnly">
+      <bool>true</bool>
+     </property>
+     <property name="markdown">
+      <string>最適化の際に調整するパラメータを選択し、初期値、下限、上限を設定・確認してください。
+
+Femtet で変数や式の設定を変更した場合は「Load」ボタンを押してください。
+
+「Test」 ボタンを押すと Femtet に「テスト値」列の値を転送し、その値でのモデルの状態を確認することができます。
+
+</string>
+     </property>
+     <property name="html">
+      <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;meta charset=&quot;utf-8&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+hr { height: 1px; border-width: 0; }
+li.unchecked::marker { content: &quot;\2610&quot;; }
+li.checked::marker { content: &quot;\2612&quot;; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Yu Gothic UI'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:6px; margin-bottom:6px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;最適化の際に調整するパラメータを選択し、初期値、下限、上限を設定・確認してください。&lt;/p&gt;
+&lt;p style=&quot; margin-top:6px; margin-bottom:6px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Femtet で変数や式の設定を変更した場合は「Load」ボタンを押してください。&lt;/p&gt;
+&lt;p style=&quot; margin-top:6px; margin-bottom:6px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;「Test」 ボタンを押すと Femtet に「テスト値」列の値を転送し、その値でのモデルの状態を確認することができます。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="0" colspan="3">
+    <widget class="QCommandLinkButton" name="commandLinkButton">
+     <property name="text">
+      <string>変数 の使い方を確認する（インターネットリンク）</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
