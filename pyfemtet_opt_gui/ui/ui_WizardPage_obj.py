@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'WizardPage_objuJcTCY.ui'
+## Form generated from reading UI file 'WizardPage_objftUTKX.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.7.2
 ##
@@ -28,6 +28,8 @@ class Ui_WizardPage_obj(object):
         self.gridLayout.setObjectName(u"gridLayout")
         self.pushButton = QPushButton(WizardPage_obj)
         self.pushButton.setObjectName(u"pushButton")
+        icon = QIcon(QIcon.fromTheme(QIcon.ThemeIcon.GoDown))
+        self.pushButton.setIcon(icon)
 
         self.gridLayout.addWidget(self.pushButton, 0, 0, 1, 1)
 
@@ -67,7 +69,7 @@ class Ui_WizardPage_obj(object):
 
     def retranslateUi(self, WizardPage_obj):
         WizardPage_obj.setWindowTitle(QCoreApplication.translate("WizardPage_obj", u"WizardPage", None))
-        self.pushButton.setText(QCoreApplication.translate("WizardPage_obj", u"[F\u27a1] Load", None))
+        self.pushButton.setText(QCoreApplication.translate("WizardPage_obj", u"Load", None))
 #if QT_CONFIG(tooltip)
         self.textEdit.setToolTip("")
 #endif // QT_CONFIG(tooltip)
@@ -81,10 +83,10 @@ class Ui_WizardPage_obj(object):
 "li.unchecked::marker { content: \"\\2610\"; }\n"
 "li.checked::marker { content: \"\\2612\"; }\n"
 "</style></head><body style=\" font-family:'Yu Gothic UI'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">\u6700\u9069\u5316\u3059\u308b\u76ee\u7684\u95a2\u6570\u3092\u9078\u3093\u3067\u304f\u3060\u3055\u3044\u3002</p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">\u203b Femtet \u306e\u30d1\u30e9\u30e1\u30c8\u30ea\u30c3\u30af\u89e3\u6790\u30c0\u30a4\u30a2\u30ed\u30b0\u3067\u76ee\u7684\u95a2\u6570\u3092\u5b9a\u7fa9\u3057\u3066"
-                        "\u304f\u3060\u3055\u3044\u3002</p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">\u203b <span style=\" font-weight:700;\">\u6700\u9069\u5316\u5b9f\u884c\u524d\u306b\u65e2\u5b58\u306e\u30b9\u30a4\u30fc\u30d7\u30c6\u30fc\u30d6\u30eb\u3092\u524a\u9664\u3057\u3066\u304f\u3060\u3055\u3044\u3002</span></p></body></html>", None))
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">\u6700\u9069\u5316\u3059\u308b\u76ee\u7684\u95a2\u6570\u3092\u9078\u629e\u3057\u3001\u305d\u306e\u6700\u9069\u5316\u76ee\u6a19\u3092\u8a2d\u5b9a\u3057\u3066\u304f\u3060\u3055\u3044\u3002</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">\u203b Femtet \u306e\u30d1\u30e9\u30e1\u30c8\u30ea\u30c3\u30af\u89e3\u6790\u30c0\u30a4"
+                        "\u30a2\u30ed\u30b0\u306e\u7d50\u679c\u51fa\u529b\u30bf\u30d6\u3067\u8a2d\u5b9a\u3057\u305f\u5185\u5bb9\u304c\u53cd\u6620\u3055\u308c\u307e\u3059\u3002</p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">\u203b <span style=\" font-weight:700;\">\u30d9\u30af\u30c8\u30eb\u53c8\u306f\u8907\u7d20\u6570\u306e\u7d50\u679c\u306f\u3001\u7b2c\u4e00\u6210\u5206\uff08X \u6210\u5206\u307e\u305f\u306f\u5b9f\u90e8\uff09\u3057\u304b\u8003\u616e\u3055\u308c\u307e\u305b\u3093\u3002</span></p></body></html>", None))
         self.commandLinkButton.setText(QCoreApplication.translate("WizardPage_obj", u"\u30d1\u30e9\u30e1\u30c8\u30ea\u30c3\u30af\u89e3\u6790\u306e\u4f7f\u3044\u65b9\u3092\u78ba\u8a8d\u3059\u308b\uff08\u30a4\u30f3\u30bf\u30fc\u30cd\u30c3\u30c8\u30ea\u30f3\u30af\uff09", None))
     # retranslateUi
 

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'WizardPage_analysis_modelvdsFyp.ui'
+## Form generated from reading UI file 'WizardPage_analysis_modelbQYNCo.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.8.1
+## Created by: Qt User Interface Compiler version 6.7.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -28,6 +28,8 @@ class Ui_WizardPage(object):
         self.gridLayout.setObjectName(u"gridLayout")
         self.pushButton_load = QPushButton(WizardPage)
         self.pushButton_load.setObjectName(u"pushButton_load")
+        icon = QIcon(QIcon.fromTheme(QIcon.ThemeIcon.GoDown))
+        self.pushButton_load.setIcon(icon)
 
         self.gridLayout.addWidget(self.pushButton_load, 0, 0, 1, 1)
 
@@ -60,7 +62,7 @@ class Ui_WizardPage(object):
 
     def retranslateUi(self, WizardPage):
         WizardPage.setWindowTitle(QCoreApplication.translate("WizardPage", u"WizardPage", None))
-        self.pushButton_load.setText(QCoreApplication.translate("WizardPage", u"[F\u27a1] Load", None))
+        self.pushButton_load.setText(QCoreApplication.translate("WizardPage", u"Load", None))
         self.textEdit.setMarkdown(QCoreApplication.translate("WizardPage", u"Femtet \u3067\u6700\u9069\u5316\u3057\u305f\u3044 .femprj \u30d5\u30a1\u30a4\u30eb\u3092\u958b\u3044\u3066\u304f\u3060\u3055\u3044\u3002\n"
 "\n"
 ".femprj \u30d5\u30a1\u30a4\u30eb\u3092\u5909\u66f4\u3057\u305f\u5834\u5408\u306f\u3001\u518d\u8aad\u307f\u8fbc\u307f\u306e\u305f\u3081\u300cLoad\u300d\u30dc\u30bf\u30f3\u3092\u62bc\u3057\u3066\u304f\u3060\u3055\u3044\u3002\n"

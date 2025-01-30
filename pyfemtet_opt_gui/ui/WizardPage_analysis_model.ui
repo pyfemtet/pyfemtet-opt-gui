@@ -17,7 +17,10 @@
    <item row="0" column="0">
     <widget class="QPushButton" name="pushButton_load">
      <property name="text">
-      <string>[F➡] Load</string>
+      <string>Load</string>
+     </property>
+     <property name="icon">
+      <iconset theme="QIcon::ThemeIcon::GoDown"/>
      </property>
     </widget>
    </item>

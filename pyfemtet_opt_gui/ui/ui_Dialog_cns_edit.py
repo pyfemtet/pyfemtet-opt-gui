@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'Dialog_cns_editdEUEIi.ui'
+## Form generated from reading UI file 'Dialog_cns_editIjFFTa.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.7.2
 ##
@@ -38,6 +38,8 @@ class Ui_Dialog(object):
         self.gridLayout_3.setObjectName(u"gridLayout_3")
         self.pushButton_load_var = QPushButton(Dialog)
         self.pushButton_load_var.setObjectName(u"pushButton_load_var")
+        icon = QIcon(QIcon.fromTheme(QIcon.ThemeIcon.GoDown))
+        self.pushButton_load_var.setIcon(icon)
 
         self.gridLayout_3.addWidget(self.pushButton_load_var, 0, 0, 1, 1)
 
@@ -177,7 +179,7 @@ class Ui_Dialog(object):
     def retranslateUi(self, Dialog):
         Dialog.setWindowTitle(QCoreApplication.translate("Dialog", u"Dialog", None))
         self.lineEdit_name.setPlaceholderText(QCoreApplication.translate("Dialog", u"\u62d8\u675f\u540d\uff08\u7a7a\u6b04\u6642\u306f\u81ea\u52d5\u547d\u540d\uff09", None))
-        self.pushButton_load_var.setText(QCoreApplication.translate("Dialog", u"[F\u27a1] Load", None))
+        self.pushButton_load_var.setText(QCoreApplication.translate("Dialog", u"Load", None))
         self.label_prmOnCns.setText(QCoreApplication.translate("Dialog", u"\u5909\u6570\u4e00\u89a7", None))
         self.pushButton_input_mean.setText(QCoreApplication.translate("Dialog", u"mean( )", None))
         self.pushButton_input_devide.setText(QCoreApplication.translate("Dialog", u"/", None))

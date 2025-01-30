@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'WizardPage_varpqLAqA.ui'
+## Form generated from reading UI file 'WizardPage_varvBrBdu.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.7.2
 ##
@@ -28,6 +28,8 @@ class Ui_WizardPage(object):
         self.gridLayout.setObjectName(u"gridLayout")
         self.pushButton_load_prm = QPushButton(WizardPage)
         self.pushButton_load_prm.setObjectName(u"pushButton_load_prm")
+        icon = QIcon(QIcon.fromTheme(QIcon.ThemeIcon.GoDown))
+        self.pushButton_load_prm.setIcon(icon)
 
         self.gridLayout.addWidget(self.pushButton_load_prm, 0, 0, 1, 1)
 
@@ -43,6 +45,8 @@ class Ui_WizardPage(object):
 
         self.pushButton_test_prm = QPushButton(WizardPage)
         self.pushButton_test_prm.setObjectName(u"pushButton_test_prm")
+        icon1 = QIcon(QIcon.fromTheme(QIcon.ThemeIcon.GoUp))
+        self.pushButton_test_prm.setIcon(icon1)
 
         self.gridLayout.addWidget(self.pushButton_test_prm, 0, 2, 1, 1)
 
@@ -71,8 +75,8 @@ class Ui_WizardPage(object):
 
     def retranslateUi(self, WizardPage):
         WizardPage.setWindowTitle(QCoreApplication.translate("WizardPage", u"WizardPage", None))
-        self.pushButton_load_prm.setText(QCoreApplication.translate("WizardPage", u"[F\u27a1] Load", None))
-        self.pushButton_test_prm.setText(QCoreApplication.translate("WizardPage", u"[\u27a1F] Test", None))
+        self.pushButton_load_prm.setText(QCoreApplication.translate("WizardPage", u"Load", None))
+        self.pushButton_test_prm.setText(QCoreApplication.translate("WizardPage", u"Test", None))
 #if QT_CONFIG(tooltip)
         self.textEdit.setToolTip(QCoreApplication.translate("WizardPage", u"<html><head/><body><p>&lt;\u7528\u8a9e\u306e\u8aac\u660e&gt;</p><p>\u300c\u5909\u6570\u300d...Femtet \u89e3\u6790\u30e2\u30c7\u30eb\u3067\u5b9a\u7fa9\u3055\u308c\u3066\u3044\u308b\u5909\u6570\u3067\u3059\u3002 (\u4f8b\uff1a&quot;coil_height&quot;)</p><p>\u300c\u30d1\u30e9\u30e1\u30fc\u30bf\u300d...\u300c\u5909\u6570\u300d\u306e\u3046\u3061\u3001\u6700\u9069\u5316\u306e\u969b\u306b\u5024\u3092\u5909\u66f4\u3059\u308b\u3082\u306e\u3067\u3059\u3002</p><p>\u300c\u5f0f\u300d...\u300c\u5909\u6570\u300d\u306e\u5024\u3092\u6c7a\u3081\u308b\u305f\u3081\u306e\u6570\u5f0f\u3067\u3059\u3002Femtet \u306e\u30d7\u30ed\u30b8\u30a7\u30af\u30c8\u30c4\u30ea\u30fc\u306b\u8868\u793a\u3055\u308c\u3066\u3044\u308b\u3082\u306e\u3067\u3059\u3002 (\u4f8b: &quot;coil_pitch * n * 3&quot;, &quot;1 * 2&quot;)</p><p>\u300c\u6587\u5b57\u5f0f\u300d...\u300c\u5909\u6570\u300d\u306e\u300c\u5f0f\u300d\u306e\u3046\u3061\u3001\u4ed6\u306e\u300c\u5909\u6570\u300d\u3092\u53c2\u7167\u3057\u3066\u3044\u308b\u3082\u306e\u3067\u3059\u3002 (\u4f8b: &quot"
                         ";coil_pitch * n * 3&quot;)</p><p>\u300c\u6570\u5f0f\u300d...\u300c\u5909\u6570\u300d\u306e\u300c\u5f0f\u300d\u306e\u3046\u3061\u300c\u6587\u5b57\u5f0f\u300d\u4ee5\u5916\u306e\u3082\u306e\u3001\u3064\u307e\u308a\u6570\u5b57\u306e\u307f\u3067\u5b9a\u7fa9\u3055\u308c\u3066\u3044\u308b\u300c\u5f0f\u300d\u3067\u3059\u3002 (\u4f8b: &quot;1 * 2&quot;)</p></body></html>", None))

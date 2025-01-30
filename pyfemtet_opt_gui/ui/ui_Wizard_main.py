@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'Wizard_mainYfAGFR.ui'
+## Form generated from reading UI file 'Wizard_mainbeavrO.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.7.2
 ##
@@ -97,10 +97,10 @@ class Ui_Wizard(object):
 #endif // QT_CONFIG(accessibility)
         self.label_connectionState.setText(QCoreApplication.translate("Wizard", u"<html><head/><body><p><span style='color:#FF0000'>\u63a5\u7d9a\u3055\u308c\u3066\u3044\u307e\u305b\u3093\u3002</span></p></body></html>", None))
         self.checkBox_openSampleFemprj.setText(QCoreApplication.translate("Wizard", u"\u63a5\u7d9a\u6642\u306b\u30b5\u30f3\u30d7\u30eb\u30d5\u30a1\u30a4\u30eb\u3092\u958b\u304f", None))
-        self.textEdit_2.setMarkdown(QCoreApplication.translate("Wizard", u"\u6700\u9069\u5316\u3092\u884c\u3046\u305f\u3081\u306e\u30b9\u30af\u30ea\u30d7\u30c8\u306e\u8a2d\u5b9a\u3092\u884c\u3044\u307e\u3059\u3002\n"
+        self.textEdit_2.setMarkdown(QCoreApplication.translate("Wizard", u"\u3053\u306e\u30d7\u30ed\u30b0\u30e9\u30e0\u3067\u306f\u3001**\u6700\u9069\u5316\u3092\u884c\u3046\u305f\u3081\u306e\u30b9\u30af\u30ea\u30d7\u30c8\u3092\u4f5c\u6210**\u3057\u307e\u3059\u3002\n"
 "\u6700\u521d\u306b\u3001Femtet \u306b\u63a5\u7d9a\u3057\u3066\u6700\u9069\u5316\u3092\u884c\u3046\u89e3\u6790\u30e2\u30c7\u30eb\u3092\u6c7a\u3081\u307e\u3059\u3002\n"
-"\u30dc\u30bf\u30f3\u3092\u62bc\u3059\u3068 Fetmet\n"
-"\u3068\u306e\u81ea\u52d5\u63a5\u7d9a\u304c\u59cb\u307e\u308a\u307e\u3059\u3002\n"
+"\u30dc\u30bf\u30f3\u3092\u62bc\u3059\u3068\n"
+"Fetmet \u3068\u306e\u81ea\u52d5\u63a5\u7d9a\u304c\u59cb\u307e\u308a\u307e\u3059\u3002\n"
 "\n"
 "", None))
         self.textEdit_2.setHtml(QCoreApplication.translate("Wizard", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
@@ -110,8 +110,8 @@ class Ui_Wizard(object):
 "li.unchecked::marker { content: \"\\2610\"; }\n"
 "li.checked::marker { content: \"\\2612\"; }\n"
 "</style></head><body style=\" font-family:'Yu Gothic UI'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">\u6700\u9069\u5316\u3092\u884c\u3046\u305f\u3081\u306e\u30b9\u30af\u30ea\u30d7\u30c8\u306e\u8a2d\u5b9a\u3092\u884c\u3044\u307e\u3059\u3002<br />\u6700\u521d\u306b\u3001Femtet \u306b\u63a5\u7d9a\u3057\u3066\u6700\u9069\u5316\u3092\u884c\u3046\u89e3\u6790\u30e2\u30c7\u30eb\u3092\u6c7a\u3081\u307e\u3059\u3002<br />\u30dc\u30bf\u30f3\u3092\u62bc\u3059\u3068 Fetmet \u3068\u306e\u81ea\u52d5\u63a5\u7d9a\u304c"
-                        "\u59cb\u307e\u308a\u307e\u3059\u3002</p></body></html>", None))
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">\u3053\u306e\u30d7\u30ed\u30b0\u30e9\u30e0\u3067\u306f\u3001<span style=\" font-weight:700;\">\u6700\u9069\u5316\u3092\u884c\u3046\u305f\u3081\u306e\u30b9\u30af\u30ea\u30d7\u30c8\u3092\u4f5c\u6210</span>\u3057\u307e\u3059\u3002<br />\u6700\u521d\u306b\u3001Femtet \u306b\u63a5\u7d9a\u3057\u3066\u6700\u9069\u5316\u3092\u884c\u3046\u89e3\u6790\u30e2\u30c7\u30eb\u3092\u6c7a\u3081\u307e\u3059\u3002<br "
+                        "/>\u30dc\u30bf\u30f3\u3092\u62bc\u3059\u3068 Fetmet \u3068\u306e\u81ea\u52d5\u63a5\u7d9a\u304c\u59cb\u307e\u308a\u307e\u3059\u3002</p></body></html>", None))
 #if QT_CONFIG(accessibility)
         self.pushButton_launch.setAccessibleName(QCoreApplication.translate("Wizard", u"Connect to Femtet", None))
 #endif // QT_CONFIG(accessibility)
