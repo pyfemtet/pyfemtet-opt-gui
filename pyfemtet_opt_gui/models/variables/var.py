@@ -870,6 +870,9 @@ class VariableWizardPage(TitledWizardPage):
     def setup_ui(self):
         self.ui = Ui_WizardPage()
         self.ui.setupUi(self)
+        self.ui.commandLinkButton.clicked.connect(
+            lambda *args: open_help('ProjectCreation/VariableTree.htm')
+        )
 
     def setup_model(
             self,

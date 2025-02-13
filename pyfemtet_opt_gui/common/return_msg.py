@@ -92,7 +92,7 @@ class ReturnMsg:
 # ReturnMsg を受け取ってダイアログ表示し
 # OK かどうかを返す関数
 def show_return_msg(
-        return_msg: ReturnMsg,
+        return_msg: ReturnMsg | ReturnMsg.Info | ReturnMsg.Warn | ReturnMsg.Error,
         parent: QWidget,
         with_cancel_button=False,
         additional_message=None,
@@ -136,7 +136,7 @@ def show_return_msg(
 # ReturnMsg を受け取ってダイアログを表示した後
 # 内部処理を進めてよいかどうかを返す関数
 def can_continue(
-        return_msg: ReturnMsg,
+        return_msg: ReturnMsg | ReturnMsg.Info | ReturnMsg.Warn | ReturnMsg.Error,
         parent: QWidget,
         with_cancel_button='auto',
         no_dialog_if_info=False,
@@ -174,7 +174,7 @@ def can_continue(
 # basic behavior
 if __name__ == '__main__':
 
-    def some_fun() -> ReturnMsg:
+    def some_fun() -> ReturnMsg | ReturnMsg.Info | ReturnMsg.Warn | ReturnMsg.Error:
         # return ReturnMsg.no_message
         return ReturnMsg.Info._test
         # return ReturnMsg.Warn._test
