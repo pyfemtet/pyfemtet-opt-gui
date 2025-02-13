@@ -223,8 +223,7 @@ class ConfirmWizardPage(TitledWizardPage):
 
             else:
                 button.setText('最適化の実行中はスクリプトを保存できません')
-
-            button.setDisabled(True)
+                button.setDisabled(True)
 
         else:
             if Version(pyfemtet.__version__) >= Version("0.8.5"):
