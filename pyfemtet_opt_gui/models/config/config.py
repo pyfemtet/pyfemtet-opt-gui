@@ -867,7 +867,7 @@ class QConfigItemModelForProblem(QSortFilterProxyModelOfStandardItemModel):
             return None, ReturnMsg.Error.host_info_not_found
 
         # port 情報を見つけた
-        return extra_data
+        return extra_data, ReturnMsg.no_message
 
 
 # 個別ページに表示される first row のない ItemModel

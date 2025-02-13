@@ -25,6 +25,10 @@ import os
 import sys
 import enum
 
+# Necessary to import early timing.
+# (importing just before run or threading causes an error.)
+import torch
+
 
 class ConnectionMessage(enum.StrEnum):
     no_connection = '接続されていません。'
