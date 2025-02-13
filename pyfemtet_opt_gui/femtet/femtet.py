@@ -3,6 +3,7 @@ import subprocess
 import webbrowser
 
 import psutil
+import psutil
 from femtetutils import util
 from win32com.client import Dispatch, CDispatch
 # noinspection PyUnresolvedReferences
