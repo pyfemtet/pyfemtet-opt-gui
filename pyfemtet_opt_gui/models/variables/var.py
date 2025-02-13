@@ -556,6 +556,7 @@ class VariableItemModel(StandardItemModelWithHeader):
         return super().flags(index)
 
     def apply_test_values(self):
+
         # test 列に登録されている変数を取得
         c_var_name = self.get_column_by_header_data(
             self.ColumnNames.name
@@ -563,13 +564,20 @@ class VariableItemModel(StandardItemModelWithHeader):
         c_test_value = self.get_column_by_header_data(
             self.ColumnNames.test_value
         )
+        c_initial_value = self.get_column_by_header_data(
+            self.ColumnNames.initial_value
+        )
 
         variables = dict()
-        if self.with_first_row:
-            iterable = range(1, self.rowCount())
-        else:
-            iterable = range(self.rowCount())
-        for r in iterable:
+        for r in self.get_row_iterable():
+
+            # 変数が expression なら無視
+            expression: Expression = self.item(r, c_initial_value).data(Qt.ItemDataRole.UserRole)
+            if expression is not None:
+                if expression.is_expression():
+                    continue
+
+            # 変数名: 値 の dict を作成
             var_name = self.item(r, c_var_name).text()
             value = self.item(r, c_test_value).text()
             variables.update(
