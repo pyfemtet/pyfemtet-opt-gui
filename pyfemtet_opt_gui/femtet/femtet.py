@@ -2,6 +2,7 @@ import ctypes
 import subprocess
 import webbrowser
 
+import psutil
 from femtetutils import util
 from win32com.client import Dispatch, CDispatch
 # noinspection PyUnresolvedReferences
@@ -75,15 +76,20 @@ def _get_pid_from_hwnd(hwnd):
 
 def _search_femtet():
 
-    si = subprocess.STARTUPINFO()
-    si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-    si.wShowWindow = subprocess.SW_HIDE
+    is_running = False
 
-    image_name = 'Femtet.exe'
-    command = f'tasklist /nh /fi "IMAGENAME eq {image_name}"'
-    output = subprocess.run(command, startupinfo=si, stdout=subprocess.PIPE, shell=True, text=True)
+    try:
+        process_name = 'Femtet.exe'
+        for proc in psutil.process_iter():
+            exe_name = proc.name()
+            if process_name == exe_name:
+                is_running = True
+                break
 
-    is_running = image_name in output.stdout
+    # psutil が失敗する場合はプロセス存在の
+    # エラーチェックをあきらめる
+    except Exception:
+        is_running = True
 
     return is_running
 
