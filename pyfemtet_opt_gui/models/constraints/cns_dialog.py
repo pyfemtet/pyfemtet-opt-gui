@@ -19,7 +19,6 @@ from pyfemtet_opt_gui.common.qt_util import *
 from pyfemtet_opt_gui.common.pyfemtet_model_bases import *
 from pyfemtet_opt_gui.common.return_msg import *
 from pyfemtet_opt_gui.common.expression_processor import *
-from pyfemtet_opt_gui.gui_interfaces import femtet
 
 from pyfemtet_opt_gui.models.variables.var import get_var_model, VariableItemModelForTableView, VariableItemModel, VariableTableViewDelegate
 from pyfemtet_opt_gui.models.constraints.model import get_cns_model, ConstraintModel, Constraint

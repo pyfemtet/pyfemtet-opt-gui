@@ -109,7 +109,7 @@ class VariableTableViewDelegate(QStyledItemDelegate):
 
         return constraint.finalize_check()
 
-    def check_valid(self, text, header_data, model, index) -> tuple[ReturnMsg, Expression | None]:
+    def check_valid(self, text, header_data, model, index) -> tuple[ReturnType, Expression | None]:
 
         new_expression: Expression | None = None
 
@@ -309,7 +309,7 @@ class VariableItemModel(StandardItemModelWithHeader):
         # variables 取得
         expression: Expression
         expressions: dict[str, Expression]
-        expressions, ret_msg = get_variables()
+        expressions, ret_msg = femtet.get_variables()
         if not can_continue(ret_msg, self.parent()):
             return ret_msg
 
@@ -585,7 +585,7 @@ class VariableItemModel(StandardItemModelWithHeader):
             )
 
         # Femtet に転送
-        return_msg, a_msg = apply_variables(variables)
+        return_msg, a_msg = femtet.apply_variables(variables)
         show_return_msg(
             return_msg=return_msg,
             parent=self.parent(),
@@ -879,7 +879,7 @@ class VariableWizardPage(TitledWizardPage):
         self.ui = Ui_WizardPage()
         self.ui.setupUi(self)
         self.ui.commandLinkButton.clicked.connect(
-            lambda *args: open_help('ProjectCreation/VariableTree.htm')
+            lambda *args: femtet.open_help('ProjectCreation/VariableTree.htm')
         )
 
     def setup_model(
@@ -942,7 +942,7 @@ if __name__ == '__main__':
     # _WITH_DUMMY = True  # comment out to prevent debug
     # from pyfemtet_opt_gui.femtet.mock import get_femtet, get_obj_names  # comment out to prevent debug
 
-    get_femtet()
+    femtet.get_femtet()
 
     app = QApplication()
     app.setStyle('fusion')

@@ -20,8 +20,6 @@ from pyfemtet_opt_gui.common.pyfemtet_model_bases import *
 from pyfemtet_opt_gui.common.return_msg import *
 # noinspection PyUnresolvedReferences
 from pyfemtet_opt_gui.common.expression_processor import *
-# noinspection PyUnresolvedReferences
-from pyfemtet_opt_gui.gui_interfaces import femtet
 
 from pyfemtet_opt_gui.models.config.algorithm.base import (
     QAbstractAlgorithmItemModel,
@@ -155,7 +153,7 @@ class QNSGAIIAlgorithmItemModel(QAbstractAlgorithmItemModel):
 
 # シングルトンパターン
 
-_MODEL: QNSGAIIAlgorithmItemModel = None
+_MODEL: QNSGAIIAlgorithmItemModel | None = None
 
 
 def get_nsgaii_algorithm_config_model(parent) -> QNSGAIIAlgorithmItemModel:

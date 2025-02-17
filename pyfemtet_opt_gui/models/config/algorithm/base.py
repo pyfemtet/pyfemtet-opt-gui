@@ -20,8 +20,6 @@ from pyfemtet_opt_gui.common.pyfemtet_model_bases import *
 from pyfemtet_opt_gui.common.return_msg import *
 # noinspection PyUnresolvedReferences
 from pyfemtet_opt_gui.common.expression_processor import *
-# noinspection PyUnresolvedReferences
-from pyfemtet_opt_gui.gui_interfaces import femtet
 
 import enum
 from abc import ABC
@@ -176,7 +174,7 @@ class QAbstractAlgorithmItemModel(StandardItemModelWithHeader):
 
 # シングルトンパターン
 
-_MODEL: QAbstractAlgorithmItemModel = None
+_MODEL: QAbstractAlgorithmItemModel | None = None
 
 
 def get_abstract_algorithm_config_model(parent) -> QAbstractAlgorithmItemModel:

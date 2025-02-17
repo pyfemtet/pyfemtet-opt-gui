@@ -32,8 +32,6 @@ from pyfemtet_opt_gui.common.titles import *
 
 from pyfemtet_opt_gui.models.config.algorithm.base import (
     QAbstractAlgorithmItemModel,
-    AbstractAlgorithmConfig,
-    get_abstract_algorithm_config_model,
 )
 
 from pyfemtet_opt_gui.models.config.algorithm.algorithm_random import (
@@ -361,9 +359,10 @@ class ConfigItemModel(StandardItemModelWithHeader):
     # これはクラス変数にする
     _history_path: str = None
 
+    # noinspection PyNestedDecorators
     @property
     @classmethod
-    def history_path(cls):
+    def history_path(cls) -> str:
         return cls._history_path
 
     @classmethod
@@ -371,8 +370,9 @@ class ConfigItemModel(StandardItemModelWithHeader):
     def history_path(cls, value):
         cls._history_path = value
 
+    # noinspection PyTypeChecker
     @property
-    def history_path(self):
+    def history_path(self) -> str:
         return type(self).history_path
 
     @history_path.setter
@@ -839,7 +839,7 @@ class QConfigItemModelForProblem(QSortFilterProxyModelOfStandardItemModel):
         assert isinstance(model, ConfigItemModel)
         model.reset_history_path()
 
-    def get_monitor_host_info(self) -> tuple[dict | None, ReturnMsg]:
+    def get_monitor_host_info(self) -> tuple[dict | None, ReturnType]:
 
         # ConfigModel 取得
         model = self.sourceModel()
@@ -850,7 +850,7 @@ class QConfigItemModelForProblem(QSortFilterProxyModelOfStandardItemModel):
         assert model.history_path is not None
 
         # history_path を取得
-        history_path = model.history_path
+        history_path: str = model.history_path
 
         # history_path が存在しない
         #  <= まだ最適化が始まっていない

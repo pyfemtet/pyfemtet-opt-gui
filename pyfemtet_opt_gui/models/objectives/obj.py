@@ -90,7 +90,8 @@ class ObjectiveItemDelegate(QStyledItemDelegate):
             return cb
 
         elif get_internal_header_data(index) == ObjectiveColumnNames.target_value:
-            editor: QLineEdit = super().createEditor(parent, option, index)
+            editor = super().createEditor(parent, option, index)
+            assert isinstance(editor, QLineEdit)
             double_validator = QDoubleValidator()
             double_validator.setRange(-1e20, 1e20, 2)
             editor.setValidator(double_validator)
@@ -155,12 +156,12 @@ class ObjectiveTableItemModel(StandardItemModelWithHeader):
 
     def load_femtet(self) -> ReturnMsg:
         # parametric if 設定取得
-        obj_names, ret_msg = get_obj_names()
+        obj_names, ret_msg = femtet.get_obj_names()
         if not can_continue(ret_msg, parent=self.parent()):
             return ret_msg
 
         # 現在の状態を stash
-        stashed_data: dict[str, dict[str, str]] = self.stash_current_table()
+        stashed_data: dict[str, dict[str, dict[Qt.ItemDataRole, ...]]] = self.stash_current_table()
 
         rows = len(obj_names) + 1
         with EditModel(self):
@@ -314,7 +315,8 @@ class QObjectiveItemModelForProblemTableView(ProxyModelWithForProblem):
 
     def filterAcceptsColumn(self, source_column: int, source_parent: QModelIndex):
         # use を非表示
-        source_model: ObjectiveTableItemModel = self.sourceModel()
+        source_model = self.sourceModel()
+        assert isinstance(source_model, ObjectiveTableItemModel)
         if source_column == get_column_by_header_data(
                 source_model,
                 ObjectiveTableItemModel.ColumnNames.use
@@ -348,7 +350,7 @@ class ObjectiveWizardPage(TitledWizardPage):
         self.ui = Ui_WizardPage_obj()
         self.ui.setupUi(self)
         self.ui.commandLinkButton.clicked.connect(
-            lambda *args: open_help('ParametricAnalysis/ParametricAnalysis.htm')
+            lambda *args: femtet.open_help('ParametricAnalysis/ParametricAnalysis.htm')
         )
 
     def setup_model(self, load_femtet_fun):
@@ -422,7 +424,7 @@ if __name__ == '__main__':
     # _WITH_DUMMY = True  # comment out to prevent debug
     # from pyfemtet_opt_gui.femtet.mock import get_femtet, get_obj_names  # comment out to prevent debug
 
-    get_femtet()
+    femtet.get_femtet()
 
     app = QApplication()
     app.setStyle('fusion')

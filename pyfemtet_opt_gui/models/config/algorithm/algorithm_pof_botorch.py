@@ -20,8 +20,6 @@ from pyfemtet_opt_gui.common.pyfemtet_model_bases import *
 from pyfemtet_opt_gui.common.return_msg import *
 # noinspection PyUnresolvedReferences
 from pyfemtet_opt_gui.common.expression_processor import *
-# noinspection PyUnresolvedReferences
-from pyfemtet_opt_gui.gui_interfaces import femtet
 
 from pyfemtet_opt_gui.models.config.algorithm.base import (
     QAbstractAlgorithmItemModel,
@@ -114,7 +112,7 @@ class QPoFBoTorchAlgorithmItemModel(QAbstractAlgorithmItemModel):
 
 # シングルトンパターン
 
-_MODEL: QPoFBoTorchAlgorithmItemModel = None
+_MODEL: QPoFBoTorchAlgorithmItemModel | None = None
 
 
 def get_pof_botorch_algorithm_config_model(parent) -> QPoFBoTorchAlgorithmItemModel:

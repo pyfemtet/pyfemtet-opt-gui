@@ -158,7 +158,7 @@ class FemprjModel(StandardItemModelWithHeader):
     def load_femtet(self) -> ReturnMsg:
 
         # 名前を取得
-        names, ret_msg = get_name()
+        names, ret_msg = femtet.get_name()
 
         # Femtet エラーならば何もしない
         if not can_continue(ret_msg, parent=self.parent()):
@@ -208,7 +208,7 @@ class FemprjModel(StandardItemModelWithHeader):
             return False
 
         # 名前を取得
-        names, ret_msg = get_name()
+        names, ret_msg = femtet.get_name()
 
         # Femtet エラーならば False
         if not can_continue(ret_msg, parent=self.parent()):
@@ -308,7 +308,7 @@ if __name__ == '__main__':
     # _WITH_DUMMY = True  # comment out to prevent debug
     # from pyfemtet_opt_gui.femtet.mock import get_femtet, get_obj_names  # comment out to prevent debug
 
-    get_femtet()
+    femtet.get_femtet()
 
     app = QApplication()
     app.setStyle('fusion')

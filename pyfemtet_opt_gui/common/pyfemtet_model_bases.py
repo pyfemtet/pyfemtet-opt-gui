@@ -124,7 +124,7 @@ class StandardItemModelWithHeader(StandardItemModelWithHeaderSearch):
                 #     _role := Qt.ItemDataRole.DisplayRole,
                 # )
 
-    def stash_current_table(self) -> dict[str, dict[Any, dict[Qt.ItemDataRole, Any]]]:
+    def stash_current_table(self) -> dict[str, dict[str, dict[Qt.ItemDataRole, Any]]]:
         """load 時に既存のデータを上書きする為に stash する
 
         dict[name, dict[ColumnName, dict[Qt.ItemDataRole, Any]]
@@ -137,13 +137,13 @@ class StandardItemModelWithHeader(StandardItemModelWithHeaderSearch):
         for r in range(1, self.rowCount()):
 
             # 行ごとに dict を作成, key は obj_name など headerData
-            row_information: dict[Any, dict[Qt.ItemDataRole, Any]] = dict()
+            row_information: dict[Any, dict[Qt.ItemDataRole, ...]] = dict()
 
             # 列ごとにデータを収取
             for header_name in self.ColumnNames:
                 c = self.get_column_by_header_data(header_name)
                 index = self.index(r, c)
-                data = self.itemData(index)
+                data: dict[int, Any] = self.itemData(index)
                 row_information.update({header_name: data})
 
             # データを収集出来たら obj_name などをキーにして
