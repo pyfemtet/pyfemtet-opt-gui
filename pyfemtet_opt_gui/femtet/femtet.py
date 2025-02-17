@@ -1,8 +1,7 @@
+import os
 import ctypes
-import subprocess
 import webbrowser
 
-import psutil
 import psutil
 from femtetutils import util
 from win32com.client import Dispatch, CDispatch
@@ -10,6 +9,7 @@ from win32com.client import Dispatch, CDispatch
 from pythoncom import com_error
 import win32process
 
+import pyfemtet_opt_gui
 from pyfemtet_opt_gui.logger import get_logger
 from pyfemtet_opt_gui.common.return_msg import ReturnMsg
 from pyfemtet_opt_gui.common.expression_processor import Expression
@@ -31,6 +31,7 @@ __all__ = [
     'open_help',
     'get_name',
     'save_femprj',
+    'open_sample',
 ]
 
 
@@ -349,3 +350,25 @@ def save_femprj() -> tuple[bool, tuple[ReturnMsg, str]]:
         return False, (ret, a_msg)
 
     return True, (ReturnMsg.no_message, a_msg)
+
+
+def open_sample() -> tuple[ReturnMsg, str]:
+
+    # get path
+    path = os.path.abspath(
+        os.path.join(
+            os.path.dirname(pyfemtet_opt_gui.__file__),
+            'assets', 'samples', 'sample.femprj'
+        )
+    ).replace(os.path.altsep, os.path.sep)
+
+    # check Femtet Connection
+    ret = get_connection_state()
+    if ret != ReturnMsg.no_message:
+        return ret, path
+
+    succeeded = _Femtet.LoadProject(path, True)
+    if not succeeded:
+        return ReturnMsg.Error.cannot_open_sample_femprj, path
+
+    return ReturnMsg.no_message, path

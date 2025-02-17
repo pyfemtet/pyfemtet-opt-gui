@@ -36,6 +36,11 @@ class ConnectionMessage(enum.StrEnum):
     connected = '接続されています。'
 
 
+class CADIntegration(enum.StrEnum):
+    no = 'なし'
+    solidworks = 'Solidworks'
+
+
 class Main(QWizard):
     ui: Ui_Wizard
     am_page: 'AnalysisModelWizardPage'
@@ -59,6 +64,10 @@ class Main(QWizard):
 
         # Cannot go to next page without connection
         self.ui.wizardPage_init.isComplete = lambda: get_connection_state() == ReturnMsg.no_message
+
+        # Setup CAD integration
+        self.ui.comboBox.addItems([txt for txt in CADIntegration])
+        self.ui.comboBox.setCurrentIndex(0)
 
     def setup_page(self):
         self.am_page = AnalysisModelWizardPage(self, load_femtet_fun=self.load_femtet)
@@ -111,7 +120,7 @@ class Main(QWizard):
                 get_connection_state() == ReturnMsg.no_message
                 and self.ui.checkBox_openSampleFemprj.isChecked()
         ):
-            ret_msg, path = self.open_sample_femprj()
+            ret_msg, path = open_sample()
             show_return_msg(ret_msg, self, additional_message=path)
 
         # load_femtet を行う
@@ -133,26 +142,6 @@ class Main(QWizard):
 
         elif connection_message == ConnectionMessage.connected:
             label.setStyleSheet('color: green')
-
-    def open_sample_femprj(self) -> tuple[ReturnMsg, str]:
-        Femtet, ret_msg = get_femtet()
-
-        if ret_msg != ReturnMsg.no_message:
-            return ret_msg
-
-        path = os.path.abspath(
-            os.path.join(
-                os.path.dirname(__file__),
-                'assets', 'samples', 'sample.femprj'
-            )
-        ).replace(os.path.altsep, os.path.sep)
-        succeeded = Femtet.LoadProject(path, True)
-
-        if succeeded:
-            return ReturnMsg.no_message, path
-
-        else:
-            return ReturnMsg.Error.cannot_open_sample_femprj, path
 
     def load_femtet(self):
         ret_msg = self.am_page.source_model.load_femtet()
