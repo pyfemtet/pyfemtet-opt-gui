@@ -10,7 +10,7 @@ from PySide6.QtGui import *
 # noinspection PyUnresolvedReferences
 from PySide6.QtWidgets import *
 
-from pyfemtet_opt_gui.femtet.femtet import *
+from pyfemtet_opt_gui.femtet import femtet
 from pyfemtet_opt_gui.common.return_msg import *
 
 from pyfemtet_opt_gui.ui.ui_Wizard_main import Ui_Wizard
@@ -21,12 +21,12 @@ from pyfemtet_opt_gui.models.constraints.cns import ConstraintWizardPage
 from pyfemtet_opt_gui.models.config.config import ConfigWizardPage
 from pyfemtet_opt_gui.models.problem.problem import ConfirmWizardPage
 
-import os
 import sys
 import enum
 
 # Necessary to import early timing.
 # (importing just before run or threading causes an error.)
+# noinspection PyUnresolvedReferences
 import torch
 
 
@@ -63,7 +63,7 @@ class Main(QWizard):
         self.ui.pushButton_launch.clicked.connect(self.connect_femtet)
 
         # Cannot go to next page without connection
-        self.ui.wizardPage_init.isComplete = lambda: get_connection_state() == ReturnMsg.no_message
+        self.ui.wizardPage_init.isComplete = lambda: femtet.get_connection_state() == ReturnMsg.no_message
 
         # Setup CAD integration
         self.ui.comboBox.addItems([txt for txt in CADIntegration])
@@ -88,7 +88,7 @@ class Main(QWizard):
         button: QPushButton = self.ui.pushButton_launch
 
         # Femtet との接続がすでに OK
-        ret: ReturnMsg = get_connection_state()
+        ret: ReturnMsg = femtet.get_connection_state()
         if ret == ReturnMsg.no_message:
             self.update_connection_state_label(ConnectionMessage.connected)
 
@@ -101,7 +101,7 @@ class Main(QWizard):
 
             # Femtet との接続を開始する
             # Femtet の接続ができるのを待つ
-            _, ret_msg = get_femtet()
+            _, ret_msg = femtet.get_femtet()
 
             # 接続成功
             if ret_msg == ReturnMsg.no_message:
@@ -117,10 +117,10 @@ class Main(QWizard):
 
         # 必要なら sample file を開く
         if (
-                get_connection_state() == ReturnMsg.no_message
+                femtet.get_connection_state() == ReturnMsg.no_message
                 and self.ui.checkBox_openSampleFemprj.isChecked()
         ):
-            ret_msg, path = open_sample()
+            ret_msg, path = femtet.open_sample()
             show_return_msg(ret_msg, self, additional_message=path)
 
         # load_femtet を行う
