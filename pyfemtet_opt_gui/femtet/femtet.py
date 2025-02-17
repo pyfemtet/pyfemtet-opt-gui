@@ -11,32 +11,19 @@ import win32process
 
 import pyfemtet_opt_gui
 from pyfemtet_opt_gui.logger import get_logger
-from pyfemtet_opt_gui.common.return_msg import ReturnMsg
+from pyfemtet_opt_gui.common.return_msg import ReturnMsg, ReturnType
 from pyfemtet_opt_gui.common.expression_processor import Expression
 
 logger = get_logger('Femtet')
 
-
 # global variables per process
-_Femtet: 'CDispatch' = None
+_Femtet: CDispatch | None = None
 _dll: 'ctypes.LibraryLoader._dll' = None
 CONNECTION_TIMEOUT = 15
 
-__all__ = [
-    'get_femtet',
-    'get_connection_state',
-    'get_obj_names',
-    'get_variables',
-    'apply_variables',
-    'open_help',
-    'get_name',
-    'save_femprj',
-    'open_sample',
-]
-
 
 # ===== Femtet process & object handling =====
-def get_femtet() -> tuple[CDispatch | None, ReturnMsg]:
+def get_femtet() -> tuple[CDispatch | None, ReturnType]:
     global _Femtet
 
     should_restart_femtet = False
@@ -77,7 +64,6 @@ def _get_pid_from_hwnd(hwnd):
 
 
 def _search_femtet():
-
     is_running = False
 
     try:
@@ -95,7 +81,7 @@ def _search_femtet():
     return is_running
 
 
-def get_connection_state() -> ReturnMsg:
+def get_connection_state() -> ReturnType:
     # プロセスが存在しない場合
     if not _search_femtet():
         return ReturnMsg.Error.femtet_not_found
@@ -145,7 +131,7 @@ def _get_dll():
     return _dll
 
 
-def get_obj_names() -> tuple[list, ReturnMsg]:
+def get_obj_names() -> tuple[list, ReturnType]:
     out = []
 
     # check Femtet Connection
@@ -173,6 +159,7 @@ if __name__ == '__main__':
         print(ret_msg)
         print(get_connection_state())
         from sys import exit
+
         exit()
 
     else:
@@ -184,7 +171,7 @@ if __name__ == '__main__':
 
 
 # ===== Parameter =====
-def get_variables() -> tuple[dict[str, Expression], ReturnMsg]:
+def get_variables() -> tuple[dict[str, Expression], ReturnType]:
     out = dict()
 
     # check Femtet Connection
@@ -217,8 +204,7 @@ def get_variables() -> tuple[dict[str, Expression], ReturnMsg]:
     return out, ReturnMsg.no_message
 
 
-def apply_variables(variables: dict[str, float | str]) -> tuple[ReturnMsg, str | None]:
-
+def apply_variables(variables: dict[str, float | str]) -> tuple[ReturnType, str | None]:
     # check Femtet Connection
     ret = get_connection_state()
     if ret != ReturnMsg.no_message:
@@ -306,7 +292,7 @@ def open_help(partial_url):
 
 
 # ===== project handling =====
-def get_name() -> tuple[tuple[tuple[str], str] | None, ReturnMsg]:
+def get_name() -> tuple[tuple[tuple[str], str] | None, ReturnType]:
     """
     Returns:
         file_paths, model_name
@@ -325,7 +311,7 @@ def get_name() -> tuple[tuple[tuple[str], str] | None, ReturnMsg]:
     return ((_Femtet.Project,), _Femtet.AnalysisModelName), ReturnMsg.no_message
 
 
-def save_femprj() -> tuple[bool, tuple[ReturnMsg, str]]:
+def save_femprj() -> tuple[bool, tuple[ReturnType, str]]:
     a_msg = ''
 
     # check Femtet Connection
@@ -352,9 +338,9 @@ def save_femprj() -> tuple[bool, tuple[ReturnMsg, str]]:
     return True, (ReturnMsg.no_message, a_msg)
 
 
-def open_sample() -> tuple[ReturnMsg, str]:
-
+def open_sample() -> tuple[ReturnType, str]:
     # get path
+    # noinspection PyTypeChecker
     path = os.path.abspath(
         os.path.join(
             os.path.dirname(pyfemtet_opt_gui.__file__),

@@ -15,7 +15,8 @@ import enum
 __all__ = [
     'ReturnMsg',
     'show_return_msg',
-    'can_continue'
+    'can_continue',
+    'ReturnType'
 ]
 
 
@@ -86,6 +87,9 @@ class ReturnMsg:
                                              '最適化を中断する場合は、ブラウザでプロセスモニターにアクセス（既定は「http://localhost:8080」）して'
                                              '中断ボタンを押してください。')
         cannot_finish_during_optimization = '最適化の実行中は終了できません。先に最適化を終了してください。'
+
+
+ReturnType = ReturnMsg.Error | ReturnMsg.Warn | ReturnMsg.Info | ReturnMsg.no_message
 
 
 # ReturnMsg を受け取ってダイアログ表示し
