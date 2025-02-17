@@ -15,7 +15,6 @@ from pyfemtet_opt_gui.common.qt_util import *
 from pyfemtet_opt_gui.common.pyfemtet_model_bases import *
 from pyfemtet_opt_gui.common.return_msg import *
 from pyfemtet_opt_gui.common.titles import *
-from pyfemtet_opt_gui.gui_interfaces import femtet
 
 from pyfemtet_opt_gui.models.analysis_model.analysis_model import get_am_model_for_problem
 from pyfemtet_opt_gui.models.variables.var import get_var_model_for_problem
@@ -194,7 +193,7 @@ class ConfirmWizardPage(TitledWizardPage):
                 # 了解を得られなかったので実行しない
                 return
 
-        femtet.save_femprj()
+        fi.get().save_femprj()
 
         self.worker.set_path(path)
         self.worker.started.connect(lambda: self.switch_save_script_button(True))
@@ -346,14 +345,14 @@ class ConfirmWizardPage(TitledWizardPage):
 
 if __name__ == '__main__':
     import sys
-    from pyfemtet_opt_gui.gui_interfaces import femtet
+    import pyfemtet_opt_gui.fem_interfaces as fi
     from pyfemtet_opt_gui.models.objectives.obj import ObjectiveWizardPage
     from pyfemtet_opt_gui.models.variables.var import VariableWizardPage
     from pyfemtet_opt_gui.models.config.config import ConfigWizardPage
     from pyfemtet_opt_gui.models.constraints.cns import ConstraintWizardPage
     from pyfemtet_opt_gui.models.analysis_model.analysis_model import AnalysisModelWizardPage
 
-    femtet.get_femtet()
+    fi.get().get_femtet()
 
     app = QApplication()
     app.setStyle('fusion')

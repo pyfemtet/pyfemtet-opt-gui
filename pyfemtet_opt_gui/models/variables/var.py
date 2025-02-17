@@ -24,7 +24,7 @@ from pyfemtet_opt_gui.common.pyfemtet_model_bases import *
 from pyfemtet_opt_gui.common.return_msg import *
 from pyfemtet_opt_gui.common.expression_processor import *
 from pyfemtet_opt_gui.common.titles import *
-from pyfemtet_opt_gui.gui_interfaces import femtet
+import pyfemtet_opt_gui.fem_interfaces as fi
 
 from pyfemtet_opt_gui.models.constraints.model import Constraint
 
@@ -309,7 +309,7 @@ class VariableItemModel(StandardItemModelWithHeader):
         # variables 取得
         expression: Expression
         expressions: dict[str, Expression]
-        expressions, ret_msg = femtet.get_variables()
+        expressions, ret_msg = fi.get().get_variables()
         if not can_continue(ret_msg, self.parent()):
             return ret_msg
 
@@ -585,7 +585,7 @@ class VariableItemModel(StandardItemModelWithHeader):
             )
 
         # Femtet に転送
-        return_msg, a_msg = femtet.apply_variables(variables)
+        return_msg, a_msg = fi.get().apply_variables(variables)
         show_return_msg(
             return_msg=return_msg,
             parent=self.parent(),
@@ -879,7 +879,7 @@ class VariableWizardPage(TitledWizardPage):
         self.ui = Ui_WizardPage()
         self.ui.setupUi(self)
         self.ui.commandLinkButton.clicked.connect(
-            lambda *args: femtet.open_help('ProjectCreation/VariableTree.htm')
+            lambda *args: fi.get().open_help('ProjectCreation/VariableTree.htm')
         )
 
     def setup_model(
@@ -942,7 +942,7 @@ if __name__ == '__main__':
     # _WITH_DUMMY = True  # comment out to prevent debug
     # from pyfemtet_opt_gui.femtet.mock import get_femtet, get_obj_names  # comment out to prevent debug
 
-    femtet.get_femtet()
+    fi.get().get_femtet()
 
     app = QApplication()
     app.setStyle('fusion')

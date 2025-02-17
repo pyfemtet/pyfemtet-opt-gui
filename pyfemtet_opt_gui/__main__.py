@@ -10,7 +10,9 @@ from PySide6.QtGui import *
 # noinspection PyUnresolvedReferences
 from PySide6.QtWidgets import *
 
-from pyfemtet_opt_gui.gui_interfaces import femtet
+# from pyfemtet_opt_gui.fem_interfaces import femtet, CADIntegration, switch_cad
+import pyfemtet_opt_gui.fem_interfaces as fi
+
 from pyfemtet_opt_gui.common.return_msg import *
 
 from pyfemtet_opt_gui.ui.ui_Wizard_main import Ui_Wizard
@@ -36,10 +38,6 @@ class ConnectionMessage(enum.StrEnum):
     connected = '接続されています。'
 
 
-class CADIntegration(enum.StrEnum):
-    no = 'なし'
-    solidworks = 'Solidworks'
-
 
 class Main(QWizard):
     ui: Ui_Wizard
@@ -63,11 +61,12 @@ class Main(QWizard):
         self.ui.pushButton_launch.clicked.connect(self.connect_femtet)
 
         # Cannot go to next page without connection
-        self.ui.wizardPage_init.isComplete = lambda: femtet.get_connection_state() == ReturnMsg.no_message
+        self.ui.wizardPage_init.isComplete = lambda: fi.get().get_connection_state() == ReturnMsg.no_message
 
         # Setup CAD integration
-        self.ui.comboBox.addItems([txt for txt in CADIntegration])
+        self.ui.comboBox.addItems([txt for txt in fi.CADIntegration])
         self.ui.comboBox.setCurrentIndex(0)
+        self.ui.comboBox.currentTextChanged.connect(self.switch_cad)
 
     def setup_page(self):
         self.am_page = AnalysisModelWizardPage(self, load_femtet_fun=self.load_femtet)
@@ -84,11 +83,14 @@ class Main(QWizard):
         self.addPage(self.config_page)
         self.addPage(self.problem_page)
 
+    def switch_cad(self, cad):
+        fi.switch_cad(cad)
+
     def connect_femtet(self):
         button: QPushButton = self.ui.pushButton_launch
 
         # Femtet との接続がすでに OK
-        ret: ReturnMsg = femtet.get_connection_state()
+        ret: ReturnMsg = fi.get().get_connection_state()
         if ret == ReturnMsg.no_message:
             self.update_connection_state_label(ConnectionMessage.connected)
 
@@ -101,7 +103,7 @@ class Main(QWizard):
 
             # Femtet との接続を開始する
             # Femtet の接続ができるのを待つ
-            _, ret_msg = femtet.get_femtet()
+            _, ret_msg = fi.get().get_femtet()
 
             # 接続成功
             if ret_msg == ReturnMsg.no_message:
@@ -117,10 +119,10 @@ class Main(QWizard):
 
         # 必要なら sample file を開く
         if (
-                femtet.get_connection_state() == ReturnMsg.no_message
+                fi.get().get_connection_state() == ReturnMsg.no_message
                 and self.ui.checkBox_openSampleFemprj.isChecked()
         ):
-            ret_msg, path = femtet.open_sample()
+            ret_msg, path = fi.get().open_sample()
             show_return_msg(ret_msg, self, additional_message=path)
 
         # load_femtet を行う

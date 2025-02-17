@@ -23,7 +23,7 @@ from pyfemtet_opt_gui.common.qt_util import *
 from pyfemtet_opt_gui.common.pyfemtet_model_bases import *
 from pyfemtet_opt_gui.common.return_msg import *
 from pyfemtet_opt_gui.common.titles import *
-from pyfemtet_opt_gui.gui_interfaces import femtet
+import pyfemtet_opt_gui.fem_interfaces as fi
 
 # ===== model =====
 OBJ_MODEL = None
@@ -156,7 +156,7 @@ class ObjectiveTableItemModel(StandardItemModelWithHeader):
 
     def load_femtet(self) -> ReturnMsg:
         # parametric if 設定取得
-        obj_names, ret_msg = femtet.get_obj_names()
+        obj_names, ret_msg = fi.get().get_obj_names()
         if not can_continue(ret_msg, parent=self.parent()):
             return ret_msg
 
@@ -350,7 +350,7 @@ class ObjectiveWizardPage(TitledWizardPage):
         self.ui = Ui_WizardPage_obj()
         self.ui.setupUi(self)
         self.ui.commandLinkButton.clicked.connect(
-            lambda *args: femtet.open_help('ParametricAnalysis/ParametricAnalysis.htm')
+            lambda *args: fi.get().open_help('ParametricAnalysis/ParametricAnalysis.htm')
         )
 
     def setup_model(self, load_femtet_fun):
@@ -424,7 +424,7 @@ if __name__ == '__main__':
     # _WITH_DUMMY = True  # comment out to prevent debug
     # from pyfemtet_opt_gui.femtet.mock import get_femtet, get_obj_names  # comment out to prevent debug
 
-    femtet.get_femtet()
+    fi.get().get_femtet()
 
     app = QApplication()
     app.setStyle('fusion')
