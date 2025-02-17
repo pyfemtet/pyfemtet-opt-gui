@@ -305,7 +305,11 @@ def open_help(partial_url):
 
 
 # ===== project handling =====
-def get_name() -> tuple[tuple[str, str] | None, ReturnMsg]:
+def get_name() -> tuple[tuple[tuple[str], str] | None, ReturnMsg]:
+    """
+    Returns:
+        file_paths, model_name
+    """
 
     # check Femtet Connection
     ret = get_connection_state()
@@ -314,10 +318,10 @@ def get_name() -> tuple[tuple[str, str] | None, ReturnMsg]:
 
     # check something opened
     if _Femtet.Project == '':
-        return ('解析プロジェクトが開かれていません', ''), ReturnMsg.no_message
+        return (('解析プロジェクトが開かれていません',), ''), ReturnMsg.no_message
 
     # else, return them
-    return (_Femtet.Project, _Femtet.AnalysisModelName), ReturnMsg.no_message
+    return ((_Femtet.Project,), _Femtet.AnalysisModelName), ReturnMsg.no_message
 
 
 def save_femprj() -> tuple[bool, tuple[ReturnMsg, str]]:
@@ -328,7 +332,8 @@ def save_femprj() -> tuple[bool, tuple[ReturnMsg, str]]:
     if ret != ReturnMsg.no_message:
         return False, (ret, a_msg)
 
-    (femprj_path, model_name), ret = get_name()
+    (femprj_paths, model_name), ret = get_name()
+    femprj_path = femprj_paths[0]
     if ret != ReturnMsg.no_message:
         return False, (ret, a_msg)
 

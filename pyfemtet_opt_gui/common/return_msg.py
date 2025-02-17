@@ -44,7 +44,6 @@ class ReturnMsg:
                                         'ただし、Femtet 上で「別名として保存」は行わないでください。')
         confirm_finish = '最適化スクリプト作成・実行を終了しますか？'
 
-
     class Error(enum.StrEnum):
         _test = 'This is a test Error message.'
 

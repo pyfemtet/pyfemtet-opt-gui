@@ -165,15 +165,15 @@ class FemprjModel(StandardItemModelWithHeader):
             return ret_msg
 
         # 名前を更新
-        femprj_path, model_name = names
+        file_paths, model_name = names
 
         # femprj_path
         with nullcontext():
             vhd = self.RowNames.femprj_path
             r = self.get_row_by_header_data(vhd)
             c = self.get_column_by_header_data(self.ColumnNames.value)
-            self.item(r, c).setText(femprj_path)
-            self.item(r, c).setToolTip(femprj_path)
+            self.item(r, c).setText('\n'.join(file_paths))
+            self.item(r, c).setToolTip('\n'.join(file_paths))
 
         # model
         with nullcontext():
@@ -214,12 +214,16 @@ class FemprjModel(StandardItemModelWithHeader):
         if not can_continue(ret_msg, parent=self.parent()):
             return False
 
+        # Femtet に関する情報をパース
+        actual_femprj_path = names[0][0]
+        actual_model_name = names[1]
+
         # 万一名前が違えば False
-        if os.path.abspath(names[0]).lower() != os.path.abspath(femprj_path).lower():
+        if os.path.abspath(actual_femprj_path).lower() != os.path.abspath(femprj_path).lower():
             return False
 
         # 万一名前が違えば False
-        if names[1].lower() != model_name.lower():
+        if actual_model_name.lower() != model_name.lower():
             return False
 
         return True
