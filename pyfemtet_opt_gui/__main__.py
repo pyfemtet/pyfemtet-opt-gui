@@ -10,7 +10,7 @@ from PySide6.QtGui import *
 # noinspection PyUnresolvedReferences
 from PySide6.QtWidgets import *
 
-from pyfemtet_opt_gui.femtet import femtet
+from pyfemtet_opt_gui.gui_interfaces import femtet
 from pyfemtet_opt_gui.common.return_msg import *
 
 from pyfemtet_opt_gui.ui.ui_Wizard_main import Ui_Wizard

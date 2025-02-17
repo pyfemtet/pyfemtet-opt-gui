@@ -24,7 +24,7 @@ from pyfemtet_opt_gui.common.pyfemtet_model_bases import *
 from pyfemtet_opt_gui.common.return_msg import *
 from pyfemtet_opt_gui.common.expression_processor import *
 from pyfemtet_opt_gui.common.titles import *
-from pyfemtet_opt_gui.femtet.femtet import *
+from pyfemtet_opt_gui.gui_interfaces import femtet
 
 # ===== model =====
 _FEMPRJ_MODEL = None

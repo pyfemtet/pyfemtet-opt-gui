@@ -15,7 +15,7 @@ from pyfemtet_opt_gui.common.qt_util import *
 from pyfemtet_opt_gui.common.pyfemtet_model_bases import *
 from pyfemtet_opt_gui.common.return_msg import *
 from pyfemtet_opt_gui.common.titles import *
-from pyfemtet_opt_gui.femtet.femtet import *
+from pyfemtet_opt_gui.gui_interfaces import femtet
 
 from pyfemtet_opt_gui.models.analysis_model.analysis_model import get_am_model_for_problem
 from pyfemtet_opt_gui.models.variables.var import get_var_model_for_problem
@@ -346,7 +346,7 @@ class ConfirmWizardPage(TitledWizardPage):
 
 if __name__ == '__main__':
     import sys
-    from pyfemtet_opt_gui.femtet.femtet import get_femtet
+    from pyfemtet_opt_gui.gui_interfaces.femtet import get_femtet
     from pyfemtet_opt_gui.models.objectives.obj import ObjectiveWizardPage
     from pyfemtet_opt_gui.models.variables.var import VariableWizardPage
     from pyfemtet_opt_gui.models.config.config import ConfigWizardPage

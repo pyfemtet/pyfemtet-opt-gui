@@ -19,7 +19,7 @@ from pyfemtet_opt_gui.common.qt_util import *
 from pyfemtet_opt_gui.common.pyfemtet_model_bases import *
 from pyfemtet_opt_gui.common.return_msg import *
 from pyfemtet_opt_gui.common.titles import *
-from pyfemtet_opt_gui.femtet.femtet import *
+from pyfemtet_opt_gui.gui_interfaces import femtet
 
 from pyfemtet_opt_gui.models.constraints.model import get_cns_model, ConstraintModel
 from pyfemtet_opt_gui.models.constraints.cns_dialog import ConstraintEditorDialog

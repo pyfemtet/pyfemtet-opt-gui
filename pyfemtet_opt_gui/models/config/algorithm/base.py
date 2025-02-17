@@ -21,7 +21,7 @@ from pyfemtet_opt_gui.common.return_msg import *
 # noinspection PyUnresolvedReferences
 from pyfemtet_opt_gui.common.expression_processor import *
 # noinspection PyUnresolvedReferences
-from pyfemtet_opt_gui.femtet.femtet import *
+from pyfemtet_opt_gui.gui_interfaces import femtet
 
 import enum
 from abc import ABC
