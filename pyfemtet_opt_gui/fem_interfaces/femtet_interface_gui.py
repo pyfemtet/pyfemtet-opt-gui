@@ -238,26 +238,70 @@ class FemtetInterfaceGUI:
 
         finally:
 
-            # モデルを再構築
-            # Gaudi にアクセスするだけで失敗する場合もある
-            # ここで失敗したらどうしようもない
-            try:
-                _Femtet.Gaudi.Activate()  # always returns None
-                succeeded = _Femtet.Gaudi.ReExecute()
-                if not succeeded:
-                    _Femtet.ShowLastError()
-                _Femtet.Redraw()  # always returns None
-
-
-            except Exception as e:  # com_error or NoAttribute
-                exception_msg = ' '.join([str(a) for a in e.args])
-                additional_msg = (f'マクロ名: ReExecute, '
-                                  f'エラーメッセージ: {exception_msg}')
-                return ReturnMsg.Error.femtet_macro_failed, additional_msg
+            r_msg2, a_msg2 = cls._rebuild_model()
+            if r_msg2 != ReturnMsg.no_message:
+                return r_msg2, a_msg2
 
             # except から finally に来ていれば
             # すでに return_msg が入っている
             return return_msg, additional_msg
+
+    # ===== Modeling =====
+    @classmethod
+    def _rebuild_model(cls) -> tuple[ReturnType, str | None]:
+        # モデルを再構築
+        # Gaudi にアクセスするだけで失敗する場合もある
+        # ここで失敗したらどうしようもない
+        try:
+            _Femtet.Gaudi.Activate()  # always returns None
+            succeeded = _Femtet.Gaudi.ReExecute()
+            if not succeeded:
+                _Femtet.ShowLastError()
+            _Femtet.Redraw()  # always returns None
+
+            return ReturnMsg.no_message, None
+
+        except Exception as e:  # com_error or NoAttribute
+            exception_msg = ' '.join([str(a) for a in e.args])
+            additional_msg = (f'マクロ名: ReExecute, '
+                              f'エラーメッセージ: {exception_msg}')
+            return ReturnMsg.Error.femtet_macro_failed, additional_msg
+
+    @classmethod
+    def _get_last_x_t_path(cls) -> tuple[ReturnType, str | None]:
+        """
+        Returns:
+            ReturnMsg, x_t_path
+        """
+
+        # check Connection
+        ret = cls.get_connection_state()
+        if ret != ReturnMsg.no_message:
+            return ret, None
+
+        x_t_path = _Femtet.Gaudi.LastXTPath
+
+        if x_t_path == '':
+            return ReturnMsg.Error.femtet_no_cad_import,  None
+
+        return ReturnMsg.no_message, x_t_path
+
+    @classmethod
+    def _set_last_x_t_path(cls, x_t_path) -> ReturnType:
+        """
+        Returns:
+            ReturnMsg
+        """
+
+        # check Connection
+        ret = cls.get_connection_state()
+        if ret != ReturnMsg.no_message:
+            return ret
+
+        _Femtet.Gaudi.LastXTPath = x_t_path
+
+        ret, *_ = cls._rebuild_model()
+        return ret
 
     # ===== femtet help homepage =====
     @classmethod
@@ -276,7 +320,7 @@ class FemtetInterfaceGUI:
 
     # ===== project handling =====
     @classmethod
-    def get_name(cls) -> tuple[tuple[tuple[str], str] | None, ReturnType]:
+    def get_name(cls) -> tuple[tuple[list[str], str] | None, ReturnType]:
         """
         Returns:
             file_paths, model_name
@@ -289,10 +333,10 @@ class FemtetInterfaceGUI:
 
         # check something opened
         if _Femtet.Project == '':
-            return (('解析プロジェクトが開かれていません',), ''), ReturnMsg.no_message
+            return (['解析プロジェクトが開かれていません',], ''), ReturnMsg.no_message
 
         # else, return them
-        return ((_Femtet.Project,), _Femtet.AnalysisModelName), ReturnMsg.no_message
+        return ([_Femtet.Project,], _Femtet.AnalysisModelName), ReturnMsg.no_message
 
     @classmethod
     def save_femprj(cls) -> tuple[bool, tuple[ReturnType, str]]:
@@ -342,6 +386,11 @@ class FemtetInterfaceGUI:
             return ReturnMsg.Error.cannot_open_sample_femprj, path
 
         return ReturnMsg.no_message, path
+
+    @classmethod
+    def _load_femprj(cls, path):
+        succeeded = _Femtet.LoadProject(path, True)
+        return succeeded
 
 
 if __name__ == '__main__':

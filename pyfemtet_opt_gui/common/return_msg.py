@@ -58,6 +58,7 @@ class ReturnMsg:
         femtet_macro_failed = 'Femtet マクロの実行に失敗しました。'
         femprj_or_model_inconsistent = 'Femtet で開かれている解析モデルが上記のモデルと一致しません。Femtet で開かれているモデルを確認し、「Load」ボタンを押してください。'
         femtet_save_failed = 'femprj ファイルの保存に失敗しました。'
+        femtet_no_cad_import = 'Femtet プロジェクトに CAD インポートコマンドが見つかりませんでした。まず Femtet で CAD インポートを行って解析条件設定を行ってください。'
 
         # expressions
         cannot_recognize_as_an_expression = '文字式の認識に失敗しました。'
@@ -87,6 +88,16 @@ class ReturnMsg:
                                              '最適化を中断する場合は、ブラウザでプロセスモニターにアクセス（既定は「http://localhost:8080」）して'
                                              '中断ボタンを押してください。')
         cannot_finish_during_optimization = '最適化の実行中は終了できません。先に最適化を終了してください。'
+
+        # solidworks
+        sw_process_not_found = 'Solidworks のプロセスがありません。'
+        sw_connection_not_yet = 'まだ Solidworks と接続されていません。'
+        sw_connection_error = 'Solidworks のプロセスと接続できていません。'
+        sw_no_active_doc = 'Solidworks のアクティブなモデルがありません。'
+        sw_model_error = 'Solidworks のモデル再構築に失敗しました。'
+        sw_cannot_export_model = 'Solidworks モデルの .x_t ファイル保存がタイムアウトしました。'
+        sw_remaining_variable = 'Solidworks モデルに登録されていない変数が転送されました。Solidworks で意図しないモデルが開かれている可能性があります。'
+        sw_sldprt_not_found = '開かれている Solidworks モデルの .sldprt ファイルパスが見つかりません。'
 
 
 ReturnType = ReturnMsg.Error | ReturnMsg.Warn | ReturnMsg.Info | ReturnMsg.no_message
