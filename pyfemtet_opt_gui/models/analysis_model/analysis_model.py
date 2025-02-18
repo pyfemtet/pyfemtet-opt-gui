@@ -17,6 +17,7 @@ from PySide6.QtGui import *
 # noinspection PyUnresolvedReferences
 from PySide6 import QtWidgets, QtCore, QtGui
 
+from pyfemtet_opt_gui.fem_interfaces import CADIntegration
 from pyfemtet_opt_gui.ui.ui_WizardPage_analysis_model import Ui_WizardPage
 
 from pyfemtet_opt_gui.common.qt_util import *
@@ -213,9 +214,14 @@ class FemprjModel(StandardItemModelWithHeader):
 
     def is_valid(self):
 
-        (femprj_path, *_), model_name = self.get_current_names()
+        (femprj_path, *related_paths), model_name = self.get_current_names()
         if not os.path.exists(femprj_path):
             return False
+
+        # パスが存在しなければ False
+        for path in (femprj_path, *related_paths):
+            if not os.path.isfile(path):
+                return False
 
         # 名前を取得
         names, ret_msg = fi.get().get_name()
@@ -225,7 +231,7 @@ class FemprjModel(StandardItemModelWithHeader):
             return False
 
         # Femtet に関する情報をパース
-        actual_femprj_path = names[0][0]
+        actual_femprj_path, *actual_related_paths = names[0]
         actual_model_name = names[1]
 
         # 万一名前が違えば False
@@ -235,6 +241,13 @@ class FemprjModel(StandardItemModelWithHeader):
         # 万一名前が違えば False
         if actual_model_name.lower() != model_name.lower():
             return False
+
+        # Solidworks ならば
+        if fi.get_current_cad_name() == CADIntegration.solidworks:
+            sldprt_path = related_paths[0]
+            actual_sldprt_path = actual_related_paths[0]
+            if os.path.abspath(actual_sldprt_path).lower() != os.path.abspath(sldprt_path).lower():
+                return False
 
         return True
 

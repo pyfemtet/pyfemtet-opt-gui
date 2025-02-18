@@ -137,8 +137,7 @@ class SolidWorksInterfaceGUI(FemtetInterfaceGUI):
         # get solidworks
         swModel = _sw.ActiveDoc
         if swModel is None:
-            ret_msg = ReturnMsg.Error.sw_no_active_doc
-            return {}, ret_msg
+            return {}, ReturnMsg.no_message
 
         # get equation manager
         swEqnMgr = swModel.GetEquationMgr
@@ -298,7 +297,7 @@ class SolidWorksInterfaceGUI(FemtetInterfaceGUI):
 
         swDoc = _sw.ActiveDoc
         if swDoc is None:
-            return None, ReturnMsg.Error.sw_no_active_doc
+            return '.sldprt ファイルが開かれていません', ReturnMsg.no_message
 
         path = swDoc.GetPathName
         if path is None or not os.path.isfile(path):
