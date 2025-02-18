@@ -185,12 +185,13 @@ class FemprjModel(StandardItemModelWithHeader):
         return ReturnMsg.no_message
 
     def get_current_names(self):
+
         # femprj_path
         with nullcontext():
             vhd = self.RowNames.femprj_path
             r = self.get_row_by_header_data(vhd)
             c = self.get_column_by_header_data(self.ColumnNames.value)
-            femprj_path = self.item(r, c).text()
+            paths = self.item(r, c).text().split('\n')
 
         # model
         with nullcontext():
@@ -199,11 +200,11 @@ class FemprjModel(StandardItemModelWithHeader):
             c = self.get_column_by_header_data(self.ColumnNames.value)
             model_name = self.item(r, c).text()
 
-        return femprj_path, model_name
+        return paths, model_name
 
     def is_valid(self):
 
-        femprj_path, model_name = self.get_current_names()
+        (femprj_path, *_), model_name = self.get_current_names()
         if not os.path.exists(femprj_path):
             return False
 

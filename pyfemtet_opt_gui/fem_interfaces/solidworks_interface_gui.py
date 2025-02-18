@@ -8,6 +8,7 @@ from win32com.client import Dispatch, CDispatch
 from win32comext.shell.shellcon import SLDF_HAS_NAME
 
 import pyfemtet_opt_gui
+from pyfemtet_opt_gui.logger import get_logger
 from pyfemtet_opt_gui.common.expression_processor import Expression
 from pyfemtet_opt_gui.common.return_msg import *
 from pyfemtet_opt_gui.fem_interfaces.femtet_interface_gui import (
@@ -295,7 +296,7 @@ class SolidWorksInterfaceGUI(FemtetInterfaceGUI):
             return None, ReturnMsg.Error.sw_no_active_doc
 
         path = swDoc.GetPathName
-        if path is None or os.path.isfile(path):
+        if path is None or not os.path.isfile(path):
             return None, ReturnMsg.Error.sw_sldprt_not_found
 
         return path, ReturnMsg.no_message

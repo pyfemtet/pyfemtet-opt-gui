@@ -26,6 +26,8 @@ from pyfemtet_opt_gui.builder.main import create_script
 from pyfemtet_opt_gui.builder.file_dialog import ScriptBuilderFileDialog
 from pyfemtet_opt_gui.builder.worker import OptimizationWorker, HistoryFinder
 
+import pyfemtet_opt_gui.fem_interfaces as fi
+
 import requests
 from requests.exceptions import ConnectionError
 from packaging.version import Version
@@ -345,7 +347,6 @@ class ConfirmWizardPage(TitledWizardPage):
 
 if __name__ == '__main__':
     import sys
-    import pyfemtet_opt_gui.fem_interfaces as fi
     from pyfemtet_opt_gui.models.objectives.obj import ObjectiveWizardPage
     from pyfemtet_opt_gui.models.variables.var import VariableWizardPage
     from pyfemtet_opt_gui.models.config.config import ConfigWizardPage

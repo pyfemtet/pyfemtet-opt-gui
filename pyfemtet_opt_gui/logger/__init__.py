@@ -6,7 +6,7 @@ _logger = None
 
 def _set_logger():
     global _logger
-    if _logger is not None:
+    if _logger is None:
         _logger = logging.getLogger('GUI')
         _logger.setLevel(logging.INFO)
         _logger.addHandler(logging.StreamHandler(sys.stdout))

@@ -22,3 +22,7 @@ def get():
 def switch_cad(cad):
     global current_cad
     current_cad = cad
+
+
+def get_current_cad_name():
+    return current_cad

@@ -6,6 +6,7 @@ from pyfemtet_opt_gui.models.variables.var import get_var_model, VariableItemMod
 from pyfemtet_opt_gui.models.config.config import get_config_model, ConfigItemModel
 from pyfemtet_opt_gui.models.objectives.obj import get_obj_model, ObjectiveTableItemModel
 from pyfemtet_opt_gui.models.constraints.model import get_cns_model, ConstraintModel
+from pyfemtet_opt_gui.fem_interfaces import get_current_cad_name, CADIntegration
 
 
 def create_from_model(model, method='output_json', n_indent=1):
@@ -25,21 +26,40 @@ def create_fem_script():
     code = ''
 
     am_model: FemprjModel = get_am_model(None)
-    femprj_path, model_name = am_model.get_current_names()
+    (femprj_path, *related_paths), model_name = am_model.get_current_names()
 
     obj_model: ObjectiveTableItemModel = get_obj_model(None)
     parametric_output_indexes_use_as_objective = obj_model.output_dict()
 
 
-    cmd_obj = dict(
-        command='FemtetInterface',
-        args=dict(
-            femprj_path=f'r"{femprj_path}"',
-            model_name=f'"{model_name}"',
-            parametric_output_indexes_use_as_objective=parametric_output_indexes_use_as_objective
-        ),
-        ret='fem',
-    )
+    if get_current_cad_name() == CADIntegration.no:
+        cmd_obj = dict(
+            command='FemtetInterface',
+            args=dict(
+                femprj_path=f'r"{femprj_path}"',
+                model_name=f'"{model_name}"',
+                parametric_output_indexes_use_as_objective=parametric_output_indexes_use_as_objective
+            ),
+            ret='fem',
+        )
+
+    elif get_current_cad_name() == CADIntegration.solidworks:
+
+        sldprt_path = related_paths[0]
+
+        cmd_obj = dict(
+            command='FemtetWithSolidworksInterface',
+            args=dict(
+                femprj_path=f'r"{femprj_path}"',
+                model_name=f'"{model_name}"',
+                sldprt_path=f'r"{sldprt_path}"',
+                parametric_output_indexes_use_as_objective=parametric_output_indexes_use_as_objective
+            ),
+            ret='fem',
+        )
+
+    else:
+        raise NotImplementedError
 
     line = create_command_line(json.dumps(cmd_obj))
     code += line

@@ -31,7 +31,7 @@ print()
 def create_header():
     code = '''
 # pyfemtet 基本クラス
-from pyfemtet.opt import FemtetInterface, OptunaOptimizer, FEMOpt
+from pyfemtet.opt import FemtetInterface, FemtetWithSolidworksInterface, OptunaOptimizer, FEMOpt
 
 # 最適化アルゴリズム
 from pyfemtet.opt.optimizer import PoFBoTorchSampler
@@ -45,7 +45,6 @@ mean = lambda *args: _mean(args)
 print('モジュールのインポートが完了しました。')
 print('最適化が開始されると、ブラウザのプロセスモニターが自動的に起動します。')
 print(f'======================')
-
 '''[1:]
     return code
 
