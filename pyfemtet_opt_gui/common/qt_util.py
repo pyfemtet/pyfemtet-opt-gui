@@ -34,11 +34,44 @@ __all__ = [
     'ExpandStateKeeper',
     'ResizeColumn',
     'HeaderDataNotFound',
+    'UntouchableProgressDialog',
 ]
 
 
 # ちょっとしたもの
 # ======================================================
+
+# Esc で消せない QProgressDialog
+class UntouchableProgressDialog(QProgressDialog):
+    def __init__(
+            self,
+            labelText: str,
+            cancelButtonText: str,
+            minimum: int,
+            maximum: int,
+            parent=...,
+    ) -> None:
+        flags = (Qt.WindowType.CustomizeWindowHint
+                 | Qt.WindowType.WindowTitleHint)
+        super().__init__(
+            labelText,
+            cancelButtonText,
+            minimum,
+            maximum,
+            parent,
+            flags
+        )
+
+        self.setWindowModality(Qt.WindowModality.WindowModal)
+
+        # noinspection PyTypeChecker
+        self.setCancelButton(None)
+
+    def keyPressEvent(self, event):
+        if event.key() == Qt.Key.Key_Escape:
+            event.ignore()
+        else:
+            super().keyPressEvent(event)
 
 
 # カスタムアイテムロール

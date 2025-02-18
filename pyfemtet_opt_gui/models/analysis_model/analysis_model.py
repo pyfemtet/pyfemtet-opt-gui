@@ -155,9 +155,12 @@ class FemprjModel(StandardItemModelWithHeader):
                 c = self.get_column_by_header_data(self.ColumnNames.value)
                 self.setItem(r, c, QStandardItem('解析モデル'))
 
-    def load_femtet(self) -> ReturnMsg:
+    def load_femtet(self, progress: QProgressDialog = None) -> ReturnMsg:
 
         # 名前を取得
+        if progress is not None:
+            progress.setValue(progress.value() + 1)
+            progress.forceShow()
         names, ret_msg = fi.get().get_name()
 
         # Femtet エラーならば何もしない
@@ -168,6 +171,9 @@ class FemprjModel(StandardItemModelWithHeader):
         file_paths, model_name = names
 
         # femprj_path
+        if progress is not None:
+            progress.setValue(progress.value() + 1)
+            progress.forceShow()
         with nullcontext():
             vhd = self.RowNames.femprj_path
             r = self.get_row_by_header_data(vhd)
@@ -176,6 +182,9 @@ class FemprjModel(StandardItemModelWithHeader):
             self.item(r, c).setToolTip('\n'.join(file_paths))
 
         # model
+        if progress is not None:
+            progress.setValue(progress.value() + 1)
+            progress.forceShow()
         with nullcontext():
             vhd = self.RowNames.model_name
             r = self.get_row_by_header_data(vhd)

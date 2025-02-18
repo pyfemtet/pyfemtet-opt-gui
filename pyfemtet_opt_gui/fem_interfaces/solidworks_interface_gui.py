@@ -6,6 +6,8 @@ from time import sleep, time
 from pythoncom import com_error
 from win32com.client import Dispatch, CDispatch
 from win32comext.shell.shellcon import SLDF_HAS_NAME
+# noinspection PyUnresolvedReferences
+from pythoncom import CoInitialize, CoUninitialize
 
 import pyfemtet_opt_gui
 from pyfemtet_opt_gui.logger import get_logger
@@ -22,8 +24,9 @@ _sw: CDispatch | None = None
 
 
 def launch_solidworks() -> bool:
-
     global _sw
+
+    CoInitialize()
 
     try:
         _sw = Dispatch('Sldworks.application')
@@ -75,7 +78,7 @@ class SolidWorksInterfaceGUI(FemtetInterfaceGUI):
             should_restart = True
 
         # Dispatch されたが現在 alive ではない場合
-        elif cls.get_connection_state() != ReturnMsg.no_message:
+        elif SolidWorksInterfaceGUI.get_sw_connection_state() != ReturnMsg.no_message:
             should_restart = True
 
         # 再起動する
@@ -94,6 +97,7 @@ class SolidWorksInterfaceGUI(FemtetInterfaceGUI):
 
     @classmethod
     def get_connection_state(cls) -> ReturnType:
+
         ret_msg = cls.get_sw_connection_state()
         if ret_msg != ReturnMsg.no_message:
             return ret_msg
@@ -116,7 +120,7 @@ class SolidWorksInterfaceGUI(FemtetInterfaceGUI):
 
         # Dispatch オブジェクトは存在するが
         # メソッドにアクセスできない場合
-        except com_error:
+        except com_error as e:
             return ReturnMsg.Error.sw_connection_error
 
         return ReturnMsg.no_message
@@ -126,7 +130,7 @@ class SolidWorksInterfaceGUI(FemtetInterfaceGUI):
     def get_variables(cls) -> tuple[dict[str, Expression], ReturnType]:
 
         # check Connection
-        ret = cls.get_connection_state()
+        ret = SolidWorksInterfaceGUI.get_sw_connection_state()
         if ret != ReturnMsg.no_message:
             return {}, ret
 
@@ -169,7 +173,7 @@ class SolidWorksInterfaceGUI(FemtetInterfaceGUI):
     def apply_variables(cls, variables: dict[str, float | str]) -> tuple[ReturnType, str | None]:
 
         # check Connection
-        ret = cls.get_connection_state()
+        ret = SolidWorksInterfaceGUI.get_sw_connection_state()
         if ret != ReturnMsg.no_message:
             return {}, ret
 
@@ -272,9 +276,10 @@ class SolidWorksInterfaceGUI(FemtetInterfaceGUI):
     # ===== project handling =====
     @classmethod
     def get_name(cls) -> tuple[tuple[list[str], str] | None, ReturnType]:
-        (paths, model_name), ret_msg = FemtetInterfaceGUI.get_name()
+        names, ret_msg = FemtetInterfaceGUI.get_name()
         if ret_msg != ReturnMsg.no_message:
             return None, ret_msg
+        (paths, model_name) = names
 
         sldprt_path, ret_msg = cls.get_sw_name()
         if ret_msg != ReturnMsg.no_message:
@@ -287,7 +292,7 @@ class SolidWorksInterfaceGUI(FemtetInterfaceGUI):
     def get_sw_name(cls) -> tuple[str | None, ReturnType]:
 
         # check Connection
-        ret = cls.get_connection_state()
+        ret = SolidWorksInterfaceGUI.get_sw_connection_state()
         if ret != ReturnMsg.no_message:
             return None, ret
 
@@ -317,7 +322,7 @@ class SolidWorksInterfaceGUI(FemtetInterfaceGUI):
     def save_sldprt(cls) -> tuple[bool, tuple[ReturnType, str]]:
 
         # check Connection
-        ret = cls.get_connection_state()
+        ret = SolidWorksInterfaceGUI.get_sw_connection_state()
         if ret != ReturnMsg.no_message:
             return False, (ret, '')
 
@@ -338,7 +343,7 @@ class SolidWorksInterfaceGUI(FemtetInterfaceGUI):
         ).replace(os.path.altsep, os.path.sep)
 
         # check Femtet Connection
-        ret = cls.get_connection_state()
+        ret = SolidWorksInterfaceGUI.get_sw_connection_state()
         if ret != ReturnMsg.no_message:
             return ret, path
 
@@ -356,7 +361,7 @@ class SolidWorksInterfaceGUI(FemtetInterfaceGUI):
         ).replace(os.path.altsep, os.path.sep)
 
         # check Femtet Connection
-        ret = cls.get_connection_state()
+        ret = SolidWorksInterfaceGUI.get_sw_connection_state()
         if ret != ReturnMsg.no_message:
             return ret, ', '.join([path, path2])
 

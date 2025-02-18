@@ -8,6 +8,8 @@ from win32com.client import Dispatch, CDispatch
 # noinspection PyUnresolvedReferences
 from pythoncom import com_error
 import win32process
+# noinspection PyUnresolvedReferences
+from pythoncom import CoInitialize, CoUninitialize
 
 import pyfemtet_opt_gui
 from pyfemtet_opt_gui.logger import get_logger
@@ -61,7 +63,7 @@ class FemtetInterfaceGUI:
             should_restart_femtet = True
 
         # Femtet が Dispatch されたが現在 alive ではない場合
-        elif cls.get_connection_state() != ReturnMsg.no_message:
+        elif FemtetInterfaceGUI.get_connection_state() != ReturnMsg.no_message:
             should_restart_femtet = True
 
         # Femtet を再起動する
@@ -120,7 +122,7 @@ class FemtetInterfaceGUI:
         global _dll
 
         # assert Femtet connected
-        assert cls.get_connection_state() == ReturnMsg.no_message
+        assert FemtetInterfaceGUI.get_connection_state() == ReturnMsg.no_message
 
         # get dll
         if _dll is None:
@@ -141,7 +143,7 @@ class FemtetInterfaceGUI:
         out = []
 
         # check Femtet Connection
-        ret = cls.get_connection_state()
+        ret = FemtetInterfaceGUI.get_connection_state()
         if ret != ReturnMsg.no_message:
             return out, ret
 
@@ -163,7 +165,7 @@ class FemtetInterfaceGUI:
         out = dict()
 
         # check Femtet Connection
-        ret = cls.get_connection_state()
+        ret = FemtetInterfaceGUI.get_connection_state()
         if ret != ReturnMsg.no_message:
             return {}, ret
 
@@ -194,7 +196,7 @@ class FemtetInterfaceGUI:
     @classmethod
     def apply_variables(cls, variables: dict[str, float | str]) -> tuple[ReturnType, str | None]:
         # check Femtet Connection
-        ret = cls.get_connection_state()
+        ret = FemtetInterfaceGUI.get_connection_state()
         if ret != ReturnMsg.no_message:
             return ret, None
 
@@ -275,7 +277,7 @@ class FemtetInterfaceGUI:
         """
 
         # check Connection
-        ret = cls.get_connection_state()
+        ret = FemtetInterfaceGUI.get_connection_state()
         if ret != ReturnMsg.no_message:
             return ret, None
 
@@ -294,7 +296,7 @@ class FemtetInterfaceGUI:
         """
 
         # check Connection
-        ret = cls.get_connection_state()
+        ret = FemtetInterfaceGUI.get_connection_state()
         if ret != ReturnMsg.no_message:
             return ret
 
@@ -320,16 +322,16 @@ class FemtetInterfaceGUI:
 
     # ===== project handling =====
     @classmethod
-    def get_name(cls) -> tuple[tuple[list[str], str] | None, ReturnType]:
+    def get_name(cls) -> tuple[tuple[list[str | None], str], ReturnType]:
         """
         Returns:
-            file_paths, model_name
+            (file_paths, model_name), return_msg
         """
 
         # check Femtet Connection
-        ret = cls.get_connection_state()
+        ret = FemtetInterfaceGUI.get_connection_state()
         if ret != ReturnMsg.no_message:
-            return None, ret
+            return ([None], ''), ret
 
         # check something opened
         if _Femtet.Project == '':
@@ -343,14 +345,14 @@ class FemtetInterfaceGUI:
         a_msg = ''
 
         # check Femtet Connection
-        ret = cls.get_connection_state()
+        ret = FemtetInterfaceGUI.get_connection_state()
         if ret != ReturnMsg.no_message:
             return False, (ret, a_msg)
 
         (femprj_paths, model_name), ret = cls.get_name()
-        femprj_path = femprj_paths[0]
         if ret != ReturnMsg.no_message:
             return False, (ret, a_msg)
+        femprj_path = femprj_paths[0]
 
         # SaveProject(ProjectFile As String, bForce As Boolean) As Boolean
         succeeded = _Femtet.SaveProject(femprj_path, True)
@@ -377,7 +379,7 @@ class FemtetInterfaceGUI:
         ).replace(os.path.altsep, os.path.sep)
 
         # check Femtet Connection
-        ret = cls.get_connection_state()
+        ret = FemtetInterfaceGUI.get_connection_state()
         if ret != ReturnMsg.no_message:
             return ret, path
 

@@ -1,3 +1,5 @@
+import sys
+
 # noinspection PyUnresolvedReferences
 from PySide6 import QtWidgets, QtCore, QtGui
 
@@ -10,11 +12,6 @@ from PySide6.QtGui import *
 # noinspection PyUnresolvedReferences
 from PySide6.QtWidgets import *
 
-# from pyfemtet_opt_gui.fem_interfaces import femtet, CADIntegration, switch_cad
-import pyfemtet_opt_gui.fem_interfaces as fi
-
-from pyfemtet_opt_gui.common.return_msg import *
-
 from pyfemtet_opt_gui.ui.ui_Wizard_main import Ui_Wizard
 from pyfemtet_opt_gui.models.analysis_model.analysis_model import AnalysisModelWizardPage
 from pyfemtet_opt_gui.models.variables.var import VariableWizardPage
@@ -23,20 +20,16 @@ from pyfemtet_opt_gui.models.constraints.cns import ConstraintWizardPage
 from pyfemtet_opt_gui.models.config.config import ConfigWizardPage
 from pyfemtet_opt_gui.models.problem.problem import ConfirmWizardPage
 
-import sys
-import enum
+from pyfemtet_opt_gui.common.return_msg import *
+from pyfemtet_opt_gui.common.qt_util import *
+from pyfemtet_opt_gui.fem_interfaces.connection_worker import *
+
+import pyfemtet_opt_gui.fem_interfaces as fi
 
 # Necessary to import early timing.
 # (importing just before run or threading causes an error.)
 # noinspection PyUnresolvedReferences
 import torch
-
-
-class ConnectionMessage(enum.StrEnum):
-    no_connection = '接続されていません。'
-    connecting = '接続可能な Femtet を探しています...\n見つからない場合は起動して接続します...'
-    connected = '接続されています。'
-
 
 
 class Main(QWizard):
@@ -87,73 +80,86 @@ class Main(QWizard):
         fi.switch_cad(cad)
 
     def connect_femtet(self):
+        """
+        プロセスとの接続は必要時間がわからないのでスレッド化して
+        プログレスバーのアニメーションで作業中であることを示す
+
+        Qt モデルの更新はメインスレッドでないと動作しないので
+        接続が終わり次第メインスレッドで更新するが
+        このときプログレスバーを更新することで作業中であることを示す
+        """
+
         button: QPushButton = self.ui.pushButton_launch
 
-        # Femtet との接続がすでに OK
-        ret: ReturnMsg = fi.get().get_connection_state()
-        if ret == ReturnMsg.no_message:
-            self.update_connection_state_label(ConnectionMessage.connected)
+        # progress を準備する
+        progress = UntouchableProgressDialog('Working...', '', 0, 0, parent=self)
+        progress.setWindowTitle('status')
+        progress.show()
 
-        # Femtet との接続が NG
-        else:
-            # 接続開始
-            self.update_connection_state_label(ConnectionMessage.connecting)
+        # 開始時及び終了時の動作を定義する
+        def when_start():
+
+            # button を disable にする
             button.setEnabled(False)
             button.repaint()
 
-            # Femtet との接続を開始する
-            # Femtet の接続ができるのを待つ
-            _, ret_msg = fi.get().get_femtet()
+        def when_finished(ret_code):
 
-            # 接続成功
-            if ret_msg == ReturnMsg.no_message:
-                self.update_connection_state_label(ConnectionMessage.connected)
+            # init ページの終了条件を更新する
+            self.ui.wizardPage_init.completeChanged.emit()
 
-            # 接続タイムアウト
-            else:
-                show_return_msg(ret_msg, self)
-                self.update_connection_state_label(ConnectionMessage.no_connection)
+            # connection に成功したかどうか
+            if can_continue(ret_code, self, no_dialog_if_info=True):
 
-        # init ページの終了条件を更新する
-        self.ui.wizardPage_init.completeChanged.emit()
+                # スレッドで接続に成功していても
+                # 一度は メインスレッドで接続しなければならない
+                fi.get().get_femtet()
 
-        # 必要なら sample file を開く
-        if (
-                fi.get().get_connection_state() == ReturnMsg.no_message
-                and self.ui.checkBox_openSampleFemprj.isChecked()
-        ):
-            ret_msg, path = fi.get().open_sample()
-            show_return_msg(ret_msg, self, additional_message=path)
+                # load_femtet を行う
+                # 時間がかかるが Model の更新は
+                # メインスレッドで行う必要がある？
+                self.load_femtet(progress)
 
-        # load_femtet を行う
-        self.load_femtet()
+            # button を元に戻す
+            button.setEnabled(True)
+            button.repaint()
 
-        # button を元に戻す
-        button.setEnabled(True)
-        button.repaint()
+            # progress を消す
+            progress.cancel()
 
-    def update_connection_state_label(self, connection_message: ConnectionMessage):
-        label: QLabel = self.ui.label_connectionState
+        # 接続を開始する
+        task = ConnectionWorker(self, self.ui)
+        task.started.connect(when_start)
+        task.finished.connect(lambda ret_code: when_finished(ret_code))
+        task.start()
 
-        label.setText(connection_message)
-        if connection_message == ConnectionMessage.no_connection:
-            label.setStyleSheet('color: red')
+    def load_femtet(self, progress: QProgressDialog = None):
 
-        elif connection_message == ConnectionMessage.connecting:
-            label.setStyleSheet('color: red')
+        if progress is not None:
+            progress.setMinimum(0)
+            progress.setMaximum(6)
+            progress.show()
 
-        elif connection_message == ConnectionMessage.connected:
-            label.setStyleSheet('color: green')
-
-    def load_femtet(self):
-        ret_msg = self.am_page.source_model.load_femtet()
+        if progress is not None:
+            progress.setLabelText('ファイル情報を読み込んでいます...')
+            progress.setValue(progress.value() + 1)
+            progress.forceShow()
+        ret_msg = self.am_page.source_model.load_femtet(progress)  # progress +3
         if ret_msg != ReturnMsg.no_message:
             return
 
+        if progress is not None:
+            progress.setLabelText('変数を読み込んでいます...')
+            progress.setValue(progress.value() + 1)
+            progress.forceShow()
         ret_msg = self.var_page.source_model.load_femtet()
         if ret_msg != ReturnMsg.no_message:
             return
 
+        if progress is not None:
+            progress.setLabelText('解析設定を読み込んでいます...')
+            progress.setValue(progress.value() + 1)
+            progress.forceShow()
         ret_msg = self.obj_page.source_model.load_femtet()
         if ret_msg != ReturnMsg.no_message:
             return

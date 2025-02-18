@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 # noinspection PyUnresolvedReferences
 from PySide6 import QtWidgets, QtCore, QtGui
 
@@ -99,6 +101,73 @@ class ReturnMsg:
         sw_remaining_variable = 'Solidworks モデルに登録されていない変数が転送されました。Solidworks で意図しないモデルが開かれている可能性があります。'
         sw_sldprt_not_found = '開かれている Solidworks モデルの .sldprt ファイルパスが見つかりません。'
 
+    @classmethod
+    def encode(cls, value: enum.StrEnum | None) -> str:
+
+        if value == cls.no_message:
+            return ''
+
+        # noinspection PyUnresolvedReferences
+        if isinstance(value, cls.Info):
+            prefix = 'I'
+        elif isinstance(value, cls.Warn):
+            prefix = 'W'
+        elif isinstance(value, cls.Error):
+            prefix = 'E'
+        else:
+            raise NotImplementedError
+
+        return f'{prefix}{value.name}'
+
+    @classmethod
+    def parse_code(cls, code: str) -> 'ReturnType':
+        assert isinstance(code, str)
+
+        if code == '':
+            ret = cls.no_message
+
+        else:
+            prefix = code[0]
+            name = code[1:]
+
+            if prefix == 'I':
+                E = cls.Info
+            elif prefix == 'W':
+                E = cls.Warn
+            elif prefix == 'E':
+                E = cls.Error
+            else:
+                raise NotImplementedError
+
+            if name in E._member_map_:
+                # noinspection PyTypeChecker
+                ret = E._member_map_[name]
+            else:
+                raise NotImplementedError('Invalid message.')
+
+        assert (
+            ret == ReturnMsg.no_message
+            or isinstance(ret, cls.Info)
+            or isinstance(ret, cls.Warn)
+            or isinstance(ret, cls.Error)
+        )
+
+        return ret
+
+    @classmethod
+    def verify_return_message(cls, code_or_ret: str | ReturnType) -> ReturnType:
+
+        if (
+                code_or_ret == cls.no_message
+                or isinstance(code_or_ret, cls.Info)
+                or isinstance(code_or_ret, cls.Warn)
+                or isinstance(code_or_ret, cls.Error)
+        ):
+            return code_or_ret
+
+        else:
+            return cls.parse_code(code_or_ret)
+
 
 ReturnType = ReturnMsg.Error | ReturnMsg.Warn | ReturnMsg.Info | ReturnMsg.no_message
 
@@ -106,11 +175,14 @@ ReturnType = ReturnMsg.Error | ReturnMsg.Warn | ReturnMsg.Info | ReturnMsg.no_me
 # ReturnMsg を受け取ってダイアログ表示し
 # OK かどうかを返す関数
 def show_return_msg(
-        return_msg: ReturnMsg | ReturnMsg.Info | ReturnMsg.Warn | ReturnMsg.Error,
+        return_msg: ReturnMsg | ReturnMsg.Info | ReturnMsg.Warn | ReturnMsg.Error | str,
         parent: QWidget,
         with_cancel_button=False,
         additional_message=None,
 ) -> bool:
+
+    return_msg = ReturnMsg.verify_return_message(return_msg)
+
     if return_msg == ReturnMsg.no_message:
         return True
 
@@ -150,7 +222,7 @@ def show_return_msg(
 # ReturnMsg を受け取ってダイアログを表示した後
 # 内部処理を進めてよいかどうかを返す関数
 def can_continue(
-        return_msg: ReturnMsg | ReturnMsg.Info | ReturnMsg.Warn | ReturnMsg.Error,
+        return_msg: ReturnMsg | ReturnMsg.Info | ReturnMsg.Warn | ReturnMsg.Error | str,
         parent: QWidget,
         with_cancel_button='auto',
         no_dialog_if_info=False,
@@ -162,6 +234,9 @@ def can_continue(
     return_msg is Warn -> return True if accepted
     return_msg is Error -> return False
     """
+
+    return_msg = ReturnMsg.verify_return_message(return_msg)
+
     if return_msg == ReturnMsg.no_message:
         return True
 
