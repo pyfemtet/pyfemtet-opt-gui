@@ -9,8 +9,10 @@ from win32comext.shell.shellcon import SLDF_HAS_NAME
 # noinspection PyUnresolvedReferences
 from pythoncom import CoInitialize, CoUninitialize
 
+# noinspection PyUnresolvedReferences
+from PySide6.QtWidgets import *
+
 import pyfemtet_opt_gui
-from pyfemtet_opt_gui.logger import get_logger
 from pyfemtet_opt_gui.common.expression_processor import Expression
 from pyfemtet_opt_gui.common.return_msg import *
 from pyfemtet_opt_gui.fem_interfaces.femtet_interface_gui import (
@@ -62,14 +64,17 @@ class SolidWorksInterfaceGUI(FemtetInterfaceGUI):
 
     # ===== process & object handling =====
     @classmethod
-    def get_femtet(cls) -> tuple[CDispatch | None, ReturnType]:
-        cls.get_sw()
-        return FemtetInterfaceGUI.get_femtet()
+    def get_femtet(cls, progress: QProgressDialog = None) -> tuple[CDispatch | None, ReturnType]:
+        cls.get_sw(progress)
+        return FemtetInterfaceGUI.get_femtet(progress)
 
     @classmethod
-    def get_sw(cls) -> tuple[CDispatch | None, ReturnType]:
+    def get_sw(cls, progress: QProgressDialog = None) -> tuple[CDispatch | None, ReturnType]:
 
         global _sw
+
+        if progress is not None:
+            progress.setLabelText('Solidworks を起動しています...')
 
         should_restart = False
 
@@ -331,7 +336,11 @@ class SolidWorksInterfaceGUI(FemtetInterfaceGUI):
         return True, (ReturnMsg.no_message, '')
 
     @classmethod
-    def open_sample(cls) -> tuple[ReturnType, str]:
+    def open_sample(cls, progress: QProgressDialog = None) -> tuple[ReturnType, str]:
+
+        if progress is not None:
+            progress.setLabelText('Femtet のサンプルファイルを開いています...')
+
         # get path
         # noinspection PyTypeChecker
         path = os.path.abspath(
@@ -349,6 +358,9 @@ class SolidWorksInterfaceGUI(FemtetInterfaceGUI):
         succeeded = cls._load_femprj(path)
         if not succeeded:
             return ReturnMsg.Error.cannot_open_sample_femprj, path
+
+        if progress is not None:
+            progress.setLabelText('Solidworks のサンプルファイルを開いています...')
 
         # get path
         # noinspection PyTypeChecker

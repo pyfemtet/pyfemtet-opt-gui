@@ -11,6 +11,9 @@ import win32process
 # noinspection PyUnresolvedReferences
 from pythoncom import CoInitialize, CoUninitialize
 
+# noinspection PyUnresolvedReferences
+from PySide6.QtWidgets import *
+
 import pyfemtet_opt_gui
 from pyfemtet_opt_gui.logger import get_logger
 from pyfemtet_opt_gui.common.return_msg import ReturnMsg, ReturnType
@@ -53,8 +56,11 @@ class FemtetInterfaceGUI:
 
     # ===== Femtet process & object handling =====
     @classmethod
-    def get_femtet(cls) -> tuple[CDispatch | None, ReturnType]:
+    def get_femtet(cls, progress: QProgressDialog = None) -> tuple[CDispatch | None, ReturnType]:
         global _Femtet
+
+        if progress is not None:
+            progress.setLabelText('Femtet を起動しています...')
 
         should_restart_femtet = False
 
@@ -368,7 +374,11 @@ class FemtetInterfaceGUI:
         return True, (ReturnMsg.no_message, a_msg)
 
     @classmethod
-    def open_sample(cls) -> tuple[ReturnType, str]:
+    def open_sample(cls, progress: QProgressDialog = None) -> tuple[ReturnType, str]:
+
+        if progress is not None:
+            progress.setLabelText('Femtet のサンプルファイルを開いています...')
+
         # get path
         # noinspection PyTypeChecker
         path = os.path.abspath(

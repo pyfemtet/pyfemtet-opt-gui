@@ -128,7 +128,7 @@ class Main(QWizard):
             progress.cancel()
 
         # 接続を開始する
-        task = ConnectionWorker(self, self.ui)
+        task = ConnectionWorker(self, self.ui, progress)
         task.started.connect(when_start)
         task.finished.connect(lambda ret_code: when_finished(ret_code))
         task.start()

@@ -47,10 +47,11 @@ class ConnectionWorker(QThreadWithReturnMsg):
             self,
             parent,
             ui: ui_Wizard_main,
-
+            progress: QProgressDialog = None,
     ):
         super().__init__(parent)
         self.ui: ui_Wizard_main = ui
+        self.progress: QProgressDialog | None = progress
 
     def run(self):
 
@@ -68,7 +69,7 @@ class ConnectionWorker(QThreadWithReturnMsg):
 
             # Femtet との接続を開始する
             # Femtet の接続ができるのを待つ
-            _, ret_msg = fi.get().get_femtet()
+            _, ret_msg = fi.get().get_femtet(self.progress)
 
             if ret_msg != ReturnMsg.no_message:
                 self.update_connection_state_label(ConnectionMessage.no_connection)
@@ -83,7 +84,7 @@ class ConnectionWorker(QThreadWithReturnMsg):
                 fi.get().get_connection_state() == ReturnMsg.no_message
                 and self.ui.checkBox_openSampleFemprj.isChecked()
         ):
-            ret_msg, path = fi.get().open_sample()
+            ret_msg, path = fi.get().open_sample(self.progress)
 
             # 開くのに失敗
             if ret_msg != ReturnMsg.no_message:
