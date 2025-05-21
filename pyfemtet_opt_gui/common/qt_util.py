@@ -45,7 +45,7 @@ __all__ = [
 
 # デバッグ用
 # ======================================================
-DEBUGGING_FLAG_PATH = '.debugging'
+DEBUGGING_FLAG_PATH = os.path.join(os.path.dirname(__file__), '.debugging')
 
 
 def _is_debugging():

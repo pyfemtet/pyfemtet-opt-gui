@@ -9,5 +9,5 @@ __all__ = [
 # インポート可能でなければいけない
 class SurrogateModelNames(enum.StrEnum):
     no = 'なし'
-    BoTorchInterface = 'BoTorchInterface'  # auto() を使うと小文字になる
+    # BoTorchInterface = 'BoTorchInterface'  # auto() を使うと小文字になる
     PoFBoTorchInterface = 'PoFBoTorchInterface'

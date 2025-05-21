@@ -834,7 +834,7 @@ class ConfigItemModel(StandardItemModelWithHeader):
 
                 # GUI が history_path にアクセスできるよう
                 # 自身に与えられるパスを持っておく
-                # 現在の実装では run_script() の中で
+                # 現在の実装では start_run_script_thread() の中で
                 # chdir しているので相対パスでも問題ない
                 self.history_path = history_path
 
@@ -856,7 +856,7 @@ class ConfigItemModel(StandardItemModelWithHeader):
     def reset_history_path(self):
         self.history_path = None
 
-    def get_surrogate_model(self) -> SurrogateModelNames:
+    def get_surrogate_model_name(self) -> SurrogateModelNames:
         c = self.get_column_by_header_data(
             self.ColumnNames.value,
         )
@@ -1041,6 +1041,6 @@ if __name__ == '__main__':
     page_obj.show()
 
     config_model = get_config_model(None)
-    print(config_model.get_surrogate_model())
+    print(config_model.get_surrogate_model_name())
 
     sys.exit(app.exec())

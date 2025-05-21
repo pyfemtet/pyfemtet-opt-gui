@@ -20,14 +20,17 @@ from pyfemtet_opt_gui.models.analysis_model.analysis_model import get_am_model_f
 from pyfemtet_opt_gui.models.variables.var import get_var_model_for_problem
 from pyfemtet_opt_gui.models.objectives.obj import get_obj_model_for_problem
 from pyfemtet_opt_gui.models.constraints.cns import get_cns_model_for_problem
-from pyfemtet_opt_gui.models.config.config import get_config_model_for_problem
+from pyfemtet_opt_gui.models.config.config import get_config_model_for_problem, get_config_model
 
 from pyfemtet_opt_gui.builder.main import create_script
 from pyfemtet_opt_gui.builder.file_dialog import ScriptBuilderFileDialog
 from pyfemtet_opt_gui.builder.worker import OptimizationWorker, HistoryFinder
+from pyfemtet_opt_gui.surrogate_model_interfaces import SurrogateModelNames
+from pyfemtet_opt_gui.logger import get_logger
 
 import pyfemtet_opt_gui.fem_interfaces as fi
 
+import os
 import requests
 from requests.exceptions import ConnectionError
 from packaging.version import Version
@@ -38,6 +41,8 @@ SUB_MODELS = None
 PROBLEM_MODEL = None
 
 _REMOVING_SWEEP_WARNED = False  # スイープテーブル削除の警告
+
+logger = get_logger()
 
 
 # ===== rules =====
@@ -138,6 +143,7 @@ class ConfirmWizardPage(TitledWizardPage):
         )
 
     def save_script(self):
+        global _REMOVING_SWEEP_WARNED
 
         # 保存ファイル名を決めてもらう
         selected_file = None
@@ -169,19 +175,7 @@ class ConfirmWizardPage(TitledWizardPage):
         if len(selected_files) == 0:
             return
 
-        # スクリプトを保存する
-        path = selected_files[0]
-        create_script(path)
-
-        # 「保存後すぐ実行する」にチェックがあれば実行する
-        should_run = self.ui.checkBox_save_with_run.checkState() == Qt.CheckState.Checked
-        if should_run:
-            self.run_script(path)
-
-    def run_script(self, path):
-        global _REMOVING_SWEEP_WARNED
-
-        # 未了解ならスイープテーブル削除の警告を行う
+        # スイープテーブルが削除される旨を警告
         if not _REMOVING_SWEEP_WARNED:
             # TODO: 永続化する
             if can_continue(
@@ -195,20 +189,89 @@ class ConfirmWizardPage(TitledWizardPage):
                 # 了解を得られなかったので実行しない
                 return
 
+        # サロゲートモデルを作成するかどうかで処理を変更
+        config_model = get_config_model(self)
+        if config_model.get_surrogate_model_name() == SurrogateModelNames.no:
+
+            # スクリプトを保存する
+            path = selected_files[0]
+            create_script(path)
+
+            # 「保存後すぐ実行する」にチェックがあれば実行する
+            should_run = self.ui.checkBox_save_with_run.checkState() == Qt.CheckState.Checked
+            if should_run:
+                history_path = config_model.history_path
+                assert history_path is not None
+                self.start_run_script_thread((path,), (history_path,))
+
+        else:
+            # スクリプトを保存する
+            user_defined_path = selected_files[0]
+            pre, post = os.path.splitext(user_defined_path)
+            training_py_path = pre + post  # create_script で「ファイル名 + _訓練データ.csv」を指定するので何か入れると不自然
+            optimize_py_path = pre + '_optimize' + post
+
+            # ユーザーは history_path を指定していない可能性があり、
+            # そのような場合は create_script 内で history_path が
+            # 確定する
+            create_script(training_py_path)
+            history_path_1 = config_model.history_path
+            assert history_path_1 is not None
+            config_model.reset_history_path()
+
+            create_script(optimize_py_path, use_surrogate=True)
+            history_path_2 = config_model.history_path
+            assert history_path_2 is not None
+
+            history_paths = (
+                history_path_1,
+                history_path_2
+            )
+
+            # 「保存後すぐ実行する」にチェックがあれば実行する
+            should_run = self.ui.checkBox_save_with_run.checkState() == Qt.CheckState.Checked
+            if should_run:
+
+                should_run_after_confirm = True
+
+                # 2 回実行することを通知する
+                if not can_continue(
+                    ReturnMsg.Info.run_twice_in_surrogate,
+                    parent=self,
+                    no_dialog_if_info=False,
+                    with_cancel_button=True,
+                ):
+                    should_run_after_confirm = False
+
+                # 終了条件が未指定なら警告もする
+                if config_model.is_no_finish_conditions():
+                    if not can_continue(
+                            ReturnMsg.Warn.no_finish_conditions_in_surrogate_optimization,
+                            parent=self,
+                    ):
+                        should_run_after_confirm = False
+
+                if should_run_after_confirm:
+                    self.start_run_script_thread(
+                        (training_py_path, optimize_py_path),
+                        history_paths
+                    )
+
+    def start_run_script_thread(self, py_paths, history_paths):
         fi.get().save_femprj()
 
-        self.worker.set_path(path)
+        self.worker.set_paths(py_paths)
         self.worker.started.connect(lambda: self.switch_save_script_button(True))
         self.worker.finished.connect(lambda: self.switch_save_script_button(False))
         self.worker.started.connect(lambda: self.switch_explanation_text('started'))
         self.worker.finished.connect(lambda: self.switch_explanation_text('finished'))
-        self.worker.start()
 
-        proxy_model = get_config_model_for_problem(self)
-        history_path = proxy_model.get_history_path()
-        assert history_path is not None
-        self.history_finder = HistoryFinder(self.worker, history_path)
+        self.history_finder = HistoryFinder(self.worker, history_paths, py_paths)
         self.history_finder.finished.connect(lambda: self.switch_explanation_text('history found'))
+
+        # worker は history の初期化(signal connect)の後に
+        # 実行する必要がある
+        self.worker.start()
         self.history_finder.start()
 
     def switch_save_script_button(self, running: bool):
@@ -245,6 +308,11 @@ class ConfirmWizardPage(TitledWizardPage):
         # worker が実行ならば button を disabled にするなど
         text_edit: QTextBrowser = self.ui.textBrowser
 
+        # FIXME:
+        #   変な終了の仕方をして
+        #   optimization worker が終了してから
+        #   history が見つかると assertion error が
+        #   起こってしまう
         if state == 'started':
             buff = text_edit.toHtml()
             text_edit._buff = buff
@@ -257,7 +325,6 @@ class ConfirmWizardPage(TitledWizardPage):
             # version 0.8.6 以降、host 情報にアクセスできる
             proxy_model = get_config_model_for_problem(self)
             data, ret_msg = proxy_model.get_monitor_host_info()
-
 
             text = (f'\nブラウザで上の URL にアクセスすると'
                     f'プロセスモニターを開くことができます。')

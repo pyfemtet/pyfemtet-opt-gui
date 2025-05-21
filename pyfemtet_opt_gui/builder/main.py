@@ -24,7 +24,7 @@ class SurrogateCodeState(enum.Enum):
 
 def get_surrogate_code_state(use_surrogate) -> SurrogateCodeState:
     config_model: ConfigItemModel = get_config_model(None)
-    surrogate_model_name: SurrogateModelNames = config_model.get_surrogate_model()
+    surrogate_model_name: SurrogateModelNames = config_model.get_surrogate_model_name()
 
     if surrogate_model_name == SurrogateModelNames.no:
         if use_surrogate:
@@ -98,7 +98,7 @@ def create_fem_script(surrogate_code_state: SurrogateCodeState):
 
     else:
         config_model: ConfigItemModel = get_config_model(None)
-        surrogate_model_name = config_model.get_surrogate_model()
+        surrogate_model_name = config_model.get_surrogate_model_name()
         assert surrogate_model_name != SurrogateModelNames.no
         assert training_history_path is not None
 
@@ -158,6 +158,12 @@ def create_femopt(surrogate_code_state: SurrogateCodeState):
     code: str = create_from_model(model, 'output_femopt_json')
 
     if surrogate_code_state == SurrogateCodeState.for_surrogate_training:
+        # history_path を参照する必要のある
+        # ConfirmWizardPage の save_script などのために
+        # 書き換えた history_path を保存
+        # TODO: config_model で設定できるようにし、
+        #   ここではそれを参照するだけにする
+        model.history_path = training_history_path
         code = re.sub(
             r'history_path=".*?"',
             f'history_path="{training_history_path}"',
@@ -167,8 +173,10 @@ def create_femopt(surrogate_code_state: SurrogateCodeState):
     return code
 
 
-# 訓練データ作成時に決定できる
-# サロゲートモデルに読み込ませる用のパス
+# 訓練データ作成時に決定する
+# サロゲートモデルに読み込ませる用の
+# 訓練データの履歴 csv path
+# TODO: config_model で指定できるようにする
 training_history_path: str | None = None
 
 

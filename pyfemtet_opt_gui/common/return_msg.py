@@ -29,6 +29,12 @@ class ReturnMsg:
         _test = 'This is a test information.'
 
         interrupt_signal_emitted = '中断信号を送信しました。現在の解析を最後に最適化を終了します。'
+        run_twice_in_surrogate = ('サロゲートモデルを用いた最適化をする場合、'
+                                  'まず Femtet を使って訓練データを作成し、'
+                                  '次にサロゲートモデルが訓練データを参照して'
+                                  '最適化を行います。\n'
+                                  'OK を押すと訓練データ作成を開始し、'
+                                  'それが終了すると自動的に最適化を開始します。')
 
     class Warn(enum.StrEnum):
         _test = 'This is a test warning message.'
@@ -44,8 +50,13 @@ class ReturnMsg:
         no_finish_conditions = '最適化の終了条件が指定されていません。この場合、手動で最適化を停止するまで計算を続けます。よろしいですか？'
         notify_to_sweep_table_remove = ('最適化実施時、対象の解析モデルからはパラメトリック解析のスイープテーブルが削除されます。\n'
                                         '必要な場合、femprj ファイルのコピーを保存してから実行してください。\n'
-                                        'ただし、Femtet 上で「別名として保存」は行わないでください。')
+                                        'このまま進めてもよろしいですか？')
         confirm_finish = '最適化スクリプト作成・実行を終了しますか？'
+        no_finish_conditions_in_surrogate_optimization = ('最適化の終了条件が指定されていません。'
+                                                          'この場合、訓練データの作成は手動停止まで継続し、'
+                                                          'その後さらにサロゲートモデルを用いた最適化が始まり、'
+                                                          '手動停止まで継続されます。'
+                                                          'このまま進めてもよろしいですか？')
 
     class Error(enum.StrEnum):
         _test = 'This is a test Error message.'
