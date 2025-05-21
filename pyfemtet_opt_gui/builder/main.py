@@ -1,4 +1,8 @@
 import json
+import os
+import enum
+import re
+
 from pyfemtet_opt_gui.builder.builder import *
 
 from pyfemtet_opt_gui.models.analysis_model.analysis_model import get_am_model, FemprjModel
@@ -7,6 +11,33 @@ from pyfemtet_opt_gui.models.config.config import get_config_model, ConfigItemMo
 from pyfemtet_opt_gui.models.objectives.obj import get_obj_model, ObjectiveTableItemModel
 from pyfemtet_opt_gui.models.constraints.model import get_cns_model, ConstraintModel
 from pyfemtet_opt_gui.fem_interfaces import get_current_cad_name, CADIntegration
+from pyfemtet_opt_gui.surrogate_model_interfaces import *
+
+from pyfemtet_opt_gui.common.qt_util import *
+
+
+class SurrogateCodeState(enum.Enum):
+    normal = enum.auto()
+    for_surrogate_training = enum.auto()
+    for_surrogate_optimization = enum.auto()
+
+
+def get_surrogate_code_state(use_surrogate) -> SurrogateCodeState:
+    config_model: ConfigItemModel = get_config_model(None)
+    surrogate_model_name: SurrogateModelNames = config_model.get_surrogate_model()
+
+    if surrogate_model_name == SurrogateModelNames.no:
+        if use_surrogate:
+            assert False
+        else:
+            surrogate_code_state = SurrogateCodeState.normal
+    else:
+        if use_surrogate:
+            surrogate_code_state = SurrogateCodeState.for_surrogate_optimization
+        else:
+            surrogate_code_state = SurrogateCodeState.for_surrogate_training
+
+    return surrogate_code_state
 
 
 def create_from_model(model, method='output_json', n_indent=1):
@@ -22,7 +53,7 @@ def create_from_model(model, method='output_json', n_indent=1):
     return code
 
 
-def create_fem_script():
+def create_fem_script(surrogate_code_state: SurrogateCodeState):
     code = ''
 
     am_model: FemprjModel = get_am_model(None)
@@ -31,35 +62,53 @@ def create_fem_script():
     obj_model: ObjectiveTableItemModel = get_obj_model(None)
     parametric_output_indexes_use_as_objective = obj_model.output_dict()
 
+    # construct FEM or surrogate interface
+    if (
+            surrogate_code_state == SurrogateCodeState.normal
+            or surrogate_code_state == SurrogateCodeState.for_surrogate_training
+    ):
+        if get_current_cad_name() == CADIntegration.no:
+            cmd_obj = dict(
+                command='FemtetInterface',
+                args=dict(
+                    femprj_path=f'r"{femprj_path}"',
+                    model_name=f'"{model_name}"',
+                    parametric_output_indexes_use_as_objective=parametric_output_indexes_use_as_objective
+                ),
+                ret='fem',
+            )
 
-    if get_current_cad_name() == CADIntegration.no:
-        cmd_obj = dict(
-            command='FemtetInterface',
-            args=dict(
-                femprj_path=f'r"{femprj_path}"',
-                model_name=f'"{model_name}"',
-                parametric_output_indexes_use_as_objective=parametric_output_indexes_use_as_objective
-            ),
-            ret='fem',
-        )
+        elif get_current_cad_name() == CADIntegration.solidworks:
 
-    elif get_current_cad_name() == CADIntegration.solidworks:
+            sldprt_path = related_paths[0]
 
-        sldprt_path = related_paths[0]
+            cmd_obj = dict(
+                command='FemtetWithSolidworksInterface',
+                args=dict(
+                    femprj_path=f'r"{femprj_path}"',
+                    model_name=f'"{model_name}"',
+                    sldprt_path=f'r"{sldprt_path}"',
+                    parametric_output_indexes_use_as_objective=parametric_output_indexes_use_as_objective
+                ),
+                ret='fem',
+            )
 
-        cmd_obj = dict(
-            command='FemtetWithSolidworksInterface',
-            args=dict(
-                femprj_path=f'r"{femprj_path}"',
-                model_name=f'"{model_name}"',
-                sldprt_path=f'r"{sldprt_path}"',
-                parametric_output_indexes_use_as_objective=parametric_output_indexes_use_as_objective
-            ),
-            ret='fem',
-        )
+        else:
+            raise NotImplementedError
 
     else:
-        raise NotImplementedError
+        config_model: ConfigItemModel = get_config_model(None)
+        surrogate_model_name = config_model.get_surrogate_model()
+        assert surrogate_model_name != SurrogateModelNames.no
+        assert training_history_path is not None
+
+        cmd_obj = dict(
+            command=surrogate_model_name,
+            args=dict(
+                history_path=f'"{training_history_path}"',
+            ),
+            ret='fem',
+        )
 
     line = create_command_line(json.dumps(cmd_obj))
     code += line
@@ -98,14 +147,51 @@ def create_cns_function_def():
     return create_from_model(model, method='output_funcdef_json', n_indent=0)
 
 
+# for pyfemtet 0.x,
 # femopt = FEMOpt(fem, opt, history_path)
-def create_femopt(n_indent=1):
+def create_femopt(surrogate_code_state: SurrogateCodeState):
     model = get_config_model(None)
-    code = create_from_model(model, 'output_femopt_json')
+    code: str = create_from_model(model, 'output_femopt_json')
+
+    if surrogate_code_state == SurrogateCodeState.for_surrogate_training:
+        code = re.sub(
+            r'history_path=".*?"',
+            f'history_path="{training_history_path}"',
+            code
+        )
+
     return code
 
 
-def create_script(path=None):
+# 訓練データ作成時に決定できる
+# サロゲートモデルに読み込ませる用のパス
+training_history_path: str | None = None
+
+
+def create_script(
+        path=None,
+        *,
+        use_surrogate: bool = False,
+):
+    """コード文字列を作成する。
+
+    Args:
+        path: コードの保存先。
+        use_surrogate: サロゲートモデルの訓練データ作成用コードかどうか。
+
+    """
+    global training_history_path
+
+    surrogate_code_state = get_surrogate_code_state(use_surrogate)
+
+    if surrogate_code_state == SurrogateCodeState.for_surrogate_training:
+        # 次にサロゲートモデル用スクリプトを作成する時に備えて
+        # パスを設定する（作成しないなら単に使われない）
+        if path is None:
+            training_history_path = '訓練データ.csv'
+        else:
+            training_history_path = os.path.splitext(path)[0] + '_訓練データ.csv'
+
     code = ''
     code += create_message()
     code += '\n\n'
@@ -116,11 +202,11 @@ def create_script(path=None):
         code += '\n\n'
     code += create_main()
     code += '\n'
-    code += create_fem_script()
+    code += create_fem_script(surrogate_code_state)
     code += '\n'
     code += create_opt_script()
     code += '\n'
-    code += create_femopt()
+    code += create_femopt(surrogate_code_state)
     code += '\n'
     code += create_var_script()
     code += '\n'
@@ -137,5 +223,17 @@ def create_script(path=None):
             f.write(code)
 
 
+def _test_create_surrogate_model():
+    _start_debugging()
+
+    # training
+    create_script(path='_test.py')
+
+    # surrogate
+    create_script(path='_test_opt.py', use_surrogate=True)
+
+    _end_debugging()
+
+
 if __name__ == '__main__':
-    create_script()
+    _test_create_surrogate_model()

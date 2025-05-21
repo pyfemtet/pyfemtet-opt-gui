@@ -36,7 +36,8 @@ _WITH_DUMMY = False
 def get_var_model(parent, _with_dummy=None) -> 'VariableItemModel':
     global _VAR_MODEL
     if _VAR_MODEL is None:
-        assert parent is not None
+        if not _is_debugging():
+            assert parent is not None
         _VAR_MODEL = VariableItemModel(
             parent,
             _WITH_DUMMY if _with_dummy is None else _with_dummy,

@@ -33,6 +33,9 @@ def create_header():
 # pyfemtet 基本クラス
 from pyfemtet.opt import FemtetInterface, FemtetWithSolidworksInterface, OptunaOptimizer, FEMOpt
 
+# サロゲートモデル作成用クラス
+from pyfemtet.opt.interface import PoFBoTorchInterface
+
 # 最適化アルゴリズム
 from pyfemtet.opt.optimizer import PoFBoTorchSampler
 from optuna.samplers import RandomSampler, QMCSampler, NSGAIISampler, TPESampler

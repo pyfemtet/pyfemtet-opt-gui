@@ -68,7 +68,8 @@ _WITH_DUMMY = False
 def get_config_model(parent, _with_dummy=None) -> 'ConfigItemModel':
     global _CONFIG_MODEL
     if _CONFIG_MODEL is None:
-        assert parent is not None
+        if not _is_debugging():
+            assert parent is not None
         _CONFIG_MODEL = ConfigItemModel(
             parent,
             _WITH_DUMMY if _with_dummy is None else _with_dummy,
@@ -187,7 +188,9 @@ class ConfigItemClassEnum(enum.Enum):
         name = 'サロゲートモデル'
         default_display = SurrogateModelNames.no.value
         default_internal = SurrogateModelNames.no
-        note = ('【実験的機能】サロゲートモデルを作成するかどうか。'
+        # default_display = SurrogateModelNames.PoFBoTorchInterface.value  # for test
+        # default_internal = SurrogateModelNames.PoFBoTorchInterface
+        note = ('サロゲートモデルを作成するかどうか。\n'
                 '作成するならばそのモデルを何にするか。')
         choices: dict[str, str] = {s: s for s in SurrogateModelNames}
 
@@ -300,13 +303,12 @@ class QConfigTreeViewDelegate(QStyledItemDelegateWithCombobox):
         if hd == ConfigHeaderNames.value:
 
             # 以下の条件を満たす
-            cond = (
+            if (
                     vhd == ConfigItemClassEnum.n_trials.value.name  # n_trials
                     or vhd == ConfigItemClassEnum.timeout.value.name  # timeout
                     or vhd == ConfigItemClassEnum.seed.value.name  # seed
                     or vhd == ConfigItemClassEnum.n_parallel.value.name  # n_parallel
-            )
-            if cond:
+            ):
 
                 editor: QLineEdit
                 text = editor.text()
@@ -331,8 +333,26 @@ class QConfigTreeViewDelegate(QStyledItemDelegateWithCombobox):
                 model.setData(index, value, Qt.ItemDataRole.UserRole)
                 return
 
+            # surrogate model である
+            elif vhd == ConfigItemClassEnum.surrogate_model_name.value.name:
+
+                # 文字列をコンボボックスで取得する前提
+                assert isinstance(editor, QComboBox)
+
+                display = editor.currentText()
+
+                # 列挙体の中にないとおかしい
+                assert display in SurrogateModelNames
+
+                # 列挙体のメンバーに変換
+                value = SurrogateModelNames(display)
+
+                model.setData(index, display, Qt.ItemDataRole.DisplayRole)
+                model.setData(index, value, Qt.ItemDataRole.UserRole)
+                return
+
             # history_path である
-            if vhd == ConfigItemClassEnum.history_path.value.name:
+            elif vhd == ConfigItemClassEnum.history_path.value.name:
                 editor: QLineEdit
                 text = editor.text()
 
