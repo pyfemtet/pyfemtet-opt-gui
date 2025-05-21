@@ -866,6 +866,11 @@ class ConfigItemModel(StandardItemModelWithHeader):
         surrogate_model_name = self.item(r, c).data(Qt.ItemDataRole.UserRole)
         return surrogate_model_name
 
+    def get_algorithm_model_for_training_surrogate_model(self) -> QAbstractAlgorithmItemModel:
+        # TODO: LHS などの QMC を追加してダイアログから選べるようにする
+        # TODO: その場合、シングルトンパターンを使わない（訓練用と最適化用の 2 つ必要）
+        return get_random_algorithm_config_model(self.parent())
+
 
 # 一覧 Problem ページに表示される StandardItemModelAsStandardItem 用 ItemModel
 class QConfigItemModelForProblem(QSortFilterProxyModelOfStandardItemModel):

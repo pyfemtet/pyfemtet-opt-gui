@@ -116,9 +116,13 @@ def create_fem_script(surrogate_code_state: SurrogateCodeState):
     return code
 
 
-def create_opt_script():
-    model_: ConfigItemModel = get_config_model(None)
-    model = model_.algorithm_model
+def create_opt_script(surrogate_code_state: SurrogateCodeState):
+    if surrogate_code_state == SurrogateCodeState.for_surrogate_training:
+        model_: ConfigItemModel = get_config_model(None)
+        model = model_.get_algorithm_model_for_training_surrogate_model()
+    else:
+        model_: ConfigItemModel = get_config_model(None)
+        model = model_.algorithm_model
     return create_from_model(model)
 
 
@@ -204,7 +208,7 @@ def create_script(
     code += '\n'
     code += create_fem_script(surrogate_code_state)
     code += '\n'
-    code += create_opt_script()
+    code += create_opt_script(surrogate_code_state)
     code += '\n'
     code += create_femopt(surrogate_code_state)
     code += '\n'
