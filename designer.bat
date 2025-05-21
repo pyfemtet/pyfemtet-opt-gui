@@ -1,1 +1,1 @@
-poetry run pyside6-designer
+uv run --no-sync pyside6-designer
