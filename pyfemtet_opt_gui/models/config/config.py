@@ -836,6 +836,16 @@ class ConfigItemModel(StandardItemModelWithHeader):
     def reset_history_path(self):
         self.history_path = None
 
+    def get_surrogate_model(self) -> SurrogateModelNames:
+        c = self.get_column_by_header_data(
+            self.ColumnNames.value,
+        )
+        r = self.get_row_by_header_data(
+            ConfigItemClassEnum.surrogate_model_name.value.name
+        )
+        surrogate_model_name = self.item(r, c).data(Qt.ItemDataRole.UserRole)
+        return surrogate_model_name
+
 
 # 一覧 Problem ページに表示される StandardItemModelAsStandardItem 用 ItemModel
 class QConfigItemModelForProblem(QSortFilterProxyModelOfStandardItemModel):
@@ -1004,5 +1014,8 @@ if __name__ == '__main__':
 
     page_obj = ConfigWizardPage()
     page_obj.show()
+
+    config_model = get_config_model(None)
+    print(config_model.get_surrogate_model())
 
     sys.exit(app.exec())
