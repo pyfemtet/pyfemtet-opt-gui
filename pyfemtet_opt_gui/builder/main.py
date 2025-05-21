@@ -2,6 +2,9 @@ import json
 import os
 import enum
 import re
+from packaging.version import Version
+
+import pyfemtet
 
 from pyfemtet_opt_gui.builder.builder import *
 
@@ -102,13 +105,21 @@ def create_fem_script(surrogate_code_state: SurrogateCodeState):
         assert surrogate_model_name != SurrogateModelNames.no
         assert training_history_path is not None
 
-        cmd_obj = dict(
-            command=surrogate_model_name,
-            args=dict(
-                history_path=f'"{training_history_path}"',
-            ),
-            ret='fem',
-        )
+        v = Version(pyfemtet.__version__)
+        if Version('0.9.5') <= v < Version('1.0.0'):
+            print(parametric_output_indexes_use_as_objective)
+            cmd_obj = dict(
+                command=surrogate_model_name,
+                args=dict(
+                    history_path=f'"{training_history_path}"',
+                    _output_directions=parametric_output_indexes_use_as_objective,
+                ),
+                ret='fem',
+            )
+            print(cmd_obj)
+
+        else:
+            assert False
 
     line = create_command_line(json.dumps(cmd_obj))
     code += line
