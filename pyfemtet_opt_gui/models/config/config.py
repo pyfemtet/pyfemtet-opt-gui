@@ -30,6 +30,8 @@ from pyfemtet_opt_gui.common.pyfemtet_model_bases import *
 from pyfemtet_opt_gui.common.return_msg import *
 from pyfemtet_opt_gui.common.titles import *
 
+from pyfemtet_opt_gui.surrogate_model_interfaces import *
+
 from pyfemtet_opt_gui.models.config.algorithm.base import (
     QAbstractAlgorithmItemModel,
 )
@@ -180,6 +182,15 @@ class ConfigItemClassEnum(enum.Enum):
                 '設定しても全く同じ結果にはならない場合が\n'
                 'あります。')
 
+    @enum.member
+    class surrogate_model_name(AbstractConfigItem):
+        name = 'サロゲートモデル'
+        default_display = SurrogateModelNames.no.value
+        default_internal = SurrogateModelNames.no
+        note = ('【実験的機能】サロゲートモデルを作成するかどうか。'
+                '作成するならばそのモデルを何にするか。')
+        choices: dict[str, str] = {s: s for s in SurrogateModelNames}
+
 
 # ===== Models =====
 
@@ -251,6 +262,18 @@ class QConfigTreeViewDelegate(QStyledItemDelegateWithCombobox):
                 index,
                 choices=list(Algorithm.choices.keys()),
                 default=DEFAULT_ALGORITHM_CONFIG.name,
+            )
+            return editor
+
+        # 「サロゲートモデル」の「設定値」ならばコンボボックスを作成
+        # 対応する setModelData, sizeHint, paint は抽象クラスで定義済み
+        if self.is_combobox_target(index, 'SURROGATE_MODEL'):
+            editor = self.create_combobox(
+                parent,
+                index,
+                choices=list(
+                    ConfigItemClassEnum.surrogate_model_name.value.choices.keys()),
+                default=SurrogateModelNames.no.value,
             )
             return editor
 
@@ -941,7 +964,11 @@ class ConfigWizardPage(TitledWizardPage):
                 'ALGORITHM': (
                     ConfigHeaderNames.value,
                     ConfigItemClassEnum.algorithm.value.name
-                )
+                ),
+                'SURROGATE_MODEL': (
+                    ConfigHeaderNames.value,
+                    ConfigItemClassEnum.surrogate_model_name.value.name
+                ),
             }
         )
 
