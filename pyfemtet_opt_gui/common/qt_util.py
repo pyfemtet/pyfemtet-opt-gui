@@ -3,6 +3,8 @@ Qt の振る舞いを微調整するユーティリティ
 ビジネスルールに関係しない機能のみにする
 """
 
+import os
+
 # noinspection PyUnresolvedReferences
 from PySide6.QtCore import *
 
@@ -21,6 +23,9 @@ from PySide6 import QtWidgets, QtCore, QtGui
 import enum
 
 __all__ = [
+    '_is_debugging',
+    '_start_debugging',
+    '_end_debugging',
     'get_enhanced_font',
     'EditModel',
     'QSortFilterProxyModelOfStandardItemModel',
@@ -36,6 +41,29 @@ __all__ = [
     'HeaderDataNotFound',
     'UntouchableProgressDialog',
 ]
+
+
+# デバッグ用
+# ======================================================
+DEBUGGING_FLAG_PATH = os.path.join(os.path.dirname(__file__), '.debugging')
+
+
+def _is_debugging():
+    if os.path.isfile(DEBUGGING_FLAG_PATH):
+        print('!!!!!!!!!! debug mode !!!!!!!!!!')
+        return True
+    return False
+
+
+def _start_debugging():
+    if not _is_debugging():
+        with open(DEBUGGING_FLAG_PATH, 'w') as f:
+            f.write('Now debugging. Remove this file to cancel debugging.')
+
+
+def _end_debugging():
+    if _is_debugging():
+        os.remove(DEBUGGING_FLAG_PATH)
 
 
 # ちょっとしたもの

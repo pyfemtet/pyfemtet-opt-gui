@@ -30,6 +30,8 @@ from pyfemtet_opt_gui.common.pyfemtet_model_bases import *
 from pyfemtet_opt_gui.common.return_msg import *
 from pyfemtet_opt_gui.common.titles import *
 
+from pyfemtet_opt_gui.surrogate_model_interfaces import *
+
 from pyfemtet_opt_gui.models.config.algorithm.base import (
     QAbstractAlgorithmItemModel,
 )
@@ -66,7 +68,8 @@ _WITH_DUMMY = False
 def get_config_model(parent, _with_dummy=None) -> 'ConfigItemModel':
     global _CONFIG_MODEL
     if _CONFIG_MODEL is None:
-        assert parent is not None
+        if not _is_debugging():
+            assert parent is not None
         _CONFIG_MODEL = ConfigItemModel(
             parent,
             _WITH_DUMMY if _with_dummy is None else _with_dummy,
@@ -180,6 +183,17 @@ class ConfigItemClassEnum(enum.Enum):
                 '設定しても全く同じ結果にはならない場合が\n'
                 'あります。')
 
+    @enum.member
+    class surrogate_model_name(AbstractConfigItem):
+        name = 'サロゲートモデル'
+        default_display = SurrogateModelNames.no.value
+        default_internal = SurrogateModelNames.no
+        # default_display = SurrogateModelNames.PoFBoTorchInterface.value  # for test
+        # default_internal = SurrogateModelNames.PoFBoTorchInterface
+        note = ('サロゲートモデルを作成するかどうか。\n'
+                '作成するならばそのモデルを何にするか。')
+        choices: dict[str, str] = {s: s for s in SurrogateModelNames}
+
 
 # ===== Models =====
 
@@ -254,6 +268,18 @@ class QConfigTreeViewDelegate(QStyledItemDelegateWithCombobox):
             )
             return editor
 
+        # 「サロゲートモデル」の「設定値」ならばコンボボックスを作成
+        # 対応する setModelData, sizeHint, paint は抽象クラスで定義済み
+        if self.is_combobox_target(index, 'SURROGATE_MODEL'):
+            editor = self.create_combobox(
+                parent,
+                index,
+                choices=list(
+                    ConfigItemClassEnum.surrogate_model_name.value.choices.keys()),
+                default=SurrogateModelNames.no.value,
+            )
+            return editor
+
         # その他の場合
         return super().createEditor(parent, option, index)
 
@@ -277,13 +303,12 @@ class QConfigTreeViewDelegate(QStyledItemDelegateWithCombobox):
         if hd == ConfigHeaderNames.value:
 
             # 以下の条件を満たす
-            cond = (
+            if (
                     vhd == ConfigItemClassEnum.n_trials.value.name  # n_trials
                     or vhd == ConfigItemClassEnum.timeout.value.name  # timeout
                     or vhd == ConfigItemClassEnum.seed.value.name  # seed
                     or vhd == ConfigItemClassEnum.n_parallel.value.name  # n_parallel
-            )
-            if cond:
+            ):
 
                 editor: QLineEdit
                 text = editor.text()
@@ -308,8 +333,26 @@ class QConfigTreeViewDelegate(QStyledItemDelegateWithCombobox):
                 model.setData(index, value, Qt.ItemDataRole.UserRole)
                 return
 
+            # surrogate model である
+            elif vhd == ConfigItemClassEnum.surrogate_model_name.value.name:
+
+                # 文字列をコンボボックスで取得する前提
+                assert isinstance(editor, QComboBox)
+
+                display = editor.currentText()
+
+                # 列挙体の中にないとおかしい
+                assert display in SurrogateModelNames
+
+                # 列挙体のメンバーに変換
+                value = SurrogateModelNames(display)
+
+                model.setData(index, display, Qt.ItemDataRole.DisplayRole)
+                model.setData(index, value, Qt.ItemDataRole.UserRole)
+                return
+
             # history_path である
-            if vhd == ConfigItemClassEnum.history_path.value.name:
+            elif vhd == ConfigItemClassEnum.history_path.value.name:
                 editor: QLineEdit
                 text = editor.text()
 
@@ -791,7 +834,7 @@ class ConfigItemModel(StandardItemModelWithHeader):
 
                 # GUI が history_path にアクセスできるよう
                 # 自身に与えられるパスを持っておく
-                # 現在の実装では run_script() の中で
+                # 現在の実装では start_run_script_thread() の中で
                 # chdir しているので相対パスでも問題ない
                 self.history_path = history_path
 
@@ -812,6 +855,21 @@ class ConfigItemModel(StandardItemModelWithHeader):
 
     def reset_history_path(self):
         self.history_path = None
+
+    def get_surrogate_model_name(self) -> SurrogateModelNames:
+        c = self.get_column_by_header_data(
+            self.ColumnNames.value,
+        )
+        r = self.get_row_by_header_data(
+            ConfigItemClassEnum.surrogate_model_name.value.name
+        )
+        surrogate_model_name = self.item(r, c).data(Qt.ItemDataRole.UserRole)
+        return surrogate_model_name
+
+    def get_algorithm_model_for_training_surrogate_model(self) -> QAbstractAlgorithmItemModel:
+        # TODO: LHS などの QMC を追加してダイアログから選べるようにする
+        # TODO: その場合、シングルトンパターンを使わない（訓練用と最適化用の 2 つ必要）
+        return get_random_algorithm_config_model(self.parent())
 
 
 # 一覧 Problem ページに表示される StandardItemModelAsStandardItem 用 ItemModel
@@ -941,7 +999,11 @@ class ConfigWizardPage(TitledWizardPage):
                 'ALGORITHM': (
                     ConfigHeaderNames.value,
                     ConfigItemClassEnum.algorithm.value.name
-                )
+                ),
+                'SURROGATE_MODEL': (
+                    ConfigHeaderNames.value,
+                    ConfigItemClassEnum.surrogate_model_name.value.name
+                ),
             }
         )
 
@@ -977,5 +1039,8 @@ if __name__ == '__main__':
 
     page_obj = ConfigWizardPage()
     page_obj.show()
+
+    config_model = get_config_model(None)
+    print(config_model.get_surrogate_model_name())
 
     sys.exit(app.exec())

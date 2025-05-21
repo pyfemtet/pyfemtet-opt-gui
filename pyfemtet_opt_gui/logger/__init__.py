@@ -22,7 +22,6 @@ def get_logger(name: str = None, debug=False):
     else:
         logger = logging.getLogger(f'GUI.{name}')
 
-
     if debug:
         logger.setLevel(logging.DEBUG)
 
