@@ -1,4 +1,5 @@
 import json
+from numbers import Real
 
 __all__ = [
     'create_header',
@@ -142,7 +143,20 @@ def create_command_line(command_json, n=1):
             #     key=value,\n
             if isinstance(value, list | tuple):
                 # key=(elem1, elem2,)
-                code += ind(n + 1) + f'{key}=(' + ', '.join(value) + ',)\n'
+
+                str_list = []
+
+                for v in value:
+                    if isinstance(v, str):
+                        str_list.append(v)
+                    elif isinstance(v, Real):
+                        str_list.append(str(v))
+                    elif v is None:
+                        str_list.append('None')
+                    else:
+                        raise NotImplementedError
+
+                code += ind(n + 1) + f'{key}=(' + ', '.join(str_list) + ',)\n'
             elif isinstance(value, dict):
                 # key={k: v, k2: v2}
                 arr = [f'{k}: {v}' for k, v in value.items()]

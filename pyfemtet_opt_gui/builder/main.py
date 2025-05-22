@@ -107,16 +107,14 @@ def create_fem_script(surrogate_code_state: SurrogateCodeState):
 
         v = Version(pyfemtet.__version__)
         if Version('0.9.5') <= v < Version('1.0.0'):
-            print(parametric_output_indexes_use_as_objective)
             cmd_obj = dict(
                 command=surrogate_model_name,
                 args=dict(
                     history_path=f'"{training_history_path}"',
-                    _output_directions=parametric_output_indexes_use_as_objective,
+                    _output_directions=list(parametric_output_indexes_use_as_objective.values()),
                 ),
                 ret='fem',
             )
-            print(cmd_obj)
 
         else:
             assert False
