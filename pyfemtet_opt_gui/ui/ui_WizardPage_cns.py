@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'WizardPage_cnsKmwSfd.ui'
+## Form generated from reading UI file 'WizardPage_cnstqEIsa.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.8.1
+## Created by: Qt User Interface Compiler version 6.7.3
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -96,7 +96,7 @@ class Ui_WizardPage(object):
         self.pushButton_add.setText(QCoreApplication.translate("WizardPage", u"\u8ffd\u52a0", None))
         self.pushButton_edit.setText(QCoreApplication.translate("WizardPage", u"\u7de8\u96c6", None))
         self.label_cnsList.setText(QCoreApplication.translate("WizardPage", u"\u62d8\u675f\u5f0f\u306e\u4e00\u89a7", None))
-        self.textEdit_7.setMarkdown(QCoreApplication.translate("WizardPage", u"\u300c\u62d8\u675f\u5f0f\u300d\u306e\u5024\u304c\u4e0a\u4e0b\u9650\u3092\u9055\u53cd\u3059\u308b\u3088\u3046\u306a\u30d1\u30e9\u30e1\u30fc\u30bf\u3067\u89e3\u6790\u304c\u3055\u308c\u306a\u3044\u3088\u3046\u306b\u3067\u304d\u307e\u3059\u3002\n"
+        self.textEdit_7.setMarkdown(QCoreApplication.translate("WizardPage", u"\u300c\u62d8\u675f\u5f0f\u300d\u306e\u4e0d\u7b49\u5f0f\u304c\u6210\u7acb\u3059\u308b\u30d1\u30e9\u30e1\u30fc\u30bf\u3067\u306e\u307f\u89e3\u6790\u304c\u5b9f\u884c\u3055\u308c\u308b\u3088\u3046\u306b\u3067\u304d\u307e\u3059\u3002\n"
 "\n"
 "\u30d1\u30e9\u30e1\u30fc\u30bf\u306e\u7d44\u5408\u305b\u3092\u5236\u9650\u3057\u305f\u3044\u5834\u5408\u306f\u3001\u3053\u306e\u753b\u9762\u3067\u8a2d\u5b9a\u3057\u3066\u304f\u3060\u3055\u3044\u3002\n"
 "\n"
@@ -110,9 +110,9 @@ class Ui_WizardPage(object):
 "li.unchecked::marker { content: \"\\2610\"; }\n"
 "li.checked::marker { content: \"\\2612\"; }\n"
 "</style></head><body style=\" font-family:'Yu Gothic UI'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\" margin-top:6px; margin-bottom:6px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">\u300c\u62d8\u675f\u5f0f\u300d\u306e\u5024\u304c\u4e0a\u4e0b\u9650\u3092\u9055\u53cd\u3059\u308b\u3088\u3046\u306a\u30d1\u30e9\u30e1\u30fc\u30bf\u3067\u89e3\u6790\u304c\u3055\u308c\u306a\u3044\u3088\u3046\u306b\u3067\u304d\u307e\u3059\u3002</p>\n"
-"<p style=\" margin-top:6px; margin-bottom:6px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">\u30d1\u30e9\u30e1\u30fc\u30bf"
-                        "\u306e\u7d44\u5408\u305b\u3092\u5236\u9650\u3057\u305f\u3044\u5834\u5408\u306f\u3001\u3053\u306e\u753b\u9762\u3067\u8a2d\u5b9a\u3057\u3066\u304f\u3060\u3055\u3044\u3002</p>\n"
+"<p style=\" margin-top:6px; margin-bottom:6px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">\u300c\u62d8\u675f\u5f0f\u300d\u306e\u4e0d\u7b49\u5f0f\u304c\u6210\u7acb\u3059\u308b\u30d1\u30e9\u30e1\u30fc\u30bf\u3067\u306e\u307f\u89e3\u6790\u304c\u5b9f\u884c\u3055\u308c\u308b\u3088\u3046\u306b\u3067\u304d\u307e\u3059\u3002</p>\n"
+"<p style=\" margin-top:6px; margin-bottom:6px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">\u30d1\u30e9\u30e1\u30fc\u30bf\u306e\u7d44"
+                        "\u5408\u305b\u3092\u5236\u9650\u3057\u305f\u3044\u5834\u5408\u306f\u3001\u3053\u306e\u753b\u9762\u3067\u8a2d\u5b9a\u3057\u3066\u304f\u3060\u3055\u3044\u3002</p>\n"
 "<p style=\" margin-top:6px; margin-bottom:6px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">\u3053\u306e\u8a2d\u5b9a\u304c\u5fc5\u8981\u306a\u3051\u308c\u3070\u3001\u300c\u6b21\u3078\u300d\u3092\u62bc\u3057\u3066\u304f\u3060\u3055\u3044\u3002</p></body></html>", None))
     # retranslateUi
 
