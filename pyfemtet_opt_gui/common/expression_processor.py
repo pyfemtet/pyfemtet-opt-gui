@@ -170,7 +170,7 @@ def eval_expressions(expressions: dict[str, Expression | float | str]) -> tuple[
             error_keys.append(key)
 
         else:
-            evaluated = sympified.subs(expressions)
+            evaluated = sympified.subs(expressions, simultaneous=True).subs(expressions)
             try:
                 value = float(evaluated)
 
