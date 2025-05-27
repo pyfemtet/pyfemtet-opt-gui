@@ -164,12 +164,12 @@ class ConstraintEditorDialog(QDialog):
             )
             ret, r_msg, _ = eval_expressions(expressions)
             if r_msg != ReturnMsg.no_message:
-                raise SympifyError(expr)
+                raise ExpressionParseError(expr)
 
             # no error
             value = ret[expr_key]
 
-        except SympifyError:
+        except ExpressionParseError:
             value = '計算エラー'
 
         self.ui.label_calc_value.setText(

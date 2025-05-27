@@ -78,6 +78,7 @@ class ReturnMsg:
         not_a_number = '数値または数式の認識に失敗しました。'
         not_a_number_expression_setting_is_enable_in_constraint = '数値が入力されていません。計算式を設定したい場合、「拘束式の設定」ページで設定してください。。'
         not_a_pure_number = '数値を入力してください。'
+        unknown_var_name = '次の変数が不明な変数を参照しています'
         evaluated_expression_not_float = '式が計算できないか、計算結果に実数以外の数が含まれています'  # 句読点なし
         inconsistent_lb_ub = '上下限の大小関係が正しくありません。'
         inconsistent_value_ub = '値と上限の大小関係が正しくありません。'
