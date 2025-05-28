@@ -241,6 +241,7 @@ class VariableTableViewDelegate(QStyledItemDelegate):
             display = new_expression.expr if new_expression is not None else ''
             model.setData(index, display, Qt.ItemDataRole.DisplayRole)
             model.setData(index, new_expression, Qt.ItemDataRole.UserRole)
+
             return
 
         return super().setModelData(editor, model, index)
@@ -765,11 +766,15 @@ class VariableItemModel(StandardItemModelWithHeader):
                 # step
                 with nullcontext():
                     item = self.item(r, self.get_column_by_header_data(self.ColumnNames.step))
-                    expr: Expression = item.data(Qt.ItemDataRole.UserRole)
-                    assert expr.is_number()
-                    args_object.update(
-                        dict(step=expr.value)
-                    )
+                    if item is None:
+                        expr: Expression | None = None
+                    else:
+                        expr: Expression | None = item.data(Qt.ItemDataRole.UserRole)
+                    if expr is not None:
+                        assert expr.is_number()
+                        args_object.update(
+                            dict(step=expr.value)
+                        )
 
             # 数式でなくて Check されていない場合: Expression (pass_to_fem=True)
             # GUI 画面と Femtet の定義に万一差があっても
