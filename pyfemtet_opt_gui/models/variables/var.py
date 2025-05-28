@@ -121,7 +121,7 @@ class VariableTableViewDelegate(QStyledItemDelegate):
 
         return constraint.finalize_check()
 
-    def check_valid(self, text, header_data, model, index) -> tuple[ReturnType, Expression | None]:
+    def check_valid(self, text, header_data, model, index) -> tuple[ReturnType, str | None, Expression | None]:
 
         new_expression: Expression | None = None
 
@@ -136,7 +136,7 @@ class VariableTableViewDelegate(QStyledItemDelegate):
                     or header_data == VariableColumnNames.upper_bound
             ):
                 if text == '':
-                    return ReturnMsg.no_message, new_expression
+                    return ReturnMsg.no_message, None, new_expression
 
         # text をチェックする
         try:
@@ -146,7 +146,7 @@ class VariableTableViewDelegate(QStyledItemDelegate):
         except Exception as e:
             print_exception(e)
             ret_msg = ReturnMsg.Error.cannot_recognize_as_an_expression
-            return ret_msg, None
+            return ret_msg, None, None
 
         # Valid expression
         if new_expression is not None:
@@ -178,15 +178,20 @@ class VariableTableViewDelegate(QStyledItemDelegate):
 
             # but raises other expression's error
             # (for example, division by zero)
-            name = self.get_name(VariableColumnNames.name, model, index)
-            expressions = get_var_model(self.parent()).get_current_variables()
-            expressions.update({name: new_expression})
-            _, ret_msg, a_msg = eval_expressions(expressions)
-            if ret_msg != ReturnMsg.no_message:
-                return ret_msg, None
+            if (
+                    header_data == VariableColumnNames.initial_value
+                    or header_data == VariableColumnNames.test_value
+            ):
+
+                name = self.get_name(VariableColumnNames.name, model, index)
+                expressions = get_var_model(self.parent()).get_current_variables()
+                expressions.update({name: new_expression})
+                _, ret_msg, a_msg = eval_expressions(expressions)
+                if ret_msg != ReturnMsg.no_message:
+                    return ReturnMsg.Error.raises_other_expression_error, a_msg, None
 
         # check end
-        return ReturnMsg.no_message, new_expression
+        return ReturnMsg.no_message, None, new_expression
 
     def setModelData(self, editor, model, index) -> None:
 
@@ -212,19 +217,19 @@ class VariableTableViewDelegate(QStyledItemDelegate):
 
                 # if step, positive only
                 else:
-                    ret_msg, new_expression = self.check_valid(text, header_data, model, index)
+                    ret_msg, a_msg, new_expression = self.check_valid(text, header_data, model, index)
                     if not can_continue(ret_msg, parent=self.parent(), additional_message=text):
                         return
 
                     assert new_expression is not None
                     if new_expression.value <= 0:
                         ret_msg = ReturnMsg.Error.step_must_be_positive
-                        can_continue(ret_msg, parent=self.parent(), additional_message=text)
+                        can_continue(ret_msg, parent=self.parent(), additional_message=','.join((text, a_msg)))
                         return
 
             else:
-                ret_msg, new_expression = self.check_valid(text, header_data, model, index)
-                if not can_continue(ret_msg, parent=self.parent(), additional_message=text):
+                ret_msg, a_msg, new_expression = self.check_valid(text, header_data, model, index)
+                if not can_continue(ret_msg, parent=self.parent(), additional_message=','.join((text, a_msg))):
                     return
 
             # if init or lb or ub, check bounds
