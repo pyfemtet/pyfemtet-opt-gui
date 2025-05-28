@@ -60,6 +60,7 @@ class VariableColumnNames(enum.StrEnum):
     initial_value = '初期値 または\n文字式'
     lower_bound = '下限'
     upper_bound = '上限'
+    step = 'ステップ'
     test_value = 'テスト値 または\n文字式の計算結果'
     note = 'メモ欄'
 
@@ -156,6 +157,7 @@ class VariableTableViewDelegate(QStyledItemDelegate):
                 # if initial_value or test_value, it must be a number.
                 if (
                         header_data == VariableColumnNames.initial_value
+                        or header_data == VariableColumnNames.step
                         or header_data == VariableColumnNames.test_value
                 ):
                     ret_msg = ReturnMsg.Error.not_a_number
@@ -196,15 +198,34 @@ class VariableTableViewDelegate(QStyledItemDelegate):
                 header_data == VariableColumnNames.initial_value
                 or header_data == VariableColumnNames.lower_bound
                 or header_data == VariableColumnNames.upper_bound
+                or header_data == VariableColumnNames.step
                 or header_data == VariableColumnNames.test_value
         ):
             editor: QLineEdit
             text = editor.text()
 
             # check valid input or not
-            ret_msg, new_expression = self.check_valid(text, header_data, model, index)
-            if not can_continue(ret_msg, parent=self.parent(), additional_message=text):
-                return
+            if header_data == VariableColumnNames.step:
+                # if step, allow empty input
+                if text == '':
+                    new_expression = None
+
+                # if step, positive only
+                else:
+                    ret_msg, new_expression = self.check_valid(text, header_data, model, index)
+                    if not can_continue(ret_msg, parent=self.parent(), additional_message=text):
+                        return
+
+                    assert new_expression is not None
+                    if new_expression.value <= 0:
+                        ret_msg = ReturnMsg.Error.step_must_be_positive
+                        can_continue(ret_msg, parent=self.parent(), additional_message=text)
+                        return
+
+            else:
+                ret_msg, new_expression = self.check_valid(text, header_data, model, index)
+                if not can_continue(ret_msg, parent=self.parent(), additional_message=text):
+                    return
 
             # if init or lb or ub, check bounds
             if (
@@ -220,6 +241,7 @@ class VariableTableViewDelegate(QStyledItemDelegate):
             display = new_expression.expr if new_expression is not None else ''
             model.setData(index, display, Qt.ItemDataRole.DisplayRole)
             model.setData(index, new_expression, Qt.ItemDataRole.UserRole)
+
             return
 
         return super().setModelData(editor, model, index)
@@ -741,6 +763,19 @@ class VariableItemModel(StandardItemModelWithHeader):
                         dict(upper_bound=expr.value)
                     )
 
+                # step
+                with nullcontext():
+                    item = self.item(r, self.get_column_by_header_data(self.ColumnNames.step))
+                    if item is None:
+                        expr: Expression | None = None
+                    else:
+                        expr: Expression | None = item.data(Qt.ItemDataRole.UserRole)
+                    if expr is not None:
+                        assert expr.is_number()
+                        args_object.update(
+                            dict(step=expr.value)
+                        )
+
             # 数式でなくて Check されていない場合: Expression (pass_to_fem=True)
             # GUI 画面と Femtet の定義に万一差があっても
             # pass_to_fem が True なら上書きできる。
@@ -965,8 +1000,6 @@ class VariableWizardPage(TitledWizardPage):
 
 
 if __name__ == '__main__':
-    # _WITH_DUMMY = True  # comment out to prevent debug
-    # from pyfemtet_opt_gui.femtet.mock import get_femtet, get_obj_names  # comment out to prevent debug
 
     fi.get().get_femtet()
 
