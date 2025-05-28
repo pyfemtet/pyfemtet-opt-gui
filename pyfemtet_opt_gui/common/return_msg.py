@@ -60,6 +60,7 @@ class ReturnMsg:
 
     class Error(enum.StrEnum):
         _test = 'This is a test Error message.'
+        internal = 'Internal Error!'
 
         # femtet
         femtet_connection_failed = 'Femtet との接続がタイムアウトしました。'

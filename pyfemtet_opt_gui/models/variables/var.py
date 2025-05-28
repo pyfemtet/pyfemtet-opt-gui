@@ -60,6 +60,7 @@ class VariableColumnNames(enum.StrEnum):
     initial_value = '初期値 または\n文字式'
     lower_bound = '下限'
     upper_bound = '上限'
+    step = 'ステップ'
     test_value = 'テスト値 または\n文字式の計算結果'
     note = 'メモ欄'
 
@@ -156,6 +157,7 @@ class VariableTableViewDelegate(QStyledItemDelegate):
                 # if initial_value or test_value, it must be a number.
                 if (
                         header_data == VariableColumnNames.initial_value
+                        or header_data == VariableColumnNames.step
                         or header_data == VariableColumnNames.test_value
                 ):
                     ret_msg = ReturnMsg.Error.not_a_number
@@ -196,6 +198,7 @@ class VariableTableViewDelegate(QStyledItemDelegate):
                 header_data == VariableColumnNames.initial_value
                 or header_data == VariableColumnNames.lower_bound
                 or header_data == VariableColumnNames.upper_bound
+                or header_data == VariableColumnNames.step
                 or header_data == VariableColumnNames.test_value
         ):
             editor: QLineEdit
@@ -965,8 +968,6 @@ class VariableWizardPage(TitledWizardPage):
 
 
 if __name__ == '__main__':
-    # _WITH_DUMMY = True  # comment out to prevent debug
-    # from pyfemtet_opt_gui.femtet.mock import get_femtet, get_obj_names  # comment out to prevent debug
 
     fi.get().get_femtet()
 
