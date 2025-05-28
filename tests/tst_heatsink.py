@@ -1,8 +1,12 @@
 import pyfemtet
+print(f' pyfemtet ver{pyfemtet.__version__} imported.')
+print()
+print('必要なモジュールをインポートしています。しばらくお待ちください。')
+print()
 
 
 # pyfemtet 基本クラス
-from pyfemtet.opt import FemtetInterface, OptunaOptimizer, FEMOpt
+from pyfemtet.opt import FemtetInterface, FemtetWithSolidworksInterface, OptunaOptimizer, FEMOpt
 
 # サロゲートモデル作成用クラス
 from pyfemtet.opt.interface import PoFBoTorchInterface
@@ -48,10 +52,10 @@ def _femtet_operator_or(*args):
         ret = ret | int(arg)
     return ret
 
-def _femtet_f_if(condition, if_true, if_false):
+def _femtet_f_if(condition, if_true_or_else, if_false_or_zero):
     if not isinstance(condition, bool):
-        condition = condition == _femtet_operator_core(True)
-    return if_true if condition else if_false
+        condition = condition != _femtet_operator_core(False)
+    return if_true_or_else if condition else if_false_or_zero
 FUNC_NAME_TO_FUNC = {_femtet_equal.__name__: _femtet_equal, _femtet_not_equal.__name__: _femtet_not_equal, _femtet_less_than.__name__: _femtet_less_than, _femtet_less_than_equal.__name__: _femtet_less_than_equal, _femtet_greater_than.__name__: _femtet_greater_than, _femtet_greater_than_equal.__name__: _femtet_greater_than_equal, _femtet_operator_and.__name__: _femtet_operator_and, _femtet_operator_or.__name__: _femtet_operator_or}
 
 def get_femtet_builtins(d: dict=None) -> dict:
@@ -63,11 +67,6 @@ def get_femtet_builtins(d: dict=None) -> dict:
 print('モジュールのインポートが完了しました。')
 print('最適化が開始されると、ブラウザのプロセスモニターが自動的に起動します。')
 print(f'======================')
-
-
-def constraint_0(_, opt_):
-    var = opt_.get_variables()
-    return eval("(pitch_x ** 2 + pitch_y ** 2) ** (1 / 2) - d * 1.5", dict(**locals(), **get_femtet_builtins(var)))
 
 
 # 最適化のメイン関数
@@ -87,7 +86,7 @@ def main():
     femopt = FEMOpt(
         fem=fem,
         opt=opt,
-        # history_path="最適化_20250527_212226.csv",
+        history_path="最適化_20250528_090420.csv",
     )
 
     femopt.add_parameter(
@@ -138,7 +137,7 @@ def main():
     )
     femopt.add_expression(
         name="dis_y",
-        fun=lambda num_y, l, d: eval("((l-2*d)-(num_y*d))/(num_y-1)", dict(**locals(), **get_femtet_builtins())),
+        fun=lambda l, num_y, d: eval("((l-2*d)-(num_y*d))/(num_y-1)", dict(**locals(), **get_femtet_builtins())),
         pass_to_fem=False,
     )
     femopt.add_expression(
@@ -171,14 +170,6 @@ def main():
         upper_bound=44.0,
     )
 
-    femopt.add_constraint(
-        name="cns_0",
-        fun=constraint_0,
-        lower_bound=None,
-        upper_bound=100.0,
-        strict=True,
-        args=(femopt.opt,)
-    )
 
 
     femopt.optimize(
