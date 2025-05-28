@@ -43,10 +43,10 @@ def get_surrogate_code_state(use_surrogate) -> SurrogateCodeState:
     return surrogate_code_state
 
 
-def create_from_model(model, method='output_json', n_indent=1):
+def create_from_model(model, method='output_json', n_indent=1, **kwargs):
     code = ''
 
-    commands_json = getattr(model, method)()
+    commands_json = getattr(model, method)(**kwargs)
     commands = json.loads(commands_json)
     assert isinstance(commands, list | tuple)
     for command in commands:
@@ -106,7 +106,7 @@ def create_fem_script(surrogate_code_state: SurrogateCodeState):
         assert training_history_path is not None
 
         v = Version(pyfemtet.__version__)
-        if Version('0.9.5') <= v < Version('1.0.0'):
+        if Version('0.8.10') <= v < Version('1.0.0'):
             cmd_obj = dict(
                 command=surrogate_model_name,
                 args=dict(
@@ -140,9 +140,9 @@ def create_var_script():
     return create_from_model(model)
 
 
-def create_cns_script():
+def create_cns_script(surrogate_code_state):
     model: ConstraintModel = get_cns_model(None)
-    return create_from_model(model)
+    return create_from_model(model, for_surrogate_model=(surrogate_code_state == SurrogateCodeState.for_surrogate_optimization))
 
 
 def create_expr_cns_script():
@@ -231,7 +231,7 @@ def create_script(
     code += '\n'
     code += create_var_script()
     code += '\n'
-    code += create_cns_script()
+    code += create_cns_script(surrogate_code_state)
     code += '\n'
     code += create_expr_cns_script()
     code += '\n'

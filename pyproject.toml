@@ -8,7 +8,7 @@ readme = "README.md"
 license = "LGPL-3.0"
 dependencies = [
     "pyside6~=6.7.1",
-    "pyfemtet>=0.9.5, <1.0.0",  # surrogate model with fixed _output_directions requires >=0.9.5
+    "pyfemtet>=0.8.10, <1.0.0",
 ]
 
 [project.urls]
