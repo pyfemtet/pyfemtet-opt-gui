@@ -16,6 +16,7 @@ from PySide6 import QtWidgets, QtCore, QtGui
 import enum
 import sys
 from contextlib import nullcontext
+from traceback import print_exception
 
 from pyfemtet_opt_gui.ui.ui_WizardPage_var import Ui_WizardPage
 
@@ -67,7 +68,16 @@ class VariableColumnNames(enum.StrEnum):
 # 個別ページに表示される TableView の Delegate
 class VariableTableViewDelegate(QStyledItemDelegate):
 
-    def get_expression(self, header_data_, model, index) -> Expression | None:
+    @staticmethod
+    def get_name(header_data_, model, index):
+        # get name of initial_value
+        c_ = get_column_by_header_data(model, header_data_)
+        index_ = model.index(index.row(), c_)
+        name: str = model.data(index_, Qt.ItemDataRole.DisplayRole)
+        return name
+
+    @staticmethod
+    def get_expression(header_data_, model, index) -> Expression | None:
         # get expression of initial_value
         c_ = get_column_by_header_data(model, header_data_)
         index_ = model.index(index.row(), c_)
@@ -132,7 +142,8 @@ class VariableTableViewDelegate(QStyledItemDelegate):
             new_expression: Expression = Expression(text)
 
         # Not a valid expression
-        except Exception:
+        except Exception as e:
+            print_exception(e)
             ret_msg = ReturnMsg.Error.cannot_recognize_as_an_expression
             return ret_msg, None
 
@@ -161,6 +172,15 @@ class VariableTableViewDelegate(QStyledItemDelegate):
                     raise RuntimeError('Internal Error! Unexpected header_data in VariableTableDelegate.')
 
                 # show error dialog
+                return ret_msg, None
+
+            # but raises other expression's error
+            # (for example, division by zero)
+            name = self.get_name(VariableColumnNames.name, model, index)
+            expressions = get_var_model(self.parent()).get_current_variables()
+            expressions.update({name: new_expression})
+            _, ret_msg, a_msg = eval_expressions(expressions)
+            if ret_msg != ReturnMsg.no_message:
                 return ret_msg, None
 
         # check end
@@ -206,6 +226,7 @@ class VariableTableViewDelegate(QStyledItemDelegate):
 
 
 # 大元の ItemModel
+# TODO: 変数の一部が更新されても式を再計算していなくない？
 class VariableItemModel(StandardItemModelWithHeader):
     ColumnNames = VariableColumnNames
 
@@ -658,9 +679,14 @@ class VariableItemModel(StandardItemModelWithHeader):
                     if expr.is_number():
                         value = f'lambda: {expr.value}'
                     else:
-                        args = [symbol.name for symbol in expr._s_expr.free_symbols]
-                        # lambda <args>: <expr>
-                        value = 'lambda ' + ', '.join(args) + ': ' + expr.expr
+                        args = list(expr.dependencies)
+                        # lambda <args>: eval('<expr>', locals=...)
+                        value = (
+                                'lambda '
+                                + ', '.join(args)
+                                + ': '
+                                + f'eval("{expr.expr}", dict(**locals(), **get_femtet_builtins()))'
+                        )
                     args_object.update(
                         dict(fun=value)
                     )
@@ -739,9 +765,8 @@ class VariableItemModel(StandardItemModelWithHeader):
                     if expr.is_number():
                         value = f'lambda: {expr.value}'
                     else:
-                        args = [symbol.name for symbol in expr._s_expr.free_symbols]
-                        # lambda <args>: <expr>
-                        value = 'lambda ' + ', '.join(args) + ': ' + expr.expr
+                        # 数式ではないのでここには来ないはず
+                        assert False
                     args_object.update(
                         dict(fun=value)
                     )

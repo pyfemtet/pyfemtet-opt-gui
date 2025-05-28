@@ -82,7 +82,7 @@ class Constraint:
         # Expression にできなければエラー
         try:
             _expr = Expression(self.expression)
-        except SympifyError:
+        except ExpressionParseError:
             return ReturnMsg.Error.cannot_recognize_as_an_expression, self.expression
 
         # Expression にできても値が
@@ -348,7 +348,7 @@ class ConstraintModel(StandardItemModelWithHeader):
             fun=constraint_0,
             lower_bound = 1.
             upper_bound = None,
-            strict=True,
+            strict=True
         )
         """
 
@@ -365,9 +365,9 @@ class ConstraintModel(StandardItemModelWithHeader):
                 continue
 
             # 式と使う変数名を取得
-            expression = constraint.expression.replace('\n', '')
-            expr = Expression(expression)
-            variable_names = [_s.name for _s in expr._s_expr.free_symbols]
+            expr_str = constraint.expression.replace('\n', '')
+            expr = Expression(expr_str)
+            variable_names = list(expr.dependencies)
 
             # def constraint_0 を定義
             fun_name = f'constraint_{fun_name_counter}'
@@ -375,8 +375,13 @@ class ConstraintModel(StandardItemModelWithHeader):
                 funcdef = dict(
                     function=fun_name,
                     args=['_', 'opt_'],
-                    commands=None,  # 今から足していく
-                    ret=expression,
+
+                    # locals に渡すための辞書 var を後で足す
+                    commands=None,
+
+                    # locals を使いたいので eval を返す
+                    ret=f'eval("{expr._converted_expr_str}", '
+                        f'dict(**locals(), **get_femtet_builtins(var)))',
                 )
 
                 # def の中身を作成
@@ -390,13 +395,13 @@ class ConstraintModel(StandardItemModelWithHeader):
                     )
                     commands.append(command)
 
-                    # a = var['a']
-                    for variable_name in variable_names:
-                        command = dict(
-                            ret=variable_name,
-                            command=f'var["{variable_name}"]'
-                        )
-                        commands.append(command)
+                    # # a = var['a']
+                    # for variable_name in variable_names:
+                    #     command = dict(
+                    #         ret=variable_name,
+                    #         command=f'var["{variable_name}"]'
+                    #     )
+                    #     commands.append(command)
 
                 funcdef.update({'commands': commands})
                 out_funcdef.append(funcdef)
