@@ -114,6 +114,7 @@ class ConfirmWizardPage(TitledWizardPage):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.worker = OptimizationWorker(self.parent())
+        self.history_finder = HistoryFinder(self.worker)
         self.setup_ui()
         self.setup_model()
         self.setup_view()
@@ -141,6 +142,15 @@ class ConfirmWizardPage(TitledWizardPage):
         self.ui.pushButton_save_script.clicked.connect(
             self.save_script
         )
+
+        # 最適化の開始・終了時のシグナル
+        self.worker.started.connect(lambda: self.switch_save_script_button(True))
+        self.worker.finished.connect(lambda: self.switch_save_script_button(False))
+        self.worker.started.connect(lambda: self.switch_explanation_text('started'))
+        self.worker.finished.connect(lambda: self.switch_explanation_text('finished'))
+
+        # history finder の開始・終了時のシグナル
+        self.history_finder.finished.connect(lambda: self.switch_explanation_text('history found'))
 
     def save_script(self):
         global _REMOVING_SWEEP_WARNED
@@ -261,13 +271,7 @@ class ConfirmWizardPage(TitledWizardPage):
         fi.get().save_femprj()
 
         self.worker.set_paths(py_paths)
-        self.worker.started.connect(lambda: self.switch_save_script_button(True))
-        self.worker.finished.connect(lambda: self.switch_save_script_button(False))
-        self.worker.started.connect(lambda: self.switch_explanation_text('started'))
-        self.worker.finished.connect(lambda: self.switch_explanation_text('finished'))
-
-        self.history_finder = HistoryFinder(self.worker, history_paths, py_paths)
-        self.history_finder.finished.connect(lambda: self.switch_explanation_text('history found'))
+        self.history_finder.set_paths(history_paths, py_paths)
 
         # worker は history の初期化(signal connect)の後に
         # 実行する必要がある
@@ -298,7 +302,7 @@ class ConfirmWizardPage(TitledWizardPage):
                 # output_json で set したhistory_path の
                 # 情報を model から消す（初期化）
                 model = get_config_model_for_problem(self)
-                model.reset_history_path()
+                # model.reset_history_path()  # このスレッドで reset してはいけないかも
 
             # 元に戻す
             button.setText(button.accessibleName())
@@ -316,9 +320,14 @@ class ConfirmWizardPage(TitledWizardPage):
         if state == 'started':
             buff = text_edit.toHtml()
             text_edit._buff = buff
-            text_edit.setText('開始しています。1 分程度お待ちください。\n'
-                              '最適化が始まるとプロセスモニターを起動します。\n'
-                              '最適化の確認・中断はプロセスモニターから行います。')
+
+            # 再実行時、html のフォーマットが残留することが
+            # あったので document を使って初期化
+            doc = QTextDocument()
+            doc.setPlainText('開始しています。1 分程度お待ちください。\n'
+                             '最適化が始まるとプロセスモニターを起動します。\n'
+                             '最適化の確認・中断はプロセスモニターから行います。')
+            text_edit.setDocument(doc)
 
         elif state == 'history found':
 
@@ -329,15 +338,20 @@ class ConfirmWizardPage(TitledWizardPage):
             text = (f'\nブラウザで上の URL にアクセスすると'
                     f'プロセスモニターを開くことができます。')
 
-            if ret_msg == ReturnMsg.no_message:
-                url = f'http://{data["host"]}:{data["port"]}'
-
-            else:
+            if Version(pyfemtet.__version__) < Version('0.8.6'):
                 from pyfemtet.opt.visualization._process_monitor.application import ProcessMonitorApplication
                 port = ProcessMonitorApplication.DEFAULT_PORT
-                # port = 8080
                 url = f'http://localhost:{port}'
                 text = text + '※ pyfemtet のバージョンが古いのでデフォルトのポート値を取得しています。\n'
+
+            else:
+
+                if ret_msg == ReturnMsg.no_message:
+                    url = f'http://{data["host"]}:{data["port"]}'
+
+                else:
+                    url = f'http://localhost:8080'
+                    text = text + '※ ポート情報の取得に失敗したのでデフォルトのポート値を取得しています。\n'
 
             text += (f'最適化が停止したらコンソール画面で「Enter」を押してください。\n'
                      f'それまでの間はモニターを停止しないので分析作業を行うことができます。')

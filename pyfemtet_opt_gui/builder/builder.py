@@ -1,5 +1,6 @@
 import json
 from numbers import Real
+from pyfemtet_opt_gui.common.femtet_operator_support import _get_myself_code_str
 
 __all__ = [
     'create_header',
@@ -30,7 +31,7 @@ print()
 
 # import 文
 def create_header():
-    code = '''
+    code = f'''
 # pyfemtet 基本クラス
 from pyfemtet.opt import FemtetInterface, FemtetWithSolidworksInterface, OptunaOptimizer, FEMOpt
 
@@ -42,9 +43,8 @@ from pyfemtet.opt.optimizer import PoFBoTorchSampler
 from optuna.samplers import RandomSampler, QMCSampler, NSGAIISampler, TPESampler
 from optuna_integration import BoTorchSampler
 
-# mean 関数
-from statistics import mean as _mean
-mean = lambda *args: _mean(args)
+# Femtet の書式で書かれた式を Python の書式に変換する関数群
+{_get_myself_code_str()}
 
 print('モジュールのインポートが完了しました。')
 print('最適化が開始されると、ブラウザのプロセスモニターが自動的に起動します。')

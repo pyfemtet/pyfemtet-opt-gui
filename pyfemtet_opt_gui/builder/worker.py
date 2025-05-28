@@ -18,16 +18,17 @@ from traceback import print_exception
 
 class HistoryFinder(QThread):
 
-    def __init__(self, parent, history_paths, py_paths):
+    def __init__(self, parent):
         assert isinstance(parent, OptimizationWorker)
         super().__init__(parent)
 
         self.optim_worker = parent
+        self.optim_worker.process_started.connect(self.on_process_started)
+
+    def set_paths(self, history_paths, py_paths):
         self.history_paths = history_paths
         self.paths = py_paths
-
         self._process_started_flags = {p: False for p in self.paths}
-        self.optim_worker.process_started.connect(self.on_process_started)
 
     def on_process_started(self, path):
         assert path in self._process_started_flags
@@ -83,6 +84,7 @@ class OptimizationWorker(QThread):
 
             import os
             import sys
+            import importlib
 
             script_place, script_name = os.path.split(path)
             module_name = os.path.splitext(script_name)[0]
@@ -90,7 +92,14 @@ class OptimizationWorker(QThread):
             os.chdir(script_place)
             sys.path.append(script_place)
             try:
-                exec(f'from {module_name} import *; main()', {}, {})
+                # from <module_name> import * を常に reload で行う
+                if module_name in sys.modules:
+                    module = importlib.reload(sys.modules[module_name])
+                else:
+                    module = importlib.import_module(module_name)
+                module_members = [name for name in dir(module) if not name.startswith('_')]
+                globals().update({name: getattr(module, name) for name in module_members})
+                getattr(module, 'main')()
 
                 print('================================')
                 print('終了しました。')

@@ -60,6 +60,7 @@ class ReturnMsg:
 
     class Error(enum.StrEnum):
         _test = 'This is a test Error message.'
+        internal = 'Internal Error!'
 
         # femtet
         femtet_connection_failed = 'Femtet との接続がタイムアウトしました。'
@@ -78,11 +79,13 @@ class ReturnMsg:
         not_a_number = '数値または数式の認識に失敗しました。'
         not_a_number_expression_setting_is_enable_in_constraint = '数値が入力されていません。計算式を設定したい場合、「拘束式の設定」ページで設定してください。。'
         not_a_pure_number = '数値を入力してください。'
+        unknown_var_name = '次の変数が不明な変数を参照しています'
         evaluated_expression_not_float = '式が計算できないか、計算結果に実数以外の数が含まれています'  # 句読点なし
         inconsistent_lb_ub = '上下限の大小関係が正しくありません。'
         inconsistent_value_ub = '値と上限の大小関係が正しくありません。'
         inconsistent_value_lb = '値と下限の大小関係が正しくありません。'
         no_bounds = '上下限のいずれかを設定してください。'
+        step_must_be_positive = 'step は正の数でなければなりません。'
 
         # others
         duplicated_constraint_name = '拘束式名が既存のものと重複しています。別の名前を指定してください。'

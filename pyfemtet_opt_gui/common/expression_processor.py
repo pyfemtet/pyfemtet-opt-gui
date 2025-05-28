@@ -1,21 +1,96 @@
-from sympy import sympify
-from sympy.core.sympify import SympifyError
-from sympy import Min, Max, Add, Symbol
+import sys
+import ast
+from traceback import print_exception
+from graphlib import TopologicalSorter
 
 from pyfemtet_opt_gui.common.return_msg import ReturnMsg
+from pyfemtet_opt_gui.common.femtet_operator_support import *
+
 
 __all__ = [
-    'Expression', 'eval_expressions', 'check_bounds', 'SympifyError'
+    'Expression', 'eval_expressions', 'check_bounds', 'ExpressionParseError'
 ]
 
 
-def get_valid_functions(expressions=None):
-    return {
-        'mean': lambda *args: Add(*args).subs(expressions if expressions is not None else {}) / len(args),
-        'max': Max,
-        'min': Min,
-        'S': Symbol('S')
-    }
+class NotSupportedOperatorError(Exception):
+    pass
+
+
+# 比較演算子に対応する関数名
+COMPARE_OP_TO_FUNC_NAME = {
+    ast.Eq: _femtet_equal.__name__,
+    ast.NotEq: _femtet_not_equal.__name__,
+    ast.Lt: _femtet_less_than.__name__,
+    ast.LtE: _femtet_less_than_equal.__name__,
+    ast.Gt: _femtet_greater_than.__name__,
+    ast.GtE: _femtet_greater_than_equal.__name__,
+    ast.And: _femtet_operator_and.__name__,
+    ast.Or: _femtet_operator_or.__name__,
+}
+
+
+# Femtet の比較演算子に合わせるための
+# 文字列中の比較演算を関数に変換するための
+# transformer
+class CompareTransformer(ast.NodeTransformer):
+
+    def visit_BoolOp(self, node: ast.BoolOp):
+        op_type = type(node.op)
+        if op_type in COMPARE_OP_TO_FUNC_NAME:
+            func_name = COMPARE_OP_TO_FUNC_NAME[op_type]
+            node = ast.Call(
+                func=ast.Name(id=func_name, ctx=ast.Load()),
+                args=node.values,
+                keywords=[]
+            )
+
+        return self.generic_visit(node)
+
+    def visit_Compare(self, node: ast.Compare):
+        if len(node.ops) == 1 and len(node.comparators) == 1:
+            op_type = type(node.ops[0])
+
+            # 変換対象かどうか
+            if op_type in COMPARE_OP_TO_FUNC_NAME:
+                func_name = COMPARE_OP_TO_FUNC_NAME[op_type]
+
+                node = ast.Call(
+                    func=ast.Name(id=func_name, ctx=ast.Load()),
+                    args=[node.left, node.comparators[0]],
+                    keywords=[]
+                )
+
+        return self.generic_visit(node)
+
+
+# Femtet 式を Python 書式・Femtet 演算に変換
+def convert_operator(expr_str: str) -> str:
+    # 小文字に統一
+    expr_str = expr_str.lower()
+
+    # 退避
+    expr_str = expr_str.replace('<=', '<$$')
+    expr_str = expr_str.replace('>=', '>$$')
+
+    # 変換
+    expr_str = expr_str.replace('=', '==')
+    expr_str = expr_str.replace('<>', '!=')
+    expr_str = expr_str.replace('^', '**')
+
+    # 元に戻す
+    expr_str = expr_str.replace('<$$', '<=')
+    expr_str = expr_str.replace('>$$', '>=')
+
+    # 演算子を関数に変換
+    tree = ast.parse(expr_str, mode='eval')
+    transformer = CompareTransformer()
+    new_tree = transformer.visit(tree)
+    ast.fix_missing_locations(new_tree)
+    return ast.unparse(new_tree)
+
+
+class ExpressionParseError(Exception):
+    pass
 
 
 def check_bounds(value=None, lb=None, ub=None) -> tuple[ReturnMsg, str | None]:
@@ -56,7 +131,45 @@ def check_bounds(value=None, lb=None, ub=None) -> tuple[ReturnMsg, str | None]:
                     raise NotImplementedError
 
 
+def get_dependency(expr_str):
+    try:
+        # 式のASTを生成
+        tree = ast.parse(expr_str, mode='eval')
+
+        dependent_vars = set()
+        used_functions = set()
+
+        class Validator(ast.NodeVisitor):
+            def visit_Name(self, node: ast.Name):
+                # 変数名を収集
+                dependent_vars.add(node.id)
+
+            def visit_Call(self, node: ast.Call):
+                # 関数呼び出しをチェック
+                if isinstance(node.func, ast.Name):
+                    func_name = node.func.id
+                    used_functions.add(func_name)
+                    if func_name not in get_femtet_builtins():
+                        raise ExpressionParseError(f"Invalid function used: {func_name}")
+                else:
+                    # 例えば属性アクセスなどは許可しない
+                    raise ExpressionParseError("Only simple function names are allowed")
+                self.generic_visit(node)
+
+        Validator().visit(tree)
+
+        # locals は除く
+        dependent_vars = dependent_vars - set(get_femtet_builtins().keys())
+
+        return dependent_vars
+
+    except Exception as e:
+        print_exception(e)
+        raise ExpressionParseError(str(e)) from e
+
+
 class Expression:
+
     def __init__(self, expression: str | float):
         """
         Example:
@@ -86,17 +199,19 @@ class Expression:
         # ユーザー指定の何らかの入力
         self._expr: str | float = expression
 
-        # max(name1, name2) など関数を入れる際に問題になるので
-        # 下記の仕様は廃止
-        # # sympify 時に tuple 扱いになるので , を置き換える
-        # # 日本人が数値に , を使うとき Python では _ を意味する
-        # # expression に _ が入っていても構わない
-        # tmp_expr = str(self._expr).replace(',', '_')
-        tmp_expr = self._expr
+        # femtet 書式を python 書式に変換
         try:
-            self._s_expr = sympify(tmp_expr, locals=get_valid_functions())
+            self._converted_expr_str: str = convert_operator(str(expression))
+        except Exception as e:
+            self.is_valid = False
+            raise ExpressionParseError(str(e)) from e
+
+        # 変換できたら dependency を取得
+        try:
+            self.dependencies = get_dependency(self._converted_expr_str)
             self.is_valid = True
-        except SympifyError as e:
+
+        except ExpressionParseError as e:
             self.is_valid = False
             raise e
 
@@ -110,7 +225,7 @@ class Expression:
             return None
 
     def is_number(self) -> bool:
-        return self._s_expr.is_number
+        return len(self.dependencies) == 0
 
     def is_expression(self) -> bool:
         return not self.is_number()
@@ -129,7 +244,7 @@ class Expression:
     @property
     def value(self) -> float:
         if self.is_number():
-            return float(self._s_expr)
+            return float(eval(self._converted_expr_str))
         else:
             raise ValueError(f'Cannot convert expression {self.expr} to float.')
 
@@ -137,7 +252,7 @@ class Expression:
         return self.__str__()
 
     def __str__(self):
-        return f'{self.expr} ({str(self._s_expr)})'
+        return f'{self.expr} ({str(self._expr)})'
 
     def __float__(self):
         return self.value
@@ -146,66 +261,67 @@ class Expression:
         return int(float(self))
 
 
-def eval_expressions(expressions: dict[str, Expression | float | str]) -> tuple[dict[str, float], ReturnMsg, str]:
-    #  値渡しに変換
-    expressions = expressions.copy()
+def topological_sort(expressions: dict[str, Expression]) -> list[str]:
+    """
+    Raises:
+        CycleError
+    """
+    dependencies = {name: expr.dependencies for name, expr in expressions.items()}
+    ts = TopologicalSorter(dependencies)
+    return list(ts.static_order())
 
-    out = dict()
+
+def eval_expressions(expressions: dict[str, Expression | float | str]) -> tuple[dict[str, float], ReturnMsg, str]:
+
+    # 値渡しに変換
+    expressions_ = expressions.copy()
+
     error_keys = []
 
+    # 型を統一
+    expression_: str | float | Expression
+    for key, expression_ in expressions_.items():
+        if not isinstance(expression_, Expression):
+            expressions[key] = Expression(expression_)
+
+    # 不明な変数を参照していればエラー
+    expression: Expression
     for key, expression in expressions.items():
-        if isinstance(expression, Expression):
-            expressions[key] = expression.expr
+        for var_name in expression.dependencies:
+            if var_name not in expressions:
+                error_keys.append(key)  # error!
 
-    expression: str | float
-    for key, expression in expressions.items():
+    # エラーがあれば終了
+    if len(error_keys) > 0:
+        return {}, ReturnMsg.Error.unknown_var_name, f': {error_keys}'
 
-        sympified = sympify(
-            expression,
-            locals=get_valid_functions(expressions),
-        )
+    # トポロジカルソート
+    evaluation_order = topological_sort(expressions)
 
-        if isinstance(sympified, tuple):
-            value = None
-            error_keys.append(key)
+    # ソート順に評価
+    evaluated_value = {}
+    for key in evaluation_order:
 
-        else:
-            evaluated = sympified.subs(expressions)
-            try:
-                value = float(evaluated)
+        # 評価の中で使える locals を作成
+        l = get_femtet_builtins()
+        l.update(evaluated_value)
 
-            except TypeError:  # mostly TypeError or ValueError
-                value = None
-                error_keys.append(key)
+        # 評価
+        expression = expressions[key]
+        try:
+            value = eval(str(expression._converted_expr_str), l)
+        except Exception as e:
+            print_exception(e)
+            print('expression:', expression._converted_expr_str, file=sys.stderr)
+            # 評価に失敗（これ以降が計算できないのでここで終了）
+            error_keys.append(key)  # error!
+            break
 
-        out[key] = value
+        # 評価済み変数に追加
+        evaluated_value[key] = value
 
     if error_keys:
         return {}, ReturnMsg.Error.evaluated_expression_not_float, f': {error_keys}'
 
     else:
-        return out, ReturnMsg.no_message, ''
-
-
-if __name__ == '__main__':
-
-    expressions_: dict[str, Expression] = {
-        'section_radius': Expression(0.5),
-        'coil_radius': Expression("section_radius * coil_height"),
-        'coil_pitch': Expression("exp(2.0**2)"),
-        'n': Expression(3.0),
-        'coil_radius_grad': Expression(0.1),
-        'gap': Expression('current * 2 + sympy'),
-        'current': 'n',
-        'coil_height': 'sqrt(coil_pitch * (n))',
-        'sympy': 0,
-        'test': "mean(gap, 2, 3)",
-        'test2': "max(1, 2, 3)",
-        'test3': "min(current, 2, 3)",
-        'test4': "min(1., 2., 3.)",
-    }
-
-    evaluated_, ret_msg, additional_msg = eval_expressions(expressions_)
-    for key_, value_ in evaluated_.items():
-        print(key_, value_)
-    print(ret_msg)
+        return evaluated_value, ReturnMsg.no_message, ''

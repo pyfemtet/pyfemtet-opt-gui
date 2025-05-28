@@ -20,6 +20,9 @@ from pyfemtet_opt_gui.common.return_msg import *
 
 import enum
 from contextlib import nullcontext
+from packaging.version import Version
+
+import pyfemtet
 
 from typing import TYPE_CHECKING
 
@@ -82,7 +85,7 @@ class Constraint:
         # Expression にできなければエラー
         try:
             _expr = Expression(self.expression)
-        except SympifyError:
+        except ExpressionParseError:
             return ReturnMsg.Error.cannot_recognize_as_an_expression, self.expression
 
         # Expression にできても値が
@@ -332,7 +335,7 @@ class ConstraintModel(StandardItemModelWithHeader):
         else:
             raise RuntimeError(f'constraint named `{name}` is not found.')
 
-    def _output_json(self):
+    def _output_json(self, for_surrogate_model=False):
         """
 
         def constraint_0(_, opt_):
@@ -348,7 +351,7 @@ class ConstraintModel(StandardItemModelWithHeader):
             fun=constraint_0,
             lower_bound = 1.
             upper_bound = None,
-            strict=True,
+            strict=True
         )
         """
 
@@ -365,18 +368,23 @@ class ConstraintModel(StandardItemModelWithHeader):
                 continue
 
             # 式と使う変数名を取得
-            expression = constraint.expression.replace('\n', '')
-            expr = Expression(expression)
-            variable_names = [_s.name for _s in expr._s_expr.free_symbols]
+            expr_str = constraint.expression.replace('\n', '')
+            expr = Expression(expr_str)
 
             # def constraint_0 を定義
             fun_name = f'constraint_{fun_name_counter}'
             with nullcontext():
+
                 funcdef = dict(
                     function=fun_name,
                     args=['_', 'opt_'],
-                    commands=None,  # 今から足していく
-                    ret=expression,
+
+                    # locals に渡すための辞書 var を後で足す
+                    commands=None,
+
+                    # locals を使いたいので eval を返す
+                    ret=f'eval("{expr._converted_expr_str}", '
+                        f'dict(**locals(), **get_femtet_builtins(var)))',
                 )
 
                 # def の中身を作成
@@ -390,14 +398,6 @@ class ConstraintModel(StandardItemModelWithHeader):
                     )
                     commands.append(command)
 
-                    # a = var['a']
-                    for variable_name in variable_names:
-                        command = dict(
-                            ret=variable_name,
-                            command=f'var["{variable_name}"]'
-                        )
-                        commands.append(command)
-
                 funcdef.update({'commands': commands})
                 out_funcdef.append(funcdef)
 
@@ -406,6 +406,14 @@ class ConstraintModel(StandardItemModelWithHeader):
                 cmd = dict(command='femopt.add_constraint')
                 args = dict()
 
+                if for_surrogate_model:
+                    if Version(pyfemtet.__version__) < Version('1.0.0'):
+                        cmd_args = ['None', 'femopt.opt']
+                    else:
+                        cmd_args = ['femopt.opt']
+                else:
+                    cmd_args = ['femopt.opt']
+
                 args.update(
                     dict(
                         name=f'"{constraint.name}"',
@@ -413,7 +421,7 @@ class ConstraintModel(StandardItemModelWithHeader):
                         lower_bound=constraint.lb,
                         upper_bound=constraint.ub,
                         strict=True,
-                        args=['femopt.opt'],
+                        args=cmd_args,
                     )
                 )
 
@@ -424,9 +432,9 @@ class ConstraintModel(StandardItemModelWithHeader):
 
         return out_funcdef, out
 
-    def output_json(self):
+    def output_json(self, for_surrogate_model=False):
         import json
-        return json.dumps(self._output_json()[1])
+        return json.dumps(self._output_json(for_surrogate_model)[1])
 
     def output_funcdef_json(self):
         import json
