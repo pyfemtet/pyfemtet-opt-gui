@@ -205,9 +205,27 @@ class VariableTableViewDelegate(QStyledItemDelegate):
             text = editor.text()
 
             # check valid input or not
-            ret_msg, new_expression = self.check_valid(text, header_data, model, index)
-            if not can_continue(ret_msg, parent=self.parent(), additional_message=text):
-                return
+            if header_data == VariableColumnNames.step:
+                # if step, allow empty input
+                if text == '':
+                    new_expression = None
+
+                # if step, positive only
+                else:
+                    ret_msg, new_expression = self.check_valid(text, header_data, model, index)
+                    if not can_continue(ret_msg, parent=self.parent(), additional_message=text):
+                        return
+
+                    assert new_expression is not None
+                    if new_expression.value <= 0:
+                        ret_msg = ReturnMsg.Error.step_must_be_positive
+                        can_continue(ret_msg, parent=self.parent(), additional_message=text)
+                        return
+
+            else:
+                ret_msg, new_expression = self.check_valid(text, header_data, model, index)
+                if not can_continue(ret_msg, parent=self.parent(), additional_message=text):
+                    return
 
             # if init or lb or ub, check bounds
             if (
@@ -742,6 +760,15 @@ class VariableItemModel(StandardItemModelWithHeader):
                     assert expr.is_number()
                     args_object.update(
                         dict(upper_bound=expr.value)
+                    )
+
+                # step
+                with nullcontext():
+                    item = self.item(r, self.get_column_by_header_data(self.ColumnNames.step))
+                    expr: Expression = item.data(Qt.ItemDataRole.UserRole)
+                    assert expr.is_number()
+                    args_object.update(
+                        dict(step=expr.value)
                     )
 
             # 数式でなくて Check されていない場合: Expression (pass_to_fem=True)
