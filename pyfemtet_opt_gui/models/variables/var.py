@@ -121,7 +121,7 @@ class VariableTableViewDelegate(QStyledItemDelegate):
 
         return constraint.finalize_check()
 
-    def check_valid(self, text, header_data, model, index) -> tuple[ReturnType, str | None, Expression | None]:
+    def check_valid(self, text, header_data, model, index) -> tuple[ReturnType, str, Expression | None]:
 
         new_expression: Expression | None = None
 
@@ -136,7 +136,7 @@ class VariableTableViewDelegate(QStyledItemDelegate):
                     or header_data == VariableColumnNames.upper_bound
             ):
                 if text == '':
-                    return ReturnMsg.no_message, None, new_expression
+                    return ReturnMsg.no_message, '', new_expression
 
         # text をチェックする
         try:
@@ -146,7 +146,7 @@ class VariableTableViewDelegate(QStyledItemDelegate):
         except Exception as e:
             print_exception(e)
             ret_msg = ReturnMsg.Error.cannot_recognize_as_an_expression
-            return ret_msg, None, None
+            return ret_msg, '', None
 
         # Valid expression
         if new_expression is not None:
@@ -174,7 +174,7 @@ class VariableTableViewDelegate(QStyledItemDelegate):
                     raise RuntimeError('Internal Error! Unexpected header_data in VariableTableDelegate.')
 
                 # show error dialog
-                return ret_msg, None
+                return ret_msg, '', None
 
             # but raises other expression's error
             # (for example, division by zero)
@@ -191,7 +191,7 @@ class VariableTableViewDelegate(QStyledItemDelegate):
                     return ReturnMsg.Error.raises_other_expression_error, a_msg, None
 
         # check end
-        return ReturnMsg.no_message, None, new_expression
+        return ReturnMsg.no_message, '', new_expression
 
     def setModelData(self, editor, model, index) -> None:
 
