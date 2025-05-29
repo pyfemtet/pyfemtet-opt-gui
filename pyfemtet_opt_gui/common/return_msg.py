@@ -57,6 +57,7 @@ class ReturnMsg:
                                                           'その後さらにサロゲートモデルを用いた最適化が始まり、'
                                                           '手動停止まで継続されます。'
                                                           'このまま進めてもよろしいですか？')
+        confirm_delete_constraint = '拘束式を削除してよろしいですか？この操作は取り消せません。: '
 
     class Error(enum.StrEnum):
         _test = 'This is a test Error message.'
@@ -105,6 +106,8 @@ class ReturnMsg:
                                              '最適化を中断する場合は、ブラウザでプロセスモニターにアクセス（既定は「http://localhost:8080」）して'
                                              '中断ボタンを押してください。')
         cannot_finish_during_optimization = '最適化の実行中は終了できません。先に最適化を終了してください。'
+        no_selection = '何も選択されていません。'
+        no_such_constraint = '拘束式が見つかりませんでした。: '
 
         # solidworks
         sw_process_not_found = 'Solidworks のプロセスがありません。'

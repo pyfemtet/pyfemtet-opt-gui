@@ -36,6 +36,16 @@
        </property>
       </widget>
      </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_delete">
+       <property name="text">
+        <string>削除</string>
+       </property>
+       <property name="icon">
+        <iconset theme="QIcon::ThemeIcon::EditDelete"/>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item row="0" column="1">

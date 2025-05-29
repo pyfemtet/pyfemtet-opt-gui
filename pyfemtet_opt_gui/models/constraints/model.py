@@ -153,6 +153,30 @@ class ConstraintModel(StandardItemModelWithHeader):
 
         return out
 
+    def delete_constraint(self, name_to_delete):
+
+        # 名前を探す
+        for r in self.get_row_iterable():
+
+            # 一致する名前を探して index.Row を取得
+            c = self.get_column_by_header_data(self.ColumnNames.name)
+            name = self.item(r, c).text()
+            if name == name_to_delete:
+                target_index = self.index(r, c)
+                break
+
+        # 存在しなければ何かおかしい
+        else:
+            show_return_msg(
+                ReturnMsg.Error.no_such_constraint,
+                parent=self.parent(),
+                additional_message=name_to_delete,
+            )
+            return
+
+        # 行を削除
+        self.removeRow(target_index.row())
+
     def set_constraint(self, constraint: Constraint, replacing_name: str = None):
 
         # replacing_name が与えられていれば
