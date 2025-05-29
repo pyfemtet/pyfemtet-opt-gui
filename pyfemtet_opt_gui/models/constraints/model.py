@@ -390,13 +390,24 @@ class ConstraintModel(StandardItemModelWithHeader):
                 # def の中身を作成
                 commands = []
                 with nullcontext():
-                    # var = opt_.variables.get_variables()
-                    command = dict(
-                        ret='var',
-                        command='opt_.variables.get_variables',
-                        args=dict(),
-                    )
-                    commands.append(command)
+
+                    if Version(pyfemtet.__version__) < Version('0.999.999'):
+                        # var = opt_.variables.get_variables()
+                        command = dict(
+                            ret='var',
+                            command='opt_.variables.get_variables',
+                            args=dict(),
+                        )
+                        commands.append(command)
+
+                    else:
+                        # var = opt_.get_variables()
+                        command = dict(
+                            ret='var',
+                            command='opt_.get_variables',
+                            args=dict(),
+                        )
+                        commands.append(command)
 
                 funcdef.update({'commands': commands})
                 out_funcdef.append(funcdef)
@@ -407,7 +418,7 @@ class ConstraintModel(StandardItemModelWithHeader):
                 args = dict()
 
                 if for_surrogate_model:
-                    if Version(pyfemtet.__version__) < Version('1.0.0'):
+                    if Version(pyfemtet.__version__) < Version('0.999.999'):
                         cmd_args = ['None', 'femopt.opt']
                     else:
                         cmd_args = ['femopt.opt']

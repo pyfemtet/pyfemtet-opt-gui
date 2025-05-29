@@ -7,8 +7,9 @@ requires-python = ">=3.11, <3.13"  # TODO: check compatibility with 3.13
 readme = "README.md"
 license = "LGPL-3.0"
 dependencies = [
+    "pyfemtet",
     "pyside6~=6.7.1",
-    "pyfemtet>=0.8.10, <1.0.0",
+    # "pyfemtet>=0.8.10, <1.0.0",
 ]
 
 [project.urls]
@@ -26,3 +27,9 @@ build-backend = "hatchling.build"
 
 [tool.hatch.version]
 source = "uv-dynamic-versioning"
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.uv.sources]
+pyfemtet = { path = "../pyfemtet" }

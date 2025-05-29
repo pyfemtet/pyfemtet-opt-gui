@@ -65,7 +65,7 @@ def create_fem_script(surrogate_code_state: SurrogateCodeState):
     obj_model: ObjectiveTableItemModel = get_obj_model(None)
     parametric_output_indexes_use_as_objective = obj_model.output_dict()
 
-    # construct FEM or surrogate interface
+    # construct FEMInterface
     if (
             surrogate_code_state == SurrogateCodeState.normal
             or surrogate_code_state == SurrogateCodeState.for_surrogate_training
@@ -99,25 +99,22 @@ def create_fem_script(surrogate_code_state: SurrogateCodeState):
         else:
             raise NotImplementedError
 
+    # construct surrogate model
     else:
         config_model: ConfigItemModel = get_config_model(None)
         surrogate_model_name = config_model.get_surrogate_model_name()
         assert surrogate_model_name != SurrogateModelNames.no
         assert training_history_path is not None
 
-        v = Version(pyfemtet.__version__)
-        if Version('0.8.10') <= v < Version('1.0.0'):
-            cmd_obj = dict(
-                command=surrogate_model_name,
-                args=dict(
-                    history_path=f'"{training_history_path}"',
-                    _output_directions=list(parametric_output_indexes_use_as_objective.values()),
-                ),
-                ret='fem',
-            )
-
-        else:
-            assert False
+        # pyfemtet 1.x でも同じインターフェースを実装
+        cmd_obj = dict(
+            command=surrogate_model_name,
+            args=dict(
+                history_path=f'"{training_history_path}"',
+                _output_directions=list(parametric_output_indexes_use_as_objective.values()),
+            ),
+            ret='fem',
+        )
 
     line = create_command_line(json.dumps(cmd_obj))
     code += line
@@ -150,9 +147,24 @@ def create_expr_cns_script():
     return create_from_model(model, 'output_expression_constraint_json')
 
 
-def create_optimize_script():
+def create_optimize_script(surrogate_code_state):
+
     model: ConfigItemModel = get_config_model(None)
-    return create_from_model(model)
+    code_str = create_from_model(model, confirm_before_exit=surrogate_code_state != SurrogateCodeState.for_surrogate_training)
+
+    # surrogate model の training 用の場合、history_path を置き換える
+    if Version(pyfemtet.__version__) > Version('0.999.999'):
+        if surrogate_code_state == SurrogateCodeState.for_surrogate_training:
+            # TODO: config_model で設定できるようにし、
+            #   ここではそれを参照するだけにする
+            model.history_path = training_history_path
+            code_str = re.sub(
+                r'history_path=r".*?"',
+                f'history_path=r"{training_history_path}"',
+                code_str
+            )
+
+    return code_str
 
 
 def create_cns_function_def():
@@ -162,24 +174,28 @@ def create_cns_function_def():
 
 # for pyfemtet 0.x,
 # femopt = FEMOpt(fem, opt, history_path)
+# for pyfemtet 1.x,
+# femopt = FEMOpt(fem, opt)
 def create_femopt(surrogate_code_state: SurrogateCodeState):
     model = get_config_model(None)
-    code: str = create_from_model(model, 'output_femopt_json')
+    code_str: str = create_from_model(model, 'output_femopt_json')
 
-    if surrogate_code_state == SurrogateCodeState.for_surrogate_training:
-        # history_path を参照する必要のある
-        # ConfirmWizardPage の save_script などのために
-        # 書き換えた history_path を保存
-        # TODO: config_model で設定できるようにし、
-        #   ここではそれを参照するだけにする
-        model.history_path = training_history_path
-        code = re.sub(
-            r'history_path=".*?"',
-            f'history_path="{training_history_path}"',
-            code
-        )
+    if Version(pyfemtet.__version__) < Version('0.999.999'):
 
-    return code
+        if surrogate_code_state == SurrogateCodeState.for_surrogate_training:
+            # history_path を参照する必要のある
+            # ConfirmWizardPage の save_script などのために
+            # 書き換えた history_path を保存
+            # TODO: config_model で設定できるようにし、
+            #   ここではそれを参照するだけにする
+            model.history_path = training_history_path
+            code_str = re.sub(
+                r'history_path=r".*?"',
+                f'history_path=r"{training_history_path}"',
+                code_str
+            )
+
+    return code_str
 
 
 # 訓練データ作成時に決定する
@@ -235,7 +251,7 @@ def create_script(
     code += '\n'
     code += create_expr_cns_script()
     code += '\n'
-    code += create_optimize_script()
+    code += create_optimize_script(surrogate_code_state)
     code += '\n\n'
     code += create_footer()
 

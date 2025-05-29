@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'Wizard_mainZYuzdq.ui'
+## Form generated from reading UI file 'Wizard_mainIULYOf.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.7.3
 ##
@@ -24,7 +24,7 @@ class Ui_Wizard(object):
     def setupUi(self, Wizard):
         if not Wizard.objectName():
             Wizard.setObjectName(u"Wizard")
-        Wizard.resize(789, 570)
+        Wizard.resize(993, 570)
         Wizard.setWizardStyle(QWizard.WizardStyle.ModernStyle)
         Wizard.setOptions(QWizard.WizardOption.HaveNextButtonOnLastPage|QWizard.WizardOption.HelpButtonOnRight|QWizard.WizardOption.NoCancelButtonOnLastPage)
         Wizard.setTitleFormat(Qt.TextFormat.RichText)
@@ -47,11 +47,6 @@ class Ui_Wizard(object):
 
         self.comboBox = QComboBox(self.wizardPage_init)
         self.comboBox.setObjectName(u"comboBox")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.Fixed)
-        sizePolicy1.setHorizontalStretch(0)
-        sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.comboBox.sizePolicy().hasHeightForWidth())
-        self.comboBox.setSizePolicy(sizePolicy1)
 
         self.gridLayout.addWidget(self.comboBox, 3, 2, 1, 1)
 
@@ -65,23 +60,17 @@ class Ui_Wizard(object):
 
         self.label = QLabel(self.wizardPage_init)
         self.label.setObjectName(u"label")
-        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
-        sizePolicy2.setHorizontalStretch(0)
-        sizePolicy2.setVerticalStretch(0)
-        sizePolicy2.setHeightForWidth(self.label.sizePolicy().hasHeightForWidth())
-        self.label.setSizePolicy(sizePolicy2)
         self.label.setAlignment(Qt.AlignmentFlag.AlignRight|Qt.AlignmentFlag.AlignTrailing|Qt.AlignmentFlag.AlignVCenter)
 
         self.gridLayout.addWidget(self.label, 3, 1, 1, 1)
 
         self.pushButton_launch = QPushButton(self.wizardPage_init)
         self.pushButton_launch.setObjectName(u"pushButton_launch")
-        sizePolicy3 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-        sizePolicy3.setHorizontalStretch(0)
-        sizePolicy3.setVerticalStretch(0)
-        sizePolicy3.setHeightForWidth(self.pushButton_launch.sizePolicy().hasHeightForWidth())
-        self.pushButton_launch.setSizePolicy(sizePolicy3)
-        self.pushButton_launch.setMinimumSize(QSize(300, 0))
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.pushButton_launch.sizePolicy().hasHeightForWidth())
+        self.pushButton_launch.setSizePolicy(sizePolicy1)
         self.pushButton_launch.setFlat(False)
 
         self.gridLayout.addWidget(self.pushButton_launch, 1, 1, 1, 2)

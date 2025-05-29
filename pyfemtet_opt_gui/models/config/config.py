@@ -1,8 +1,3 @@
-import json
-import os
-import datetime
-import csv
-
 # noinspection PyUnresolvedReferences
 from PySide6.QtCore import *
 
@@ -18,10 +13,17 @@ from PySide6.QtGui import *
 # noinspection PyUnresolvedReferences
 from PySide6 import QtWidgets, QtCore, QtGui
 
-import enum
+import os
 import sys
-from contextlib import nullcontext
+import csv
+import json
+import enum
+import datetime
 from pathlib import Path
+from contextlib import nullcontext
+from packaging.version import Version
+
+import pyfemtet
 
 from pyfemtet_opt_gui.ui.ui_WizardPage_config import Ui_WizardPage
 
@@ -701,7 +703,36 @@ class ConfigItemModel(StandardItemModelWithHeader):
         else:
             return False
 
-    def output_json(self):
+    def __certify_and_get_history_path(self):
+
+        # 「設定値」列の番号
+        c_value = self.get_column_by_header_data(self.ColumnNames.value)
+
+        # 行番号
+        cls = ConfigItemClassEnum.history_path.value
+        vhd = cls.name
+        r = self.get_row_by_header_data(vhd)
+
+        # 値
+        history_path = self.item(r, c_value).data(Qt.ItemDataRole.DisplayRole)
+
+        # GUI から停止信号を出すための
+        # host, port 情報にアクセスするため
+        # history_path が exec() 内で生成されたら困るので
+        # スクリプトに None が渡らないように
+        # ここで自動作成する
+        if history_path == '':
+            history_path = datetime.datetime.now().strftime('最適化_%Y%m%d_%H%M%S.csv')
+
+        # GUI が history_path にアクセスできるよう
+        # 自身に与えられるパスを持っておく
+        # 現在の実装では start_run_script_thread() の中で
+        # chdir しているので相対パスでも問題ない
+        self.history_path = history_path
+
+        return history_path
+
+    def output_json(self, confirm_before_exit=True):
         """
 
         femopt.set_random_seed(...)
@@ -794,69 +825,55 @@ class ConfigItemModel(StandardItemModelWithHeader):
 
                 out_args.update({arg: value})
 
+            # confirm_before_exit
+            with nullcontext():
+                arg = 'confirm_before_exit'
+                value = str(confirm_before_exit)
+                out_args.update({arg: value})
+
+            # history_path
+            if Version(pyfemtet.__version__) >= Version('0.999.999'):
+                arg = 'history_path'
+                value = f'r"{self.__certify_and_get_history_path()}"'
+                out_args.update({arg: value})
+
             out.update({'args': out_args})
             out_.append(out)
 
-        import json
         return json.dumps(out_)
 
     def output_femopt_json(self):
         # femopt = FEMOpt(fem=fem, opt=opt, history_path=history_path)
 
-        # 「設定値」列の番号
-        c_value = self.get_column_by_header_data(self.ColumnNames.value)
+        out: dict[str, str | dict] = dict(
+            ret='femopt',
+            command='FEMOpt',
+        )
+        out_args = dict(
+            fem='fem',
+            opt='opt',
+        )
 
-        # history_path 行
-        with nullcontext():
-            out = dict(
-                ret='femopt',
-                command='FEMOpt',
-            )
-            out_args = dict()
+        # history_path
+        if Version(pyfemtet.__version__) < Version('0.999.999'):
+            history_path = self.__certify_and_get_history_path()
+            out_args.update(dict(
+                history_path=f'r"{history_path}"'
+            ))
 
-            # seed
-            cls = ConfigItemClassEnum.history_path.value
-            with nullcontext():
-                # 行番号
-                vhd = cls.name
-                r = self.get_row_by_header_data(vhd)
+        # command update
+        out.update(dict(args=out_args))
 
-                # 値
-                history_path = self.item(r, c_value).data(Qt.ItemDataRole.DisplayRole)
-
-                # GUI から停止信号を出すための
-                # host, port 情報にアクセスするため
-                # history_path が exec() 内で生成されたら困るので
-                # スクリプトに None が渡らないように
-                # ここで自動作成する
-                if history_path == '':
-                    history_path = datetime.datetime.now().strftime('最適化_%Y%m%d_%H%M%S.csv')
-
-                # GUI が history_path にアクセスできるよう
-                # 自身に与えられるパスを持っておく
-                # 現在の実装では start_run_script_thread() の中で
-                # chdir しているので相対パスでも問題ない
-                self.history_path = history_path
-
-                # 引数
-                out_args.update(
-                    dict(
-                        fem='fem',
-                        opt='opt',
-                        history_path=f'"{history_path}"'
-                    )
-                )
-
-            # command update
-            out.update(dict(args=out_args))
-
-            import json
-            return json.dumps([out])
+        return json.dumps([out])
 
     def reset_history_path(self):
         self.history_path = None
 
     def get_surrogate_model_name(self) -> SurrogateModelNames:
+
+        if _is_debugging():
+            return SurrogateModelNames.PoFBoTorchInterface
+
         c = self.get_column_by_header_data(
             self.ColumnNames.value,
         )
@@ -1020,7 +1037,7 @@ class ConfigWizardPage(TitledWizardPage):
         # 確認する
         if self.source_model.is_no_finish_conditions():
             ret_msg = ReturnMsg.Warn.no_finish_conditions
-            if can_continue(ret_msg, parent=self):
+            if can_continue(ret_msg, parent=self):  # type: ignore
                 # 進めてもよい
                 return True
             else:
