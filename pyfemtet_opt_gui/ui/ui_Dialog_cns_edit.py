@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'Dialog_cns_editIjFFTa.ui'
+## Form generated from reading UI file 'Dialog_cns_editrXxbrV.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.7.2
+## Created by: Qt User Interface Compiler version 6.7.3
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -193,6 +193,7 @@ class Ui_Dialog(object):
 #if QT_CONFIG(tooltip)
         self.lineEdit_lb.setToolTip(QCoreApplication.translate("Dialog", u"\u4e0a\u9650\u3068\u4e0b\u9650\u306e\u3044\u305a\u308c\u304b\u306e\u5165\u529b\u304c\u5fc5\u9808\u3067\u3059\u3002", None))
 #endif // QT_CONFIG(tooltip)
+        self.lineEdit_lb.setText(QCoreApplication.translate("Dialog", u"0", None))
         self.lineEdit_lb.setPlaceholderText(QCoreApplication.translate("Dialog", u"\u4e0b\u9650\u3092\u5165\u529b", None))
         self.label_4.setText(QCoreApplication.translate("Dialog", u"<=", None))
         self.plainTextEdit_cnsFormula.setPlaceholderText(QCoreApplication.translate("Dialog", u"\u5f0f\u3092\u5165\u529b   \u4f8b\uff1a(a + max(b, c)) * d   \u6539\u884c\u53ef", None))

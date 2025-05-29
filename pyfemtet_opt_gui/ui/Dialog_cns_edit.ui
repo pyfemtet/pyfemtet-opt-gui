@@ -202,6 +202,9 @@
        <property name="toolTip">
         <string>上限と下限のいずれかの入力が必須です。</string>
        </property>
+       <property name="text">
+        <string>0</string>
+       </property>
        <property name="placeholderText">
         <string>下限を入力</string>
        </property>
