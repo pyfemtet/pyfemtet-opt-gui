@@ -112,6 +112,7 @@ class ConstraintWizardPage(TitledWizardPage):
             existing_constraint_name=name,
             load_femtet_fun=self.load_femtet_fun
         )
+        dialog.setModal(True)
         dialog.show()
 
 
