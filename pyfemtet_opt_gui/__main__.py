@@ -12,6 +12,11 @@ from PySide6.QtGui import *
 # noinspection PyUnresolvedReferences
 from PySide6.QtWidgets import *
 
+import pyfemtet_opt_gui
+
+print('=== pyfemtet_opt_gui version', pyfemtet_opt_gui.__version__, '===')
+print('Loading modules. It can take a few minutes for first time...')
+
 from pyfemtet_opt_gui.ui.ui_Wizard_main import Ui_Wizard
 from pyfemtet_opt_gui.models.analysis_model.analysis_model import AnalysisModelWizardPage
 from pyfemtet_opt_gui.models.variables.var import VariableWizardPage
@@ -166,11 +171,13 @@ class Main(QWizard):
 
 
 def main():
+    print('Module loaded. Initializing...')
     app = QApplication()
     app.setStyle('fusion')
 
     page_obj = Main()
     page_obj.show()
+    print('pyfemtet-opt-gui successfully launched!')
 
     sys.exit(app.exec())
 
