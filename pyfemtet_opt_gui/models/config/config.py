@@ -131,8 +131,8 @@ class ConfigItemClassEnum(enum.Enum):
     @enum.member
     class n_trials(AbstractConfigItem):
         name = '解析実行回数'
-        default_display = str(10)
-        default_internal = 10
+        default_display = str(20)
+        default_internal = 20
         note = ('解析および結果取得の成功数がこの値になると最適化を終了します。\n'
                 '「なし」の場合、回数による終了条件を設けません。')
 
