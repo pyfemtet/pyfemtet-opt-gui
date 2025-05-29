@@ -152,6 +152,9 @@ class ConstraintEditorDialog(QDialog):
         )
 
     def update_evaluated_value(self, expression: str):
+
+        label = self.ui.label_calc_value
+
         try:
             # error check
             expr = Expression(expression)
@@ -169,8 +172,25 @@ class ConstraintEditorDialog(QDialog):
             # no error
             value = ret[expr_key]
 
+            # set default style
+            palette = label.palette()
+            default_color = label.style().standardPalette().color(QPalette.ColorRole.WindowText)
+            palette.setColor(QPalette.ColorRole.WindowText, default_color)
+            label.setPalette(palette)
+            font = label.font()
+            font.setBold(False)
+            label.setFont(font)
+
         except ExpressionParseError:
             value = '計算エラー'
+
+            # set 赤字・太字
+            palette = label.palette()
+            palette.setColor(QPalette.ColorRole.WindowText, QColor("red"))
+            label.setPalette(palette)
+            font = label.font()
+            font.setBold(True)
+            label.setFont(font)
 
         self.ui.label_calc_value.setText(
             '現在の計算値: ' + str(value)
