@@ -66,7 +66,7 @@ class Constraint:
         self.ub: float | None = None
         self.var_model: 'VariableItemModel' = var_model
 
-    def finalize_check(self) -> tuple[ReturnMsg, str]:
+    def finalize_check(self) -> tuple[ReturnType, str]:
         # 両方とも指定されていなければエラー
         if self.lb is None and self.ub is None:
             return ReturnMsg.Error.no_bounds, ''
@@ -104,9 +104,9 @@ class Constraint:
         # lb, ub との上下関係がおかしければ
         # Warning
         if _expr_key not in ret.keys():
-            raise RuntimeError('Internal Error!')
+            raise RuntimeError(f'Internal Error! The _expr_key ({_expr_key}) is not in ret.keys() ({tuple(ret.keys())})')
         if not isinstance(ret[_expr_key], float):
-            raise RuntimeError('Internal Error!')
+            raise RuntimeError(f'Internal Error! The type of ret[_expr_key] is not float but {type(ret[_expr_key])}')
         evaluated = ret[_expr_key]
         ret_msg, a_msg = check_bounds(evaluated, self.lb, self.ub)
         if ret_msg != ReturnMsg.no_message:

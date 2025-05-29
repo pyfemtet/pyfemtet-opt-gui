@@ -3,7 +3,7 @@ import ast
 from traceback import print_exception
 from graphlib import TopologicalSorter
 
-from pyfemtet_opt_gui.common.return_msg import ReturnMsg
+from pyfemtet_opt_gui.common.return_msg import ReturnMsg, ReturnType
 from pyfemtet_opt_gui.common.femtet_operator_support import *
 
 
@@ -168,6 +168,12 @@ def get_dependency(expr_str):
         raise ExpressionParseError(str(e)) from e
 
 
+def remove_prefix_recursive(string, prefix):
+    while string.startswith(prefix):
+        string = string.removeprefix(prefix)
+    return string
+
+
 class Expression:
 
     def __init__(self, expression: str | float):
@@ -199,9 +205,13 @@ class Expression:
         # ユーザー指定の何らかの入力
         self._expr: str | float = expression
 
+        # 最低限の整形を行う
+        if isinstance(self._expr, str):
+            self._expr = remove_prefix_recursive(self._expr, ' ')
+
         # femtet 書式を python 書式に変換
         try:
-            self._converted_expr_str: str = convert_operator(str(expression))
+            self._converted_expr_str: str = convert_operator(str(self._expr))
         except Exception as e:
             self.is_valid = False
             raise ExpressionParseError(str(e)) from e
@@ -271,7 +281,7 @@ def topological_sort(expressions: dict[str, Expression]) -> list[str]:
     return list(ts.static_order())
 
 
-def eval_expressions(expressions: dict[str, Expression | float | str]) -> tuple[dict[str, float], ReturnMsg, str]:
+def eval_expressions(expressions: dict[str, Expression | float | str]) -> tuple[dict[str, float], ReturnType, str]:
 
     # 値渡しに変換
     expressions_ = expressions.copy()
@@ -309,7 +319,7 @@ def eval_expressions(expressions: dict[str, Expression | float | str]) -> tuple[
         # 評価
         expression = expressions[key]
         try:
-            value = eval(str(expression._converted_expr_str), l)
+            value = float(eval(str(expression._converted_expr_str), l))
         except Exception as e:
             print_exception(e)
             print('expression:', expression._converted_expr_str, file=sys.stderr)
