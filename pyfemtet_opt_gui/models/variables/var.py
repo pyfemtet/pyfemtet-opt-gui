@@ -302,12 +302,20 @@ class VariableItemModel(StandardItemModelWithHeader):
 
                 # self.ColumnNames.initial_value
                 with nullcontext():
+
                     _h = self.ColumnNames.initial_value
                     c = self.get_column_by_header_data(_h)
-
                     item = QStandardItem()
-                    item.setText(f'{r}')
-                    item.setData(Expression(f'{r}'), Qt.ItemDataRole.UserRole)
+
+                    if r < 3:
+
+                        item.setText(f'{r}')
+                        item.setData(Expression(f'{r}'), Qt.ItemDataRole.UserRole)
+
+                    else:
+
+                        item.setText(f'name{r-2} + name{r-1}')
+                        item.setData(Expression(f'name{r-2} + name{r-1}'), Qt.ItemDataRole.UserRole)
 
                     self.setItem(r, c, item)
 
@@ -317,8 +325,10 @@ class VariableItemModel(StandardItemModelWithHeader):
                     c = self.get_column_by_header_data(_h)
 
                     item = QStandardItem()
-                    item.setText(f'{r - 1}')
-                    item.setData(Expression(f'{r - 1}'), Qt.ItemDataRole.UserRole)
+
+                    if r < 3:
+                        item.setText(f'{r - 1}')
+                        item.setData(Expression(f'{r - 1}'), Qt.ItemDataRole.UserRole)
 
                     self.setItem(r, c, item)
 
@@ -328,8 +338,9 @@ class VariableItemModel(StandardItemModelWithHeader):
                     c = self.get_column_by_header_data(_h)
 
                     item = QStandardItem()
-                    item.setText(f'{r + 1}')
-                    item.setData(Expression(f'{r + 1}'), Qt.ItemDataRole.UserRole)
+                    if r < 3:
+                        item.setText(f'{r + 1}')
+                        item.setData(Expression(f'{r + 1}'), Qt.ItemDataRole.UserRole)
 
                     self.setItem(r, c, item)
 
@@ -339,8 +350,9 @@ class VariableItemModel(StandardItemModelWithHeader):
                     c = self.get_column_by_header_data(_h)
 
                     item = QStandardItem()
-                    item.setText(f'{r + 1}')
-                    item.setData(Expression(f'{r + 1}'), Qt.ItemDataRole.UserRole)
+                    if r < 3:
+                        item.setText(f'{r + 1}')
+                        item.setData(Expression(f'{r + 1}'), Qt.ItemDataRole.UserRole)
 
                     self.setItem(r, c, item)
 

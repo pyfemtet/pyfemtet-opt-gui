@@ -177,14 +177,12 @@ class ConstraintEditorDialog(QDialog):
         )
 
     def get_selected_variable(self) -> str | None:
-        indexes: list[QModelIndex] = self.ui.tableView_prmsOnCns.selectedIndexes()
 
-        # no index, do nothing
-        if len(indexes) == 0:
+        index: QModelIndex = self.ui.tableView_prmsOnCns.currentIndex()
+
+        # no current index, do nothing
+        if not index.isValid():
             return None
-
-        # process 1st index only
-        index: QModelIndex = indexes[0]
 
         # get source model
         proxy_model = index.model()
