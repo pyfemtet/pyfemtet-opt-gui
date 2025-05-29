@@ -1,5 +1,9 @@
 import json
 from numbers import Real
+from packaging.version import Version
+
+import pyfemtet
+
 from pyfemtet_opt_gui.common.femtet_operator_support import _get_myself_code_str
 
 __all__ = [
@@ -34,7 +38,14 @@ def create_header():
     code = f'''
 # pyfemtet 基本クラス
 from pyfemtet.opt import FemtetInterface, FemtetWithSolidworksInterface, OptunaOptimizer, FEMOpt
+'''
 
+    if Version(pyfemtet.__version__) > Version('0.999.999'):
+        code += '''FemtetInterface._show_parametric_index_warning = False
+'''
+
+    code += f'''
+    
 # サロゲートモデル作成用クラス
 from pyfemtet.opt.interface import PoFBoTorchInterface
 
