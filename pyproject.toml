@@ -24,5 +24,11 @@ fallback-version = "0.0.0"
 requires = ["hatchling", "uv-dynamic-versioning"]
 build-backend = "hatchling.build"
 
+[dependency-groups]
+dev = [
+    "pytest>=8.3.5",
+    "pytest-qt>=4.4.0",
+]
+
 [tool.hatch.version]
 source = "uv-dynamic-versioning"
