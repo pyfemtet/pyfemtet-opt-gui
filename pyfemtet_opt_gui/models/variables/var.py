@@ -85,7 +85,7 @@ class VariableTableViewDelegate(QStyledItemDelegate):
         expression_: Expression | None = model.data(index_, Qt.ItemDataRole.UserRole)
         return expression_
 
-    def check_bounds(self, new_expression, header_data, model, index) -> tuple[ReturnMsg, str]:
+    def check_bounds(self, new_expression, header_data, model, index) -> tuple[ReturnType, str | None]:
 
         # get current value
         init: Expression = self.get_expression(VariableColumnNames.initial_value, model, index)
@@ -195,6 +195,8 @@ class VariableTableViewDelegate(QStyledItemDelegate):
 
     def setModelData(self, editor, model, index) -> None:
 
+        assert isinstance(model, VariableItemModelForTableView), f'{type(model)=}'
+
         # QLineEdit を使いたいので str を setText すること
 
         header_data = get_internal_header_data(index)
@@ -239,6 +241,15 @@ class VariableTableViewDelegate(QStyledItemDelegate):
                     or header_data == VariableColumnNames.upper_bound
             ):
                 ret_msg, a_msg = self.check_bounds(new_expression, header_data, model, index)
+                if not can_continue(ret_msg, parent=self.parent(), additional_message=a_msg):
+                    return
+
+            # if test, evaluate other expressions
+            if (
+                    header_data == VariableColumnNames.test_value
+            ):
+                name = self.get_name(VariableColumnNames.name, model, index)
+                ret_msg, a_msg = get_var_model(None).update_test_value_expressions({name: new_expression})
                 if not can_continue(ret_msg, parent=self.parent(), additional_message=a_msg):
                     return
 
@@ -616,6 +627,46 @@ class VariableItemModel(StandardItemModelWithHeader):
 
         return super().flags(index)
 
+    def update_test_value_expressions(
+            self, partial_expressions: dict[str, Expression] = None
+    ) -> tuple[ReturnType, str | None]:
+        # QLineEdit を使いたいので str を setText すること
+
+        # 再計算する
+        expressions = self.get_current_variables(get_test_Value=True)
+        if partial_expressions is not None:
+            expressions.update(partial_expressions)
+        evaluated_values, ret_msg, a_msg = eval_expressions(expressions)
+
+        # もし計算過程でエラーになっていたらエラーにする
+        if ret_msg != ReturnMsg.no_message:
+            return ret_msg, a_msg
+
+        # 再計算結果を表示する
+        c_var_name = self.get_column_by_header_data(
+            self.ColumnNames.name
+        )
+        c_test_value = self.get_column_by_header_data(
+            self.ColumnNames.test_value
+        )
+        c_initial_value = self.get_column_by_header_data(
+            self.ColumnNames.initial_value
+        )
+        for r in self.get_row_iterable():
+
+            # 変数が expression でなければ無視
+            expression: Expression = self.item(r, c_initial_value).data(Qt.ItemDataRole.UserRole)
+            if expression is not None:
+                if not expression.is_expression():
+                    continue
+
+            # 値を更新
+            name = self.item(r, c_var_name).text()
+            self.item(r, c_test_value).setData(str(evaluated_values[name]), Qt.ItemDataRole.DisplayRole)
+            # self.item(r, c_test_value).setData(expressions[name], Qt.ItemDataRole.UserRole)  # なくてもいいはず
+
+        return ReturnMsg.no_message, None
+
     def apply_test_values(self):
 
         # test 列に登録されている変数を取得
@@ -653,13 +704,16 @@ class VariableItemModel(StandardItemModelWithHeader):
             additional_message=a_msg,
         )
 
-    def get_current_variables(self) -> dict[str, Expression]:
+    def get_current_variables(self, get_test_Value=False) -> dict[str, Expression]:
         if self.with_first_row:
             iterable = range(1, self.rowCount())
         else:
             iterable = range(0, self.rowCount())
         c_name = self.get_column_by_header_data(self.ColumnNames.name)
-        c_value = self.get_column_by_header_data(self.ColumnNames.initial_value)
+        if get_test_Value:
+            c_value = self.get_column_by_header_data(self.ColumnNames.test_value)
+        else:
+            c_value = self.get_column_by_header_data(self.ColumnNames.initial_value)
         out = dict()
         for r in iterable:
             name = self.item(r, c_name).text()
