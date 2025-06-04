@@ -183,10 +183,18 @@ class FemtetInterfaceGUI:
             return {}, ReturnMsg.Error.femtet_macro_version_old
 
         # get variables
-        variable_names = _Femtet.GetVariableNames_py()  # equals or later than 2023.1.1
+        variable_names: tuple[str, ...] | None = _Femtet.GetVariableNames_py()  # equals or later than 2023.1.1
 
         # no variables
         if variable_names is None:
+            return out, ReturnMsg.no_message
+
+        # exclude `pi` or `c_pi`
+        variable_names = tuple([name for name in variable_names
+                                if name not in ('pi', 'c_pi')])
+
+        # no variables
+        if len(variable_names) == 0:
             return out, ReturnMsg.no_message
 
         # succeeded
