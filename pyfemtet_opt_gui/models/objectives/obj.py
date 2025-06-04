@@ -365,6 +365,12 @@ class ObjectiveWizardPage(TitledWizardPage):
             (lambda *_: load_femtet_fun())
         )
 
+        # ボタンを押したら checkState に関係なく
+        # isComplete を更新する
+        self.ui.pushButton.clicked.connect(
+            lambda *args, **kwargs: self.completeChanged.emit()
+        )
+
         # model の checkState が変更されたら
         # isComplete を更新する
         def filter_role(_1, _2, roles):
