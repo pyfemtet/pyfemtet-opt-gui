@@ -5,7 +5,6 @@ from time import sleep, time
 # noinspection PyUnresolvedReferences
 from pythoncom import com_error
 from win32com.client import Dispatch, CDispatch
-from win32comext.shell.shellcon import SLDF_HAS_NAME
 # noinspection PyUnresolvedReferences
 from pythoncom import CoInitialize, CoUninitialize
 
@@ -384,7 +383,6 @@ class SolidWorksInterfaceGUI(FemtetInterfaceGUI):
         return ReturnMsg.no_message, ', '.join([path, path2])
 
 
-
 if __name__ == '__main__':
     __Femtet, __ret_msg = SolidWorksInterfaceGUI.get_femtet()
     print(__ret_msg)
@@ -403,5 +401,3 @@ if __name__ == '__main__':
     )
     print(__ret_msg)
     print(__a_msg)
-
-
