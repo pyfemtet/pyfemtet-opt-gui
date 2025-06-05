@@ -27,7 +27,6 @@ from pyfemtet_opt_gui.common.expression_processor import *
 from pyfemtet_opt_gui.common.titles import *
 import pyfemtet_opt_gui.fem_interfaces as fi
 
-from pyfemtet_opt_gui.models.constraints.model import Constraint
 
 # ===== model =====
 _VAR_MODEL = None
@@ -132,14 +131,12 @@ class VariableTableViewDelegate(QStyledItemDelegate):
         if lb is None and ub is None:
             return ReturnMsg.no_message, None
 
-        # initialize Constraint
-        with nullcontext():
-            constraint: Constraint = Constraint(get_var_model(None))
-            constraint.expression = init.expr
-            constraint.lb = lb.value if lb is not None else None
-            constraint.ub = ub.value if ub is not None else None
-
-        return constraint.finalize_check()
+        return check_expr_str_and_bounds(
+            init.expr,
+            lb.value if lb is not None else None,
+            ub.value if ub is not None else None,
+            get_var_model(None).get_current_variables(),
+        )
 
     def check_valid(self, text, header_data, model, index) -> tuple[ReturnType, str, Expression | None]:
 
@@ -346,7 +343,6 @@ class VariableItemModel(StandardItemModelWithHeader):
                     name = _dummy_data[self.ColumnNames.name][i]
                     item.setText(str(variable_values[name]))
                     item.setData(Expression(value), Qt.ItemDataRole.UserRole)
-
 
                 elif key == self.ColumnNames.note:
                     if value is not None:
