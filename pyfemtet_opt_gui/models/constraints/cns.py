@@ -24,8 +24,8 @@ from pyfemtet_opt_gui.models.constraints.model import get_cns_model, ConstraintM
 from pyfemtet_opt_gui.models.constraints.cns_dialog import ConstraintEditorDialog
 
 
-def get_cns_model_for_problem(parent, _with_dummy=None):
-    model = get_cns_model(parent, _with_dummy)
+def get_cns_model_for_problem(parent, _dummy_data=None):
+    model = get_cns_model(parent, _dummy_data)
     model_for_problem = ConstraintModelForProblem(parent)
     model_for_problem.setSourceModel(model)
     return model_for_problem
@@ -50,8 +50,13 @@ class ConstraintWizardPage(TitledWizardPage):
 
     page_name = PageSubTitles.cns
 
-    def __init__(self, parent=None, load_femtet_fun=None):
-        super().__init__(parent)
+    def __init__(
+            self,
+            parent=None,
+            load_femtet_fun=None,
+            _dummy_data=None,
+    ):
+        super().__init__(parent, _dummy_data)
         self.load_femtet_fun = load_femtet_fun
         self.setup_ui()
         self.setup_model()
@@ -63,7 +68,7 @@ class ConstraintWizardPage(TitledWizardPage):
         self.ui.setupUi(self)
 
     def setup_model(self):
-        self.source_model = get_cns_model(parent=self)
+        self.source_model = get_cns_model(parent=self, _dummy_data=self._dummy_data)
         self.proxy_model = ConstraintModelWithoutFirstRow(self)
         self.proxy_model.setSourceModel(self.source_model)
 
@@ -95,12 +100,13 @@ class ConstraintWizardPage(TitledWizardPage):
 
         proxy_index: QModelIndex = proxy_indexes[0]
 
-        assert isinstance(proxy_index.model(), ConstraintModelWithoutFirstRow)
-        proxy_model: ConstraintModelWithoutFirstRow = proxy_index.model()
+        proxy_model = proxy_index.model()
+        assert isinstance(proxy_model, ConstraintModelWithoutFirstRow)
 
-        assert isinstance(proxy_model.sourceModel(), ConstraintModel)
-        source_model: ConstraintModel = proxy_model.sourceModel()
         source_index = proxy_model.mapToSource(proxy_index)
+
+        source_model = proxy_model.sourceModel()
+        assert isinstance(source_model, ConstraintModel)
 
         r = source_index.row()
         c = source_model.get_column_by_header_data(source_model.ColumnNames.name)
@@ -123,7 +129,7 @@ class ConstraintWizardPage(TitledWizardPage):
         if name is None:
             show_return_msg(
                 ReturnMsg.Error.no_selection,
-                parent=self,
+                parent=self.parent(),
             )
             return
 
@@ -131,7 +137,7 @@ class ConstraintWizardPage(TitledWizardPage):
             ReturnMsg.Warn.confirm_delete_constraint,
             additional_message=name,
             with_cancel_button=True,
-            parent=self,
+            parent=self.parent(),
         )
         if should_delete:
             print(self.source_model.rowCount())
@@ -145,6 +151,6 @@ class ConstraintWizardPage(TitledWizardPage):
 if __name__ == '__main__':
     app = QApplication()
     app.setStyle('fusion')
-    window = ConstraintWizardPage()
+    window = ConstraintWizardPage(_dummy_data=True)
     window.show()
     app.exec()
