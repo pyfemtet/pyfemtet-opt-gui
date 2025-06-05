@@ -173,7 +173,7 @@ class StandardItemModelWithHeader(StandardItemModelWithHeaderSearch):
         for role, value in data.items():
             item.setData(value, role)
 
-    def _set_dummy_data(self, _dummy_data=None):
+    def _set_dummy_data(self, _dummy_data: dict):
         n_rows = 3
         rows = len(self.ColumnNames)
         columns = len(self.ColumnNames) if n_rows is None else n_rows

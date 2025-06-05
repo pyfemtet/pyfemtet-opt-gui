@@ -48,7 +48,6 @@ def get_var_model(parent, _dummy_data=None) -> 'VariableItemModel':
     return _VAR_MODEL
 
 
-
 def _reset_var_model():
     global _VAR_MODEL
     _VAR_MODEL = None
@@ -293,7 +292,7 @@ class VariableItemModel(StandardItemModelWithHeader):
         CommonItemColumnName.use: 'パラメータ\nとして使用'
     }
 
-    def _set_dummy_data(self, _dummy_data=None):
+    def _set_dummy_data(self, _dummy_data: dict):
 
         rows = 1 + len(tuple(_dummy_data.values())[0])
         columns = len(self.ColumnNames)
