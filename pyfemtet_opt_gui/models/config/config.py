@@ -64,29 +64,28 @@ Q_DEFAULT_ALGORITHM_CONFIG_ITEM_FACTORY = get_random_algorithm_config_model
 # ===== model =====
 _CONFIG_MODEL = None
 _CONFIG_MODEL_FOR_PROBLEM = None
-_WITH_DUMMY = False
 
 
-def get_config_model(parent, _with_dummy=None) -> 'ConfigItemModel':
+def get_config_model(parent, _dummy_data=None) -> 'ConfigItemModel':
     global _CONFIG_MODEL
     if _CONFIG_MODEL is None:
         if not _is_debugging():
             assert parent is not None
         _CONFIG_MODEL = ConfigItemModel(
             parent,
-            _WITH_DUMMY if _with_dummy is None else _with_dummy,
+            _dummy_data,
         )
     return _CONFIG_MODEL
 
 
-def get_config_model_for_problem(parent, _with_dummy=None):
+def get_config_model_for_problem(parent, _dummy_data=None):
     global _CONFIG_MODEL_FOR_PROBLEM
     if _CONFIG_MODEL_FOR_PROBLEM is None:
         assert parent is not None
         source_model = ConfigItemModel(
             parent,
-            _WITH_DUMMY if _with_dummy is None else _with_dummy,
-            original_model=get_config_model(parent, _with_dummy)
+            _dummy_data,
+            original_model=get_config_model(parent, _dummy_data)
         )
         _CONFIG_MODEL_FOR_PROBLEM = QConfigItemModelForProblem(parent)
         _CONFIG_MODEL_FOR_PROBLEM.setSourceModel(source_model)
@@ -424,8 +423,8 @@ class ConfigItemModel(StandardItemModelWithHeader):
     def history_path(self, value):
         type(self).history_path = value
 
-    def __init__(self, parent=None, _with_dummy=True, original_model: 'ConfigItemModel' = None):
-        super().__init__(parent, _with_dummy)
+    def __init__(self, parent=None, _dummy_data=True, original_model: 'ConfigItemModel' = None):
+        super().__init__(parent, _dummy_data)
 
         # SortFilterProxyModel に列方向の Recursive 機能がないため、
         # problem 画面に正しく表示するためには以下のことをする。
@@ -960,8 +959,8 @@ class ConfigWizardPage(TitledWizardPage):
 
     page_name = PageSubTitles.cfg
 
-    def __init__(self, parent=None):
-        super().__init__(parent)
+    def __init__(self, parent=None, _dummy_data=None):
+        super().__init__(parent, _dummy_data)
         self.setup_ui()
         self.setup_model()
         self.setup_view()
@@ -972,7 +971,7 @@ class ConfigWizardPage(TitledWizardPage):
         self.ui.setupUi(self)
 
     def setup_model(self):
-        self.source_model = get_config_model(self)
+        self.source_model = get_config_model(self, self._dummy_data)
         self.proxy_model = ConfigItemModelForIndividualView(self)
         self.proxy_model.setSourceModel(self.source_model)
 
