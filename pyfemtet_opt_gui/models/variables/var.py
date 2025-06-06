@@ -231,7 +231,7 @@ class VariableTableViewDelegate(QStyledItemDelegate):
             # check valid input or not
             if header_data == VariableColumnNames.step:
                 # if step, allow empty input
-                if text == '':
+                if text.removeprefix(' ') == '':
                     new_expression = None
 
                 # if step, positive only
