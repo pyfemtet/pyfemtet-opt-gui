@@ -568,6 +568,44 @@ class VariableItemModel(StandardItemModelWithHeader):
                     c = self.get_column_by_header_data(self.ColumnNames.test_value)
                     self.setItem(r, c, item)
 
+                # ===== step =====
+                with nullcontext():
+                    item = QStandardItem()
+                    # 新しい変数の式が文字式ならとにかくデフォルト値を設定する
+                    if expression.is_expression():
+                        item.setData(None, Qt.ItemDataRole.UserRole)
+                        item.setText('')
+
+                    # 新しい変数が数値であって、
+                    else:
+
+                        # 以前からある変数であって、
+                        if name in stashed_data.keys():
+
+                            # 以前は文字式であった場合 (stashed_data の initial_value を調べる)
+                            tmp_item = QStandardItem()
+                            self.set_data_from_stash(tmp_item, name, self.ColumnNames.initial_value, stashed_data)
+                            stashed_expression: Expression = tmp_item.data(Qt.ItemDataRole.UserRole)
+                            if stashed_expression.is_expression():
+
+                                # デフォルト値を設定する
+                                item.setData(None, Qt.ItemDataRole.UserRole)
+                                item.setText('')
+
+                            # 以前も数値であった場合
+                            else:
+                                # stash_data を使う
+                                self.set_data_from_stash(item, name, self.ColumnNames.step, stashed_data)
+
+                        # 以前からない数値であれば
+                        else:
+                            # デフォルト値を設定する
+                            item.setData(None, Qt.ItemDataRole.UserRole)
+                            item.setText('')
+
+                    c = self.get_column_by_header_data(self.ColumnNames.step)
+                    self.setItem(r, c, item)
+
                 # ===== note =====
                 with nullcontext():
                     item = QStandardItem()
