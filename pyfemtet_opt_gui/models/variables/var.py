@@ -1089,9 +1089,14 @@ class VariableWizardPage(TitledWizardPage):
             return True
 
 
-if __name__ == '__main__':
+def _debug():
 
-    # fi.get().get_femtet()
+    from tests import get_test_femprj_path
+
+    fem_gui = fi.get()
+    fem_gui.get_femtet()
+    assert fem_gui.get_connection_state() == ReturnMsg.no_message
+    assert fem_gui._load_femprj(get_test_femprj_path()) is True
 
     app = QApplication()
     app.setStyle('fusion')
@@ -1100,3 +1105,7 @@ if __name__ == '__main__':
     page_obj.show()
 
     sys.exit(app.exec())
+
+
+if __name__ == '__main__':
+    _debug()

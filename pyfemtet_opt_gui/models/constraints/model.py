@@ -44,6 +44,11 @@ def get_cns_model(parent=None, _dummy_data=None):
     return _CNS_MODEL
 
 
+def _reset_cns_model():
+    global _CNS_MODEL
+    _CNS_MODEL = None
+
+
 # ===== header data =====
 class ConstraintColumnNames(enum.StrEnum):
     use = CommonItemColumnName.use
