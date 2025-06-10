@@ -719,6 +719,7 @@ class ConfigItemModel(StandardItemModelWithHeader):
 
         # 値
         history_path = self.item(r, c_value).data(Qt.ItemDataRole.DisplayRole)
+        history_path = history_path.removesuffix('.csv') + '.csv'
 
         # GUI から停止信号を出すための
         # host, port 情報にアクセスするため
