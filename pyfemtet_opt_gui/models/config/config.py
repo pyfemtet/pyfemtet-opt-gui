@@ -938,7 +938,13 @@ class QConfigItemModelForProblem(QSortFilterProxyModelOfStandardItemModel):
         with open(history_path, 'r', encoding='932', newline='\n') as f:
             reader = csv.reader(f, delimiter=',')
             meta_columns = reader.__next__()
-        extra_data = json.loads(meta_columns[0])
+
+        try:
+            extra_data = json.loads(meta_columns[0])
+
+        # 想定と違うフォーマットで読み込めない
+        except Exception:
+            return None, ReturnMsg.Error.host_info_not_found
 
         # 存在はするが metadata に情報がない
         #  <= pyfemtet 0.8.5 未満である
