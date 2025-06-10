@@ -934,12 +934,14 @@ class QConfigItemModelForProblem(QSortFilterProxyModelOfStandardItemModel):
         if not os.path.exists(history_path):
             return None, ReturnMsg.Error.history_path_not_found
 
-        # 存在はするが metadata に情報がない
-        #  <= pyfemtet 0.8.5 未満である
+        # TODO: pyfemtet 1.0.0 以降では厳密には 1 列目ではなく動的に決まる
         with open(history_path, 'r', encoding='932', newline='\n') as f:
             reader = csv.reader(f, delimiter=',')
             meta_columns = reader.__next__()
         extra_data = json.loads(meta_columns[0])
+
+        # 存在はするが metadata に情報がない
+        #  <= pyfemtet 0.8.5 未満である
         if 'host' not in extra_data.keys() or 'port' not in extra_data.keys():
             return None, ReturnMsg.Error.host_info_not_found
 
