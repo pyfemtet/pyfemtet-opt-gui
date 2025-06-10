@@ -9,6 +9,7 @@ from pytestqt.qtbot import QtBot
 import pytest
 
 from tests import get_test_femprj_path
+from tests.ui_tests.test_variables import fem
 
 
 _dummy_data = {
@@ -18,21 +19,6 @@ _dummy_data = {
     ObjectiveColumnNames.target_value: [0., 0., 10.],
     ObjectiveColumnNames.note: [None, None, None],
 }
-
-
-@pytest.fixture(scope='session')
-def fem():
-    # Femtet 起動
-    fem_gui = fi.get()
-    fem_gui.get_femtet()
-    assert fem_gui.get_connection_state() == ReturnMsg.no_message
-    assert fem_gui._load_femprj(get_test_femprj_path()) is True
-
-    yield fem_gui
-
-    if util.get_last_executed_femtet_process_id() > 0:
-        # close femtet ... しなくていいか。
-        pass
 
 
 @pytest.fixture
