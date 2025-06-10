@@ -3,7 +3,7 @@ name = "pyfemtet-opt-gui"
 dynamic = ["version"]
 description = "GUI to build and run a script for pyfemtet.opt"
 authors = [{ name = "kazuma.naito", email = "kazuma.naito@murata.com" }]
-requires-python = ">=3.11, <3.13"  # TODO: check compatibility with 3.13
+requires-python = ">=3.11, <3.14"
 readme = "README.md"
 license = "LGPL-3.0"
 dependencies = [
