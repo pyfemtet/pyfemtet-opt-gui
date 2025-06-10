@@ -78,6 +78,11 @@ def get_config_model(parent, _dummy_data=None) -> 'ConfigItemModel':
     return _CONFIG_MODEL
 
 
+def _reset_config_model():
+    global _CONFIG_MODEL
+    _CONFIG_MODEL = None
+
+
 def get_config_model_for_problem(parent, _dummy_data=None):
     global _CONFIG_MODEL_FOR_PROBLEM
     if _CONFIG_MODEL_FOR_PROBLEM is None:
@@ -869,9 +874,6 @@ class ConfigItemModel(StandardItemModelWithHeader):
         self.history_path = None
 
     def get_surrogate_model_name(self) -> SurrogateModelNames:
-
-        if _is_debugging():
-            return SurrogateModelNames.PoFBoTorchInterface
 
         c = self.get_column_by_header_data(
             self.ColumnNames.value,
