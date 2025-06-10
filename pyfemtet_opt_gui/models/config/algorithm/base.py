@@ -100,7 +100,7 @@ class QAbstractAlgorithmItemModel(StandardItemModelWithHeader):
     # abstract
     AlgorithmConfig: AbstractAlgorithmConfig = AbstractAlgorithmConfig()
 
-    def __init__(self, parent=None, _with_dummy=True):
+    def __init__(self, parent=None):
         StandardItemModelWithHeaderSearch.__init__(self, parent)
         self.setup_header_data()
         self.setup_vertical_header_data()

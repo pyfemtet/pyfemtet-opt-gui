@@ -46,15 +46,20 @@ class StandardItemModelWithHeader(StandardItemModelWithHeaderSearch):
 
     column_name_display_map = dict()
 
-    def __init__(self, parent=None, _with_dummy=True, with_first_row=True):
+    def __init__(
+            self,
+            parent=None,
+            _dummy_data=None,
+            with_first_row=True
+    ):
         super().__init__(parent)
 
         self.with_first_row = with_first_row
         self.setup_header_data()
         self.setup_vertical_header_data()
 
-        if _with_dummy:
-            self._set_dummy_data()
+        if _dummy_data:
+            self._set_dummy_data(_dummy_data)
 
     def setup_header_data(self):
 
@@ -168,7 +173,8 @@ class StandardItemModelWithHeader(StandardItemModelWithHeaderSearch):
         for role, value in data.items():
             item.setData(value, role)
 
-    def _set_dummy_data(self, n_rows=None):
+    def _set_dummy_data(self, _dummy_data: dict):
+        n_rows = 3
         rows = len(self.ColumnNames)
         columns = len(self.ColumnNames) if n_rows is None else n_rows
 

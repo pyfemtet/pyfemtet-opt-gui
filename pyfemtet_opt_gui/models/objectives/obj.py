@@ -27,24 +27,31 @@ import pyfemtet_opt_gui.fem_interfaces as fi
 
 # ===== model =====
 OBJ_MODEL = None
-_WITH_DUMMY = False
 
 
-def get_obj_model(parent=None, _with_dummy=None) -> 'ObjectiveTableItemModel':
+def get_obj_model(parent=None, _dummy_data=None) -> 'ObjectiveTableItemModel':
     global OBJ_MODEL
     if OBJ_MODEL is None:
         OBJ_MODEL = ObjectiveTableItemModel(
             parent=parent,
-            _with_dummy=_with_dummy if _with_dummy is not None else _WITH_DUMMY,
+            _dummy_data=(
+                _default_dummy_data if _dummy_data is True
+                else _dummy_data
+            ),
         )
     return OBJ_MODEL
 
 
-def get_obj_model_for_problem(parent, _with_dummy=None):
-    model = get_obj_model(parent, _with_dummy)
+def get_obj_model_for_problem(parent, _dummy_data=None):
+    model = get_obj_model(parent, _dummy_data)
     model_for_problem = QObjectiveItemModelForProblemTableView(parent)
     model_for_problem.setSourceModel(model)
     return model_for_problem
+
+
+def _reset_obj_model():
+    global OBJ_MODEL
+    OBJ_MODEL = None
 
 
 # ===== constants =====
@@ -60,6 +67,15 @@ class ObjectiveDirection(enum.StrEnum):  # python >= 3.11
     minimize = 'minimize'
     maximize = 'maximize'
     specific_value = 'aim for'
+
+
+_default_dummy_data = {
+    ObjectiveColumnNames.use: [True, True, True],
+    ObjectiveColumnNames.name: ['obj1', 'obj2', 'obj3'],
+    ObjectiveColumnNames.direction: [ObjectiveDirection.maximize, ObjectiveDirection.minimize, ObjectiveDirection.specific_value],
+    ObjectiveColumnNames.target_value: [None, None, 10.],
+    ObjectiveColumnNames.note: [None, None, None],
+}
 
 
 # ===== qt objects =====
@@ -141,6 +157,51 @@ class ObjectiveItemDelegate(QStyledItemDelegate):
 
 class ObjectiveTableItemModel(StandardItemModelWithHeader):
     ColumnNames = ObjectiveColumnNames
+
+    def _set_dummy_data(self, _dummy_data: dict):
+
+        rows = 1 + len(tuple(_dummy_data.values())[0])
+        columns = len(self.ColumnNames)
+        self.setRowCount(rows)
+        self.setColumnCount(columns)
+
+        iterable = self.get_row_iterable()
+        for key, values in _dummy_data.items():
+            for i, (r, value) in enumerate(zip(iterable, values)):
+
+                c = self.get_column_by_header_data(key)
+                item = QStandardItem()
+
+                # self.ColumnNames.use
+                if key == self.ColumnNames.use:
+                    item.setCheckable(True)
+                    item.setCheckState(Qt.CheckState.Checked)
+                    item.setEditable(False)
+
+                # self.ColumnNames.name
+                elif key == self.ColumnNames.name:
+                    item.setText(str(value))
+                    item.setEditable(False)
+
+                # self.ColumnNames.direction
+                elif key == self.ColumnNames.direction:
+                    item.setText(str(value))
+
+                # self.ColumnNames.direction
+                elif key == self.ColumnNames.target_value:
+                    if value is None:
+                        item.setText('0')
+                    else:
+                        item.setText(str(value))
+
+                elif key == self.ColumnNames.note:
+                    if value is not None:
+                        item.setText(str(value))
+
+                else:
+                    raise Exception(f'ダミーデータが不正, {key}')
+
+                self.setItem(r, c, item)
 
     def flags(self, index):
 
@@ -339,8 +400,13 @@ class ObjectiveWizardPage(TitledWizardPage):
 
     page_name = PageSubTitles.obj
 
-    def __init__(self, parent=None, load_femtet_fun: callable = None):
-        super().__init__(parent)
+    def __init__(
+            self,
+            parent=None,
+            load_femtet_fun: callable = None,
+            _dummy_data=None,
+    ):
+        super().__init__(parent, _dummy_data)
         self.setup_ui()
         self.setup_model(load_femtet_fun)
         self.setup_view()
@@ -354,7 +420,7 @@ class ObjectiveWizardPage(TitledWizardPage):
         )
 
     def setup_model(self, load_femtet_fun):
-        self.source_model = get_obj_model(self)
+        self.source_model = get_obj_model(self, _dummy_data=self._dummy_data)
         self.proxy_model = ObjectiveItemModelWithoutFirstRow(self)
         self.proxy_model.setSourceModel(self.source_model)
 
@@ -427,15 +493,14 @@ class ObjectiveWizardPage(TitledWizardPage):
 
 
 if __name__ == '__main__':
-    # _WITH_DUMMY = True  # comment out to prevent debug
     # from pyfemtet_opt_gui.femtet.mock import get_femtet, get_obj_names  # comment out to prevent debug
 
-    fi.get().get_femtet()
+    # fi.get().get_femtet()
 
     app = QApplication()
     app.setStyle('fusion')
 
-    page_obj = ObjectiveWizardPage()
+    page_obj = ObjectiveWizardPage(_dummy_data=True)
     page_obj.show()
 
     sys.exit(app.exec())

@@ -16,7 +16,6 @@ from PySide6 import QtWidgets, QtCore, QtGui
 from pyfemtet_opt_gui.ui.ui_Dialog_cns_edit import Ui_Dialog
 
 from pyfemtet_opt_gui.common.qt_util import *
-from pyfemtet_opt_gui.common.pyfemtet_model_bases import *
 from pyfemtet_opt_gui.common.return_msg import *
 from pyfemtet_opt_gui.common.expression_processor import *
 
@@ -58,7 +57,7 @@ class ConstraintEditorDialog(QDialog):
         self.constraints = get_cns_model(parent=self)
 
         # variables
-        self.original_var_model = get_var_model(parent=self, _with_dummy=True)
+        self.original_var_model = get_var_model(parent=self)
         self.var_model = VariableItemModelForTableView(self)
         self.var_model.setSourceModel(self.original_var_model)
 
@@ -205,9 +204,13 @@ class ConstraintEditorDialog(QDialog):
             return None
 
         # get source model
+
+        # noinspection PyTypeChecker
         proxy_model = index.model()
         assert isinstance(proxy_model, type(self.var_model))
         proxy_model: VariableItemModelForTableView
+
+        # noinspection PyTypeChecker
         model = proxy_model.sourceModel()
         assert isinstance(model, VariableItemModel)
         model: VariableItemModel
@@ -267,7 +270,7 @@ class ConstraintEditorDialog(QDialog):
                 try:
                     lb_value = float(lb)
                 except ValueError:
-                    show_return_msg(ReturnMsg.Error.not_a_pure_number, parent=self, additional_message=': ' + lb)
+                    show_return_msg(ReturnMsg.Error.not_a_pure_number, parent=self.parent(), additional_message=': ' + lb)
                     return None
             else:
                 lb_value = None
@@ -277,7 +280,7 @@ class ConstraintEditorDialog(QDialog):
                 try:
                     ub_value = float(ub)
                 except ValueError:
-                    show_return_msg(ReturnMsg.Error.not_a_pure_number, parent=self, additional_message=': ' + ub)
+                    show_return_msg(ReturnMsg.Error.not_a_pure_number, parent=self.parent(), additional_message=': ' + ub)
                     return None
             else:
                 ub_value = None
@@ -297,7 +300,7 @@ class ConstraintEditorDialog(QDialog):
         # して処理を続行するかどうかを分岐
         if not can_continue(
                 return_msg=ret_msg,
-                parent=self,
+                parent=self.parent(),
                 additional_message=a_msg,
         ):
             return None
@@ -311,7 +314,7 @@ class ConstraintEditorDialog(QDialog):
                 if constraint.name in self.constraints.get_constraint_names():  # 3.
                     can_continue(
                         ReturnMsg.Error.duplicated_constraint_name,
-                        parent=self,
+                        parent=self.parent(),
                         additional_message=f'拘束式名: {constraint.name}',
                     )
                     return None
@@ -322,10 +325,12 @@ class ConstraintEditorDialog(QDialog):
         super().accept()
 
     def _load_femtet_debug(self):
-        from pyfemtet_opt_gui.models.variables.var import VariableItemModel
+
+        # noinspection PyTypeChecker
         source_model = self.var_model.sourceModel()
         assert isinstance(source_model, VariableItemModel)
         source_model: VariableItemModel
+
         source_model.load_femtet()
 
 

@@ -85,8 +85,9 @@ class TitledWizardPage(QWizardPage):
     def page_name(self):
         raise NotImplementedError
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, _dummy_data=None):
         super().__init__(parent)
+        self._dummy_data = _dummy_data
 
         self.setTitle(get_html_title(self.page_name))
         self.setSubTitle(get_html_subtitle(self.page_name))

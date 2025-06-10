@@ -27,27 +27,33 @@ from pyfemtet_opt_gui.common.expression_processor import *
 from pyfemtet_opt_gui.common.titles import *
 import pyfemtet_opt_gui.fem_interfaces as fi
 
-from pyfemtet_opt_gui.models.constraints.model import Constraint
 
 # ===== model =====
 _VAR_MODEL = None
-_WITH_DUMMY = False
 
 
-def get_var_model(parent, _with_dummy=None) -> 'VariableItemModel':
+def get_var_model(parent, _dummy_data=None) -> 'VariableItemModel':
     global _VAR_MODEL
     if _VAR_MODEL is None:
         if not _is_debugging():
             assert parent is not None
         _VAR_MODEL = VariableItemModel(
             parent,
-            _WITH_DUMMY if _with_dummy is None else _with_dummy,
+            _dummy_data=(
+                _default_dummy_data if _dummy_data is True
+                else _dummy_data
+            )
         )
     return _VAR_MODEL
 
 
-def get_var_model_for_problem(parent, _with_dummy=None):
-    var_model = get_var_model(parent, _with_dummy)
+def _reset_var_model():
+    global _VAR_MODEL
+    _VAR_MODEL = None
+
+
+def get_var_model_for_problem(parent, _dummy_data=None):
+    var_model = get_var_model(parent,_dummy_data)
     var_model_for_problem = QVariableItemModelForProblem(parent)
     var_model_for_problem.setSourceModel(var_model)
     return var_model_for_problem
@@ -63,6 +69,19 @@ class VariableColumnNames(enum.StrEnum):
     step = 'ステップ'
     test_value = 'テスト値 または\n文字式の計算結果'
     note = 'メモ欄'
+
+
+# dummy data
+_default_dummy_data = {
+    VariableColumnNames.use: [True, True, True, False],
+    VariableColumnNames.name: ['x1', 'x2', 'x3', 'x4'],
+    VariableColumnNames.initial_value: [0., 3.14, 'x1 + x2', 'x1 / x2'],
+    VariableColumnNames.lower_bound: [-1, -1, None, None],
+    VariableColumnNames.upper_bound: [1, 10., None, None],
+    VariableColumnNames.step: [1, None, None, None],
+    VariableColumnNames.test_value: [0., 3.14, 'x1 + x2', 'x1 / x2'],
+    VariableColumnNames.note: [None, None, None, None],
+}
 
 
 # ===== qt objects =====
@@ -112,14 +131,12 @@ class VariableTableViewDelegate(QStyledItemDelegate):
         if lb is None and ub is None:
             return ReturnMsg.no_message, None
 
-        # initialize Constraint
-        with nullcontext():
-            constraint: Constraint = Constraint(get_var_model(None))
-            constraint.expression = init.expr
-            constraint.lb = lb.value if lb is not None else None
-            constraint.ub = ub.value if ub is not None else None
-
-        return constraint.finalize_check()
+        return check_expr_str_and_bounds(
+            init.expr,
+            lb.value if lb is not None else None,
+            ub.value if ub is not None else None,
+            get_var_model(None).get_current_variables(),
+        )
 
     def check_valid(self, text, header_data, model, index) -> tuple[ReturnType, str, Expression | None]:
 
@@ -214,7 +231,7 @@ class VariableTableViewDelegate(QStyledItemDelegate):
             # check valid input or not
             if header_data == VariableColumnNames.step:
                 # if step, allow empty input
-                if text == '':
+                if text.removeprefix(' ') == '':
                     new_expression = None
 
                 # if step, positive only
@@ -272,110 +289,69 @@ class VariableItemModel(StandardItemModelWithHeader):
         CommonItemColumnName.use: 'パラメータ\nとして使用'
     }
 
-    def _set_dummy_data(self, n_rows=None):
-        rows = n_rows if n_rows is not None else 3
+    def _set_dummy_data(self, _dummy_data: dict):
+
+        rows = 1 + len(tuple(_dummy_data.values())[0])
         columns = len(self.ColumnNames)
+        self.setRowCount(rows)
+        self.setColumnCount(columns)
 
-        if self.with_first_row:
-            rows += 1
-            iterable = range(1, rows)
-        else:
-            iterable = range(0, rows)
+        variable_values, ret_msg, additional_msg = eval_expressions(
+            {
+                name: Expression(tst) for name, tst in zip(
+                    _dummy_data[self.ColumnNames.name],
+                    _dummy_data[self.ColumnNames.test_value]
+                )
+            }
+        )
+        assert ret_msg == ReturnMsg.no_message, 'ダミーデータが計算不能'
 
-        with EditModel(self):
-            self.setRowCount(rows)
-            self.setColumnCount(columns)
+        iterable = self.get_row_iterable()
+        for key, values in _dummy_data.items():
+            for i, (r, value) in enumerate(zip(iterable, values)):
 
-        with EditModel(self):
-            for r in iterable:
+                c = self.get_column_by_header_data(key)
+                item = QStandardItem()
+
                 # self.ColumnNames.use
-                with nullcontext():
-                    _h = self.ColumnNames.use
-                    c = self.get_column_by_header_data(_h)
-
-                    item = QStandardItem()
+                if key == self.ColumnNames.use:
                     item.setCheckable(True)
                     item.setCheckState(Qt.CheckState.Checked)
                     item.setEditable(False)
 
-                    self.setItem(r, c, item)
-
                 # self.ColumnNames.name
-                with nullcontext():
-                    _h = self.ColumnNames.name
-                    c = self.get_column_by_header_data(_h)
-
-                    item = QStandardItem()
-                    item.setText(f'name{r}')
+                elif key == self.ColumnNames.name:
+                    item.setText(str(value))
                     item.setEditable(False)
 
-                    self.setItem(r, c, item)
-
                 # self.ColumnNames.initial_value
-                with nullcontext():
-
-                    _h = self.ColumnNames.initial_value
-                    c = self.get_column_by_header_data(_h)
-                    item = QStandardItem()
-
-                    if r < 3:
-
-                        item.setText(f'{r}')
-                        item.setData(Expression(f'{r}'), Qt.ItemDataRole.UserRole)
-
-                    else:
-
-                        item.setText(f'name{r-2} + name{r-1}')
-                        item.setData(Expression(f'name{r-2} + name{r-1}'), Qt.ItemDataRole.UserRole)
-
-                    self.setItem(r, c, item)
-
                 # self.ColumnNames.lower_bound
-                with nullcontext():
-                    _h = self.ColumnNames.lower_bound
-                    c = self.get_column_by_header_data(_h)
-
-                    item = QStandardItem()
-
-                    if r < 3:
-                        item.setText(f'{r - 1}')
-                        item.setData(Expression(f'{r - 1}'), Qt.ItemDataRole.UserRole)
-
-                    self.setItem(r, c, item)
-
                 # self.ColumnNames.upper_bound
-                with nullcontext():
-                    _h = self.ColumnNames.upper_bound
-                    c = self.get_column_by_header_data(_h)
-
-                    item = QStandardItem()
-                    if r < 3:
-                        item.setText(f'{r + 1}')
-                        item.setData(Expression(f'{r + 1}'), Qt.ItemDataRole.UserRole)
-
-                    self.setItem(r, c, item)
+                # self.ColumnNames.step
+                elif (
+                        key == self.ColumnNames.initial_value
+                        or key == self.ColumnNames.lower_bound
+                        or key == self.ColumnNames.upper_bound
+                        or key == self.ColumnNames.step
+                ):
+                    if value is not None:
+                        item.setText(str(value))
+                        item.setData(Expression(value), Qt.ItemDataRole.UserRole)
 
                 # self.ColumnNames.test_value
-                with nullcontext():
-                    _h = self.ColumnNames.test_value
-                    c = self.get_column_by_header_data(_h)
+                elif key == self.ColumnNames.test_value:
+                    name = _dummy_data[self.ColumnNames.name][i]
+                    item.setText(str(variable_values[name]))
+                    item.setData(Expression(value), Qt.ItemDataRole.UserRole)
 
-                    item = QStandardItem()
-                    if r < 3:
-                        item.setText(f'{r + 1}')
-                        item.setData(Expression(f'{r + 1}'), Qt.ItemDataRole.UserRole)
+                elif key == self.ColumnNames.note:
+                    if value is not None:
+                        item.setText(str(value))
 
-                    self.setItem(r, c, item)
+                else:
+                    raise Exception(f'ダミーデータが不正, {key}')
 
-                # self.ColumnNames.note
-                with nullcontext():
-                    _h = self.ColumnNames.note
-                    c = self.get_column_by_header_data(_h)
-
-                    item = QStandardItem()
-                    item.setText(f'{r + 1}')
-
-                    self.setItem(r, c, item)
+                self.setItem(r, c, item)
 
     def load_femtet(self) -> ReturnMsg:
         # variables 取得
@@ -590,6 +566,44 @@ class VariableItemModel(StandardItemModelWithHeader):
                             item.setText(str(variable_values[name]))
 
                     c = self.get_column_by_header_data(self.ColumnNames.test_value)
+                    self.setItem(r, c, item)
+
+                # ===== step =====
+                with nullcontext():
+                    item = QStandardItem()
+                    # 新しい変数の式が文字式ならとにかくデフォルト値を設定する
+                    if expression.is_expression():
+                        item.setData(None, Qt.ItemDataRole.UserRole)
+                        item.setText('')
+
+                    # 新しい変数が数値であって、
+                    else:
+
+                        # 以前からある変数であって、
+                        if name in stashed_data.keys():
+
+                            # 以前は文字式であった場合 (stashed_data の initial_value を調べる)
+                            tmp_item = QStandardItem()
+                            self.set_data_from_stash(tmp_item, name, self.ColumnNames.initial_value, stashed_data)
+                            stashed_expression: Expression = tmp_item.data(Qt.ItemDataRole.UserRole)
+                            if stashed_expression.is_expression():
+
+                                # デフォルト値を設定する
+                                item.setData(None, Qt.ItemDataRole.UserRole)
+                                item.setText('')
+
+                            # 以前も数値であった場合
+                            else:
+                                # stash_data を使う
+                                self.set_data_from_stash(item, name, self.ColumnNames.step, stashed_data)
+
+                        # 以前からない数値であれば
+                        else:
+                            # デフォルト値を設定する
+                            item.setData(None, Qt.ItemDataRole.UserRole)
+                            item.setText('')
+
+                    c = self.get_column_by_header_data(self.ColumnNames.step)
                     self.setItem(r, c, item)
 
                 # ===== note =====
@@ -1000,8 +1014,13 @@ class VariableWizardPage(TitledWizardPage):
 
     page_name = PageSubTitles.var
 
-    def __init__(self, parent=None, load_femtet_fun: callable = None):
-        super().__init__(parent)
+    def __init__(
+            self,
+            parent=None,
+            load_femtet_fun: callable = None,
+            _dummy_data=None,
+    ):
+        super().__init__(parent, _dummy_data)
         self.setup_ui()
         self.setup_model(load_femtet_fun)
         self.setup_view()
@@ -1018,7 +1037,7 @@ class VariableWizardPage(TitledWizardPage):
             self,
             load_femtet_fun=None,
     ):
-        self.source_model = get_var_model(self)
+        self.source_model = get_var_model(self, _dummy_data=self._dummy_data)
         self.proxy_model = VariableItemModelForTableView(self)
         self.proxy_model.setSourceModel(self.source_model)
 
@@ -1070,14 +1089,23 @@ class VariableWizardPage(TitledWizardPage):
             return True
 
 
-if __name__ == '__main__':
+def _debug():
 
-    fi.get().get_femtet()
+    from tests import get_test_femprj_path
+
+    fem_gui = fi.get()
+    fem_gui.get_femtet()
+    assert fem_gui.get_connection_state() == ReturnMsg.no_message
+    assert fem_gui._load_femprj(get_test_femprj_path()) is True
 
     app = QApplication()
     app.setStyle('fusion')
 
-    page_obj = VariableWizardPage()
+    page_obj = VariableWizardPage(_dummy_data=True)
     page_obj.show()
 
     sys.exit(app.exec())
+
+
+if __name__ == '__main__':
+    _debug()

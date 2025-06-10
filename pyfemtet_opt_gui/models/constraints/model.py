@@ -17,6 +17,7 @@ from pyfemtet_opt_gui.common.qt_util import *
 from pyfemtet_opt_gui.common.expression_processor import *
 from pyfemtet_opt_gui.common.pyfemtet_model_bases import *
 from pyfemtet_opt_gui.common.return_msg import *
+from pyfemtet_opt_gui.models.variables.var import VariableItemModel, get_var_model
 
 import enum
 from contextlib import nullcontext
@@ -24,24 +25,28 @@ from packaging.version import Version
 
 import pyfemtet
 
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from pyfemtet_opt_gui.models.variables.var import VariableItemModel
 
 # ===== model singleton pattern =====
 _CNS_MODEL = None
 _WITH_DUMMY = False
 
 
-def get_cns_model(parent=None, _with_dummy=None):
+def get_cns_model(parent=None, _dummy_data=None):
     global _CNS_MODEL
     if _CNS_MODEL is None:
         _CNS_MODEL = ConstraintModel(
             parent=parent,
-            _with_dummy=_with_dummy if _with_dummy is not None else _WITH_DUMMY,
+            _dummy_data=(
+                _default_dummy_data if _dummy_data is True
+                else _dummy_data
+            ),
         )
     return _CNS_MODEL
+
+
+def _reset_cns_model():
+    global _CNS_MODEL
+    _CNS_MODEL = None
 
 
 # ===== header data =====
@@ -52,6 +57,16 @@ class ConstraintColumnNames(enum.StrEnum):
     lb = '下限'
     ub = '上限'
     note = 'メモ欄'
+
+
+_default_dummy_data = {
+    ConstraintColumnNames.use: [True, True, True],
+    ConstraintColumnNames.name: ['cns1', 'cns2', 'cns3'],
+    ConstraintColumnNames.expr: ['x1', 'x1 + x2', 'x1 - x3'],
+    ConstraintColumnNames.lb: [0, None, -3.14],
+    ConstraintColumnNames.ub: [None, 1, 3.14],
+    ConstraintColumnNames.note: [None, None, None],
+}
 
 
 # ===== intermediate data =====
@@ -67,59 +82,45 @@ class Constraint:
         self.var_model: 'VariableItemModel' = var_model
 
     def finalize_check(self) -> tuple[ReturnType, str]:
-        # 両方とも指定されていなければエラー
-        if self.lb is None and self.ub is None:
-            return ReturnMsg.Error.no_bounds, ''
 
-        # 上下関係がおかしければエラー
-        if self.lb is not None and self.ub is not None:
-            ret_msg, a_msg = check_bounds(None, self.lb, self.ub)
-            if ret_msg != ReturnMsg.no_message:
-                return ret_msg, a_msg
-
-        # expression が None ならエラー
-        if self.expression is None:
-            return ReturnMsg.Error.cannot_recognize_as_an_expression, '式が入力されていません。'
-
-        # expression が None でなくとも
-        # Expression にできなければエラー
-        try:
-            _expr = Expression(self.expression)
-        except ExpressionParseError:
-            return ReturnMsg.Error.cannot_recognize_as_an_expression, self.expression
-
-        # Expression にできても値が
-        # 計算できなければエラー
-        _expr_key = 'this_is_a_target_constraint_expression'
-        expressions = self.var_model.get_current_variables()
-        expressions.update(
-            {_expr_key: _expr}
+        return check_expr_str_and_bounds(
+            self.expression,
+            self.lb,
+            self.ub,
+            self.var_model.get_current_variables(),
         )
-        ret, ret_msg, a_msg = eval_expressions(expressions)
-        a_msg = a_msg.replace(_expr_key, self.expression)
-        if ret_msg != ReturnMsg.no_message:
-            return ret_msg, a_msg
-
-        # Expression の計算ができても
-        # lb, ub との上下関係がおかしければ
-        # Warning
-        if _expr_key not in ret.keys():
-            raise RuntimeError(f'Internal Error! The _expr_key ({_expr_key}) is not in ret.keys() ({tuple(ret.keys())})')
-        if not isinstance(ret[_expr_key], float):
-            raise RuntimeError(f'Internal Error! The type of ret[_expr_key] is not float but {type(ret[_expr_key])}')
-        evaluated = ret[_expr_key]
-        ret_msg, a_msg = check_bounds(evaluated, self.lb, self.ub)
-        if ret_msg != ReturnMsg.no_message:
-            return ReturnMsg.Warn.inconsistent_value_bounds, ''
-
-        # 何もなければ no_msg
-        return ReturnMsg.no_message, ''
 
 
 # ===== Qt objects =====
 # 大元のモデル
 class ConstraintModel(StandardItemModelWithHeader):
     ColumnNames = ConstraintColumnNames
+
+    def _set_dummy_data(self, _dummy_data: dict):
+
+        var = _dummy_data.get('var_model', None)
+        if var is None:
+            # ここで import すると singleton が壊れる
+            var = get_var_model(self.parent(), _dummy_data=True)
+
+        rows = 1
+        columns = len(self.ColumnNames)
+        self.setRowCount(rows)
+        self.setColumnCount(columns)
+
+        for i in range(len(tuple(_dummy_data.values())[0])):
+            dummy_constraint_data = {}
+            for key, values in _dummy_data.items():
+                value = tuple(values)[i]
+                dummy_constraint_data.update({key: value})
+
+            dummy_cns: Constraint = Constraint(var)
+            dummy_cns.use = dummy_constraint_data[self.ColumnNames.use]
+            dummy_cns.name = dummy_constraint_data[self.ColumnNames.name]
+            dummy_cns.expression = dummy_constraint_data[self.ColumnNames.expr]
+            dummy_cns.lb = dummy_constraint_data[self.ColumnNames.lb]
+            dummy_cns.ub = dummy_constraint_data[self.ColumnNames.ub]
+            self.set_constraint(dummy_cns)
 
     def get_unique_name(self):
         # get constraint names
@@ -141,6 +142,7 @@ class ConstraintModel(StandardItemModelWithHeader):
         return candidate
 
     def get_constraint_names(self):
+
         if self.with_first_row:
             iterable = range(1, self.rowCount())
         else:
@@ -149,7 +151,7 @@ class ConstraintModel(StandardItemModelWithHeader):
         _h = self.ColumnNames.name
         c = self.get_column_by_header_data(_h)
 
-        out = [self.item(r, c).text() for r in iterable]
+        out = [self.item(r, c).text() if self.item(r, c) is not None else None for r in iterable]
 
         return out
 

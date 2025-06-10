@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import sys
 import ast
 from traceback import print_exception
@@ -8,7 +10,11 @@ from pyfemtet_opt_gui.common.femtet_operator_support import *
 
 
 __all__ = [
-    'Expression', 'eval_expressions', 'check_bounds', 'ExpressionParseError'
+    'Expression',
+    'eval_expressions',
+    'check_bounds',
+    'check_expr_str_and_bounds',
+    'ExpressionParseError',
 ]
 
 
@@ -129,6 +135,66 @@ def check_bounds(value=None, lb=None, ub=None) -> tuple[ReturnMsg, str | None]:
                     return ReturnMsg.Error.inconsistent_value_ub, f'value: {value}\nupper: {ub}'
                 else:
                     raise NotImplementedError
+
+
+def check_expr_str_and_bounds(
+        expr_str: str | None,
+        lb: float | None,
+        ub: float | None,
+        expressions: dict[str, Expression],
+) -> tuple[ReturnType, str]:
+
+    # 両方とも指定されていなければエラー
+    if lb is None and ub is None:
+        return ReturnMsg.Error.no_bounds, ''
+
+    # 上下関係がおかしければエラー
+    if lb is not None and ub is not None:
+        ret_msg, a_msg = check_bounds(None, lb, ub)
+        if ret_msg != ReturnMsg.no_message:
+            return ret_msg, a_msg
+
+    # expression が None ならエラー
+    if expr_str is None:
+        return ReturnMsg.Error.cannot_recognize_as_an_expression, '式が入力されていません。'
+
+    # expression が None でなくとも
+    # Expression にできなければエラー
+    try:
+        _expr = Expression(expr_str)
+    except ExpressionParseError:
+        return ReturnMsg.Error.cannot_recognize_as_an_expression, expr_str
+
+    # Expression にできても値が
+    # 計算できなければエラー
+    _expr_key = 'this_is_a_target_constraint_expression'
+    # expressions = var_model.get_current_variables()
+    expressions.update(
+        {_expr_key: _expr}
+    )
+    ret, ret_msg, a_msg = eval_expressions(expressions)
+    a_msg = a_msg.replace(_expr_key, expr_str)
+    if ret_msg != ReturnMsg.no_message:
+        return ret_msg, a_msg
+
+    # Expression の計算ができても
+    # lb, ub との上下関係がおかしければ
+    # Warning
+    if _expr_key not in ret.keys():
+        raise RuntimeError(f'Internal Error! The _expr_key '
+                           f'({_expr_key}) is not in ret.keys() '
+                           f'({tuple(ret.keys())})')
+    if not isinstance(ret[_expr_key], float):
+        raise RuntimeError(f'Internal Error! The type of '
+                           f'ret[_expr_key] is not float '
+                           f'but {type(ret[_expr_key])}')
+    evaluated = ret[_expr_key]
+    ret_msg, a_msg = check_bounds(evaluated, lb, ub)
+    if ret_msg != ReturnMsg.no_message:
+        return ReturnMsg.Warn.inconsistent_value_bounds, ''
+
+    # 何もなければ no_msg
+    return ReturnMsg.no_message, ''
 
 
 def get_dependency(expr_str):

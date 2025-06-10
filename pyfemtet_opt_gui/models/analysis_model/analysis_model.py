@@ -23,7 +23,6 @@ from pyfemtet_opt_gui.ui.ui_WizardPage_analysis_model import Ui_WizardPage
 from pyfemtet_opt_gui.common.qt_util import *
 from pyfemtet_opt_gui.common.pyfemtet_model_bases import *
 from pyfemtet_opt_gui.common.return_msg import *
-from pyfemtet_opt_gui.common.expression_processor import *
 from pyfemtet_opt_gui.common.titles import *
 import pyfemtet_opt_gui.fem_interfaces as fi
 
@@ -32,10 +31,13 @@ _FEMPRJ_MODEL = None
 _FEMPRJ_MODEL_FOR_PROBLEM = None
 
 
-def get_am_model(parent) -> 'FemprjModel':
+def get_am_model(parent, _dummy_data=None) -> 'FemprjModel':
     global _FEMPRJ_MODEL
     if _FEMPRJ_MODEL is None:
-        _FEMPRJ_MODEL = FemprjModel(parent=parent, _with_dummy=False)
+        _FEMPRJ_MODEL = FemprjModel(
+            parent=parent,
+            _dummy_data=_dummy_data,
+        )
     return _FEMPRJ_MODEL
 
 
@@ -61,8 +63,8 @@ class FemprjModel(StandardItemModelWithHeader):
         item = '項目'
         value = '値'
 
-    def __init__(self, parent=None, _with_dummy=True, with_first_row=True):
-        super().__init__(parent, _with_dummy, with_first_row)
+    def __init__(self, parent=None, _dummy_data=None, with_first_row=True):
+        super().__init__(parent, _dummy_data, with_first_row)
         self.setup_model()
 
     def setup_model(self):
@@ -110,51 +112,8 @@ class FemprjModel(StandardItemModelWithHeader):
                 c = self.get_column_by_header_data(self.ColumnNames.value)
                 self.setItem(r, c, QStandardItem())
 
-    def _set_dummy_data(self, n_rows=None):
-
-        # set size
-        with nullcontext():
-            # row count
-            n_rows = len(self.RowNames)
-            if self.with_first_row:
-                n_rows += 1
-            self.setRowCount(n_rows)
-
-            # column count
-            n_cols = len(self.ColumnNames)
-            self.setColumnCount(n_cols)
-
-        # femprj
-        with nullcontext():
-            vhd = self.RowNames.femprj_path
-            r = self.get_row_by_header_data(vhd)
-
-            # item
-            with nullcontext():
-                c = self.get_column_by_header_data(self.ColumnNames.item)
-                self.setItem(r, c, QStandardItem(vhd))
-
-            # value
-            with nullcontext():
-                c = self.get_column_by_header_data(self.ColumnNames.value)
-                item = QStandardItem('sample.femprj')
-                item.setData('ignore', CustomItemDataRole.CustomResizeRole)
-                self.setItem(r, c, item)
-
-        # model
-        with nullcontext():
-            vhd = self.RowNames.model_name
-            r = self.get_row_by_header_data(vhd)
-
-            # item
-            with nullcontext():
-                c = self.get_column_by_header_data(self.ColumnNames.item)
-                self.setItem(r, c, QStandardItem(vhd))
-
-            # value
-            with nullcontext():
-                c = self.get_column_by_header_data(self.ColumnNames.value)
-                self.setItem(r, c, QStandardItem('解析モデル'))
+    def _set_dummy_data(self, _dummy_data: dict):
+        raise NotImplementedError('Use FemtetMock instead.')
 
     def load_femtet(self, progress: QProgressDialog = None) -> ReturnMsg:
 
@@ -271,8 +230,8 @@ class AnalysisModelWizardPage(TitledWizardPage):
 
     page_name = PageSubTitles.analysis_model
 
-    def __init__(self, parent=None, load_femtet_fun=None):
-        super().__init__(parent)
+    def __init__(self, parent=None, _dummy_data=None, load_femtet_fun=None):
+        super().__init__(parent, _dummy_data)
         self.setup_ui()
         self.setup_model()
         self.setup_view()
@@ -283,7 +242,7 @@ class AnalysisModelWizardPage(TitledWizardPage):
         self.ui.setupUi(self)
 
     def setup_model(self):
-        self.source_model = get_am_model(parent=self)
+        self.source_model = get_am_model(parent=self, _dummy_data=self._dummy_data)
         self.proxy_model = StandardItemModelWithoutFirstRow(parent=self)
         self.proxy_model.setSourceModel(self.source_model)
 
@@ -331,7 +290,7 @@ if __name__ == '__main__':
     # _WITH_DUMMY = True  # comment out to prevent debug
     # from pyfemtet_opt_gui.femtet.mock import get_femtet, get_obj_names  # comment out to prevent debug
 
-    fi.get().get_femtet()
+    # fi.get().get_femtet()
 
     app = QApplication()
     app.setStyle('fusion')
