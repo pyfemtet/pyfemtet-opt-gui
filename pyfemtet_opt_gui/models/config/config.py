@@ -726,7 +726,7 @@ class ConfigItemModel(StandardItemModelWithHeader):
         # history_path が exec() 内で生成されたら困るので
         # スクリプトに None が渡らないように
         # ここで自動作成する
-        if history_path == '':
+        if history_path == '.csv':
             history_path = datetime.datetime.now().strftime('最適化_%Y%m%d_%H%M%S.csv')
 
         # GUI が history_path にアクセスできるよう
