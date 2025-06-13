@@ -71,8 +71,6 @@ class CompareTransformer(ast.NodeTransformer):
 
 # Femtet 式を Python 書式・Femtet 演算に変換
 def convert_operator(expr_str: str) -> str:
-    # 小文字に統一
-    expr_str = expr_str.lower()
 
     # 退避
     expr_str = expr_str.replace('<=', '<$$')

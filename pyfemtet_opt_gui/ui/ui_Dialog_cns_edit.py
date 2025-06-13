@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'Dialog_cns_editrXxbrV.ui'
+## Form generated from reading UI file 'Dialog_cns_editEbwvTk.ui'
 ##
 ## Created by: Qt User Interface Compiler version 6.7.3
 ##
@@ -181,10 +181,10 @@ class Ui_Dialog(object):
         self.lineEdit_name.setPlaceholderText(QCoreApplication.translate("Dialog", u"\u62d8\u675f\u540d\uff08\u7a7a\u6b04\u6642\u306f\u81ea\u52d5\u547d\u540d\uff09", None))
         self.pushButton_load_var.setText(QCoreApplication.translate("Dialog", u"Load", None))
         self.label_prmOnCns.setText(QCoreApplication.translate("Dialog", u"\u5909\u6570\u4e00\u89a7", None))
-        self.pushButton_input_mean.setText(QCoreApplication.translate("Dialog", u"mean( )", None))
+        self.pushButton_input_mean.setText(QCoreApplication.translate("Dialog", u"Mean( )", None))
         self.pushButton_input_devide.setText(QCoreApplication.translate("Dialog", u"/", None))
-        self.pushButton_input_min.setText(QCoreApplication.translate("Dialog", u"min( )", None))
-        self.pushButton_input_max.setText(QCoreApplication.translate("Dialog", u"max( )", None))
+        self.pushButton_input_min.setText(QCoreApplication.translate("Dialog", u"Min( )", None))
+        self.pushButton_input_max.setText(QCoreApplication.translate("Dialog", u"Max( )", None))
         self.pushButton_input_minus.setText(QCoreApplication.translate("Dialog", u"-", None))
         self.pushButton_input_plus.setText(QCoreApplication.translate("Dialog", u"+", None))
         self.pushButton_input_var.setText(QCoreApplication.translate("Dialog", u"\u9078\u629e\u4e2d\u306e\u5909\u6570\u3092\u5165\u529b", None))
@@ -196,7 +196,7 @@ class Ui_Dialog(object):
         self.lineEdit_lb.setText(QCoreApplication.translate("Dialog", u"0", None))
         self.lineEdit_lb.setPlaceholderText(QCoreApplication.translate("Dialog", u"\u4e0b\u9650\u3092\u5165\u529b", None))
         self.label_4.setText(QCoreApplication.translate("Dialog", u"<=", None))
-        self.plainTextEdit_cnsFormula.setPlaceholderText(QCoreApplication.translate("Dialog", u"\u5f0f\u3092\u5165\u529b   \u4f8b\uff1a(a + max(b, c)) * d   \u6539\u884c\u53ef", None))
+        self.plainTextEdit_cnsFormula.setPlaceholderText(QCoreApplication.translate("Dialog", u"\u5f0f\u3092\u5165\u529b   \u4f8b\uff1a(a + Max(b, c)) * d   \u6539\u884c\u53ef", None))
         self.label_5.setText(QCoreApplication.translate("Dialog", u"<=", None))
 #if QT_CONFIG(tooltip)
         self.lineEdit_ub.setToolTip(QCoreApplication.translate("Dialog", u"\u4e0a\u9650\u3068\u4e0b\u9650\u306e\u3044\u305a\u308c\u304b\u306e\u5165\u529b\u304c\u5fc5\u9808\u3067\u3059\u3002", None))

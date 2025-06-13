@@ -136,17 +136,17 @@ class ConstraintEditorDialog(QDialog):
         # 関数
         self.ui.pushButton_input_max.clicked.connect(
             lambda _: self.insert_text_to_expression(
-                'max(,)'
+                'Max(,)'
             )
         )
         self.ui.pushButton_input_min.clicked.connect(
             lambda _: self.insert_text_to_expression(
-                'min(,)'
+                'Min(,)'
             )
         )
         self.ui.pushButton_input_mean.clicked.connect(
             lambda _: self.insert_text_to_expression(
-                'mean(,)'
+                'Mean(,)'
             )
         )
 
