@@ -171,3 +171,5 @@ PyCharm
 .vscode/
 *.pptx
 desktop.ini
+
+uv.lock
