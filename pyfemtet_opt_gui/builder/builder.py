@@ -59,6 +59,9 @@ from pyfemtet.opt.optimizer import PoFBoTorchSampler
 from optuna.samplers import RandomSampler, QMCSampler, NSGAIISampler, TPESampler
 from optuna_integration import BoTorchSampler
 
+# COM インターフェースの初期化
+from pythoncom import CoInitialize
+
 # Femtet の書式で書かれた式を Python の書式に変換する関数群
 {_get_myself_code_str()}
 
@@ -83,6 +86,7 @@ def create_main():
     code = f'''
 # 最適化のメイン関数
 def main():
+    CoInitialize()
 '''[1:]
 
     return code
