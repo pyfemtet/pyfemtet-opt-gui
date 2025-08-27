@@ -348,7 +348,7 @@ class QConfigTreeViewDelegate(QStyledItemDelegateWithCombobox):
                 display = editor.currentText()
 
                 # 列挙体の中にないとおかしい
-                assert display in SurrogateModelNames
+                assert display in [member.value for member in SurrogateModelNames]
 
                 # 列挙体のメンバーに変換
                 value = SurrogateModelNames(display)
