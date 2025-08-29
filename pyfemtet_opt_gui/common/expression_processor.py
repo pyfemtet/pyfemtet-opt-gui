@@ -7,6 +7,9 @@ from graphlib import TopologicalSorter
 
 from pyfemtet_opt_gui.common.return_msg import ReturnMsg, ReturnType
 from pyfemtet_opt_gui.common.femtet_operator_support import *
+from pyfemtet_opt_gui.common.solidworks_function_support import *
+
+from pyfemtet_opt_gui.fem_interfaces import get_current_cad_name, CADIntegration
 
 
 __all__ = [
@@ -75,6 +78,7 @@ def convert_operator(expr_str: str) -> str:
     # 退避
     expr_str = expr_str.replace('<=', '<$$')
     expr_str = expr_str.replace('>=', '>$$')
+    expr_str = expr_str.replace('==', '$$$$')
 
     # 変換
     expr_str = expr_str.replace('=', '==')
@@ -84,13 +88,17 @@ def convert_operator(expr_str: str) -> str:
     # 元に戻す
     expr_str = expr_str.replace('<$$', '<=')
     expr_str = expr_str.replace('>$$', '>=')
+    expr_str = expr_str.replace('$$$$', '==')
 
-    # 演算子を関数に変換
-    tree = ast.parse(expr_str, mode='eval')
-    transformer = CompareTransformer()
-    new_tree = transformer.visit(tree)
-    ast.fix_missing_locations(new_tree)
-    return ast.unparse(new_tree)
+    # Femtet ならば演算子を関数に変換
+    if get_current_cad_name() == CADIntegration.no:
+        tree = ast.parse(expr_str, mode='eval')
+        transformer = CompareTransformer()
+        new_tree = transformer.visit(tree)
+        ast.fix_missing_locations(new_tree)
+        expr_str = ast.unparse(new_tree)
+
+    return expr_str
 
 
 class ExpressionParseError(Exception):
@@ -213,7 +221,7 @@ def get_dependency(expr_str):
                 if isinstance(node.func, ast.Name):
                     func_name = node.func.id
                     used_functions.add(func_name)
-                    if func_name not in get_femtet_builtins():
+                    if func_name not in get_cad_buitlins():
                         raise ExpressionParseError(f"Invalid function used: {func_name}")
                 else:
                     # 例えば属性アクセスなどは許可しない
@@ -223,7 +231,7 @@ def get_dependency(expr_str):
         Validator().visit(tree)
 
         # locals は除く
-        dependent_vars = dependent_vars - set(get_femtet_builtins().keys())
+        dependent_vars = dependent_vars - set(get_cad_buitlins().keys())
 
         return dependent_vars
 
@@ -232,10 +240,14 @@ def get_dependency(expr_str):
         raise ExpressionParseError(str(e)) from e
 
 
-def remove_prefix_recursive(string, prefix):
-    while string.startswith(prefix):
-        string = string.removeprefix(prefix)
-    return string
+def get_cad_buitlins():
+    current_cad = get_current_cad_name()
+    if current_cad == CADIntegration.solidworks:
+        return get_solidworks_builtins()
+    elif current_cad == CADIntegration.no:
+        return get_femtet_builtins()
+    else:
+        assert False, f'Unknown CADIntegration: {current_cad}'
 
 
 class Expression:
@@ -263,17 +275,23 @@ class Expression:
             e.expr  # '1.0'
             e.value  # 1.0
 
-
-
         """
         # ユーザー指定の何らかの入力
         self._expr: str | float = expression
 
         # 最低限の整形を行う
         if isinstance(self._expr, str):
-            self._expr = remove_prefix_recursive(self._expr, ' ')
+            self._expr = self._expr
 
-        # femtet 書式を python 書式に変換
+        # 単位があれば分離 (主に SW 向け)
+        if isinstance(self._expr, str):
+            value, unit = split_unit_solidworks(self._expr)
+            self._expr = value
+            self.unit = unit  # '', 'mm', ...
+        else:
+            self.unit = ''
+
+        # 書式を python 書式に変換
         try:
             self._converted_expr_str: str = convert_operator(str(self._expr))
         except Exception as e:
@@ -292,6 +310,9 @@ class Expression:
     def _get_value_if_pure_number(self) -> float | None:
         # 1.0000 => True
         # 1 * 0.9 => False
+        # 100mm => False
+        if self.unit != '':
+            return None
         try:
             value = float(str(self._expr).replace(',', '_'))
             return value
@@ -313,7 +334,7 @@ class Expression:
         if value is not None:
             return str(value)
         else:
-            return self._expr
+            return str(self._expr) + self.unit
 
     @property
     def value(self) -> float:
@@ -377,7 +398,7 @@ def eval_expressions(expressions: dict[str, Expression | float | str]) -> tuple[
     for key in evaluation_order:
 
         # 評価の中で使える locals を作成
-        l = get_femtet_builtins()
+        l = get_cad_buitlins()
         l.update(evaluated_value)
 
         # 評価

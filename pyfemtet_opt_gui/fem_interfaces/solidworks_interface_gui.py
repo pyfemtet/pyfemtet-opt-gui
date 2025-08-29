@@ -151,13 +151,6 @@ class SolidWorksInterfaceGUI(FemtetInterfaceGUI):
         nEquation = swEqnMgr.GetCount
 
         # get variables
-        """Solidworks variables の前提
-        
-        global variables のうち、
-            - 右辺が数値のもの -> variables
-            - 右辺が "" で囲まれた文字を含むもの -> expressions とみなす
-        
-        """
         out = dict()
         for i in range(nEquation):
 

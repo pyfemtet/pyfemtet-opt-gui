@@ -8,7 +8,7 @@ class CADIntegration(enum.StrEnum):
     solidworks = 'Solidworks'
 
 
-current_cad = CADIntegration.no
+current_cad: CADIntegration = CADIntegration.no
 
 
 def get():
@@ -18,11 +18,14 @@ def get():
     elif current_cad == CADIntegration.solidworks:
         return SolidWorksInterfaceGUI
 
+    else:
+        assert False, f'Unknown current_cad: {current_cad}'
+
 
 def switch_cad(cad):
     global current_cad
     current_cad = cad
 
 
-def get_current_cad_name():
+def get_current_cad_name() -> CADIntegration:
     return current_cad
