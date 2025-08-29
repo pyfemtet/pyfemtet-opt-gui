@@ -18,9 +18,13 @@ def split_unit_solidworks(expr_str: str) -> tuple[str, str]:
         return None
 
     # Solidworks で使われる単位一覧 (UI より)    
-    units = ['A', 'cm', 'ft', 'in', 'm', 'uin', 'um', 'mil', 'mm', 'nm', 'deg', 'rad', ]
+    units = ['A', 'cm', 'ft', 'in', 'uin', 'um', 'mil', 'mm', 'nm', 'deg', 'rad']
 
-    ret = None
+    # 'm' が存在するかどうかのチェックは
+    # ほかの m で終わる単位のチェックが
+    # 終わった後でなければならない
+    units.extend(['m'])
+
     for unit in units:
         ret = split_core(expr_str, unit)
         if ret is not None:
@@ -29,7 +33,7 @@ def split_unit_solidworks(expr_str: str) -> tuple[str, str]:
 
 
 def _solidworks_iif(condition, if_true, if_false):
-    assert isinstance(if_true, bool), f"if_true must be bool, not {type(if_true)}"
+    assert isinstance(condition, bool), f"if_true must be bool, not {type(condition)}"
     return if_true if condition else if_false
 
 

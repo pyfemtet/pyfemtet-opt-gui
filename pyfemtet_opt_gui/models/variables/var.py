@@ -563,7 +563,7 @@ class VariableItemModel(StandardItemModelWithHeader):
                             # デフォルト値を設定する
                             tmp_expression = Expression(expression.expr)
                             item.setData(tmp_expression, Qt.ItemDataRole.UserRole)
-                            item.setText(str(variable_values[name]))
+                            item.setText(str(variable_values[name]) + expression.unit)
 
                     c = self.get_column_by_header_data(self.ColumnNames.test_value)
                     self.setItem(r, c, item)

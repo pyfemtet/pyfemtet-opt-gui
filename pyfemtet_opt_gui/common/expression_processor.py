@@ -204,6 +204,12 @@ def check_expr_str_and_bounds(
 
 
 def get_dependency(expr_str):
+    """大文字・小文字を維持したまま依存変数を取得する。
+    関数は無視する。"""
+
+    # CAD ビルトイン関数名の小文字化したもの
+    cad_builtin_keys_lower = [key.lower() for key in get_cad_buitlins().keys()]
+
     try:
         # 式のASTを生成
         tree = ast.parse(expr_str, mode='eval')
@@ -221,7 +227,9 @@ def get_dependency(expr_str):
                 if isinstance(node.func, ast.Name):
                     func_name = node.func.id
                     used_functions.add(func_name)
-                    if func_name not in get_cad_buitlins():
+                    # 大文字・小文字は任意のものが入ってくるので
+                    # チェック対象との比較のため小文字化
+                    if func_name.lower() not in cad_builtin_keys_lower:
                         raise ExpressionParseError(f"Invalid function used: {func_name}")
                 else:
                     # 例えば属性アクセスなどは許可しない
@@ -231,7 +239,10 @@ def get_dependency(expr_str):
         Validator().visit(tree)
 
         # locals は除く
-        dependent_vars = dependent_vars - set(get_cad_buitlins().keys())
+        dependent_vars = {v for v in dependent_vars if v.lower() not in cad_builtin_keys_lower}
+
+        # 関数を除く
+        dependent_vars = dependent_vars - used_functions
 
         return dependent_vars
 
@@ -281,13 +292,19 @@ class Expression:
 
         # 最低限の整形を行う
         if isinstance(self._expr, str):
-            self._expr = self._expr
+            # Femtet, SW ではスペース削除可
+            self._expr = self._expr.replace(' ', '')
 
-        # 単位があれば分離 (主に SW 向け)
+        # 単位があれば分離
         if isinstance(self._expr, str):
-            value, unit = split_unit_solidworks(self._expr)
-            self._expr = value
-            self.unit = unit  # '', 'mm', ...
+            if get_current_cad_name() == CADIntegration.solidworks:
+                value, unit = split_unit_solidworks(self._expr)
+                self._expr = value
+                self.unit = unit  # '', 'mm', ...
+            elif get_current_cad_name() == CADIntegration.no:
+                self.unit = ''
+            else:
+                assert False, f'Unknown CADIntegration: {get_current_cad_name()}'
         else:
             self.unit = ''
 
@@ -306,6 +323,11 @@ class Expression:
         except ExpressionParseError as e:
             self.is_valid = False
             raise e
+
+        # locals が適切ならば Python 式として評価できる文字列
+        # 大文字・小文字を区別しないが変更しては不具合が出る CAD のため
+        # Python 評価時は小文字で統一
+        self.evalable_expr_str = self._converted_expr_str.lower()
 
     def _get_value_if_pure_number(self) -> float | None:
         # 1.0000 => True
@@ -339,9 +361,15 @@ class Expression:
     @property
     def value(self) -> float:
         if self.is_number():
-            return float(eval(self._converted_expr_str))
+            return self.eval()
         else:
             raise ValueError(f'Cannot convert expression {self.expr} to float.')
+
+    def eval(self, l: dict[str, ...] = None):
+        l_ = {k.lower(): v for k, v in get_cad_buitlins().items()}
+        if l is not None:
+            l_.update({k.lower(): v for k, v in l.items()})
+        return float(eval(self.evalable_expr_str, l_))
 
     def __repr__(self):
         return self.__str__()
@@ -369,13 +397,13 @@ def topological_sort(expressions: dict[str, Expression]) -> list[str]:
 def eval_expressions(expressions: dict[str, Expression | float | str]) -> tuple[dict[str, float], ReturnType, str]:
 
     # 値渡しに変換
-    expressions_ = expressions.copy()
+    expressions = expressions.copy()
 
     error_keys = []
 
     # 型を統一
     expression_: str | float | Expression
-    for key, expression_ in expressions_.items():
+    for key, expression_ in expressions.items():
         if not isinstance(expression_, Expression):
             expressions[key] = Expression(expression_)
 
@@ -397,17 +425,15 @@ def eval_expressions(expressions: dict[str, Expression | float | str]) -> tuple[
     evaluated_value = {}
     for key in evaluation_order:
 
-        # 評価の中で使える locals を作成
-        l = get_cad_buitlins()
-        l.update(evaluated_value)
-
         # 評価
         expression = expressions[key]
         try:
-            value = float(eval(str(expression._converted_expr_str), l))
+            value = expression.eval(evaluated_value)
         except Exception as e:
             print_exception(e)
-            print('expression:', expression._converted_expr_str, file=sys.stderr)
+            print(f'Failed to evaluate expression '
+                  f'{key}={expression.evalable_expr_str}',
+                  file=sys.stderr)
             # 評価に失敗（これ以降が計算できないのでここで終了）
             error_keys.append(key)  # error!
             break

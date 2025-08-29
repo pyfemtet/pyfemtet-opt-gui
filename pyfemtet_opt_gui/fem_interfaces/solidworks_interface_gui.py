@@ -53,8 +53,8 @@ def get_name_from_equation(equation: str):
 
 def get_expression_from_equation(equation: str):
     assert '=' in equation
-    expression: str = equation.split('=')[1]
-    expression = expression.replace('"', '')
+    expression: str = equation.removeprefix(equation.split('=')[0] + '=')  # 最初の = 以降を取得
+    expression = expression.replace('"', '')  # SW では式中の変数を " で囲む
     expr: Expression = Expression(expression)
     return expr
 
@@ -158,6 +158,7 @@ class SolidWorksInterfaceGUI(FemtetInterfaceGUI):
                 continue
 
             eq = swEqnMgr.Equation(i)
+            print(f'===== {eq} =====')
             name = get_name_from_equation(eq)
             expr: Expression = get_expression_from_equation(eq)
 

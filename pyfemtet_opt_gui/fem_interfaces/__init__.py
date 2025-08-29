@@ -1,6 +1,4 @@
 import enum
-from pyfemtet_opt_gui.fem_interfaces.femtet_interface_gui import FemtetInterfaceGUI
-from pyfemtet_opt_gui.fem_interfaces.solidworks_interface_gui import SolidWorksInterfaceGUI
 
 
 class CADIntegration(enum.StrEnum):
@@ -29,3 +27,8 @@ def switch_cad(cad):
 
 def get_current_cad_name() -> CADIntegration:
     return current_cad
+
+
+# 循環参照を避けるためここでインポート
+from pyfemtet_opt_gui.fem_interfaces.femtet_interface_gui import FemtetInterfaceGUI
+from pyfemtet_opt_gui.fem_interfaces.solidworks_interface_gui import SolidWorksInterfaceGUI
