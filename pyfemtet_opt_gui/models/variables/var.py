@@ -861,6 +861,18 @@ class VariableItemModel(StandardItemModelWithHeader):
                             dict(step=expr.value)
                         )
 
+                # properties
+                with nullcontext():
+                    # initial_value の Expression が unit を持つなら
+                    # それを properties に追加
+                    item = self.item(r, self.get_column_by_header_data(self.ColumnNames.initial_value))
+                    expr: Expression = item.data(Qt.ItemDataRole.UserRole)
+                    assert expr.is_number()
+                    if expr.unit:
+                        args_object.update(
+                            dict(properties=f'dict(unit="{expr.unit}")')
+                        )
+
             # 数式でなくて Check されていない場合: Expression (pass_to_fem=True)
             # GUI 画面と Femtet の定義に万一差があっても
             # pass_to_fem が True なら上書きできる。
