@@ -11,6 +11,8 @@ from pythoncom import CoInitialize, CoUninitialize
 # noinspection PyUnresolvedReferences
 from PySide6.QtWidgets import *
 
+from pyfemtet._util.solidworks_variable import SolidworksVariableManager
+
 import pyfemtet_opt_gui
 from pyfemtet_opt_gui.common.expression_processor import Expression
 from pyfemtet_opt_gui.common.return_msg import *
@@ -19,7 +21,6 @@ from pyfemtet_opt_gui.fem_interfaces.femtet_interface_gui import (
     FemtetInterfaceGUI,
     logger
 )
-
 
 _sw: CDispatch | None = None
 
@@ -120,11 +121,12 @@ class SolidWorksInterfaceGUI(FemtetInterfaceGUI):
 
         # メソッドへのアクセスを試みる
         try:
+            # noinspection PyUnusedLocal
             visible = _sw.Visible
 
         # Dispatch オブジェクトは存在するが
         # メソッドにアクセスできない場合
-        except com_error as e:
+        except com_error:
             return ReturnMsg.Error.sw_connection_error
 
         return ReturnMsg.no_message
@@ -143,22 +145,20 @@ class SolidWorksInterfaceGUI(FemtetInterfaceGUI):
         if swModel is None:
             return {}, ReturnMsg.no_message
 
-        # get equation manager
-        swEqnMgr = swModel.GetEquationMgr
-        if swEqnMgr is None:
-            return {}, ReturnMsg.Error.sw_connection_error
+        # Get equations
+        mgr = SolidworksVariableManager()
+        equations: set[str] = mgr.get_equations_recourse(
+            swModel=swModel,
+            global_variables_only=False,
+        )
 
-        nEquation = swEqnMgr.GetCount
-
-        # get variables
+        # Parse equations
         out = dict()
-        for i in range(nEquation):
-
-            if not swEqnMgr.GlobalVariable(i):
-                continue
-
-            eq = swEqnMgr.Equation(i)
-            print(f'===== {eq} =====')
+        for eq in equations:
+            logger.debug(f'===== {eq} =====')
+            print(eq)
+            eq = eq.replace('@', '__at__')
+            print(eq)
             name = get_name_from_equation(eq)
             expr: Expression = get_expression_from_equation(eq)
 
@@ -172,54 +172,23 @@ class SolidWorksInterfaceGUI(FemtetInterfaceGUI):
         # check Connection
         ret = SolidWorksInterfaceGUI.get_sw_connection_state()
         if ret != ReturnMsg.no_message:
-            return {}, ret
+            return ret, ''
 
         # get solidworks
         swModel = _sw.ActiveDoc
         if swModel is None:
             ret_msg = ReturnMsg.Error.sw_no_active_doc
-            return {}, ret_msg
+            return ret_msg, ''
 
-        # get equation manager
-        swEqnMgr = swModel.GetEquationMgr
-        if swEqnMgr is None:
-            return {}, ReturnMsg.Error.sw_connection_error
+        # Construct SWVariables:
+        x = {name.replace('__at__', '@'): str(expression).replace('__at__', '@') for name, expression in variables.items()}
 
-        # プロパティを退避
-        buffer_aso = swEqnMgr.AutomaticSolveOrder
-        buffer_ar = swEqnMgr.AutomaticRebuild
+        # Update variables
+        mgr = SolidworksVariableManager(logger)
+        mgr.update_global_variables_recourse(swModel=swModel, x=x)
 
-        # 計算関連プロパティを設定
-        swEqnMgr.AutomaticSolveOrder = False
-        swEqnMgr.AutomaticRebuild = False
-
-        nEquation = swEqnMgr.GetCount
-        updated_variables = set()
-        for i in range(nEquation):
-
-            if not swEqnMgr.GlobalVariable(i):
-                continue
-
-            # name, equation の取得
-            current_equation = swEqnMgr.Equation(i)
-            current_name = get_name_from_equation(current_equation)
-
-            # 対象なら処理
-            if current_name in variables:
-                new_equation = f'"{current_name}" = {variables[current_name]}'
-                swEqnMgr.Equation(i, new_equation)
-                updated_variables.add(current_name)
-
-        # 式の計算
-        # noinspection PyStatementEffect
-        swEqnMgr.EvaluateAll  # always returns -1
-
-        # プロパティをもとに戻す
-        swEqnMgr.AutomaticSolveOrder = buffer_aso
-        swEqnMgr.AutomaticRebuild = buffer_ar
-
-        # チェック
-        remaining_variables = (updated_variables - set(variables.keys()))
+        # Check the variables updated
+        remaining_variables = (set(variables.keys()) - mgr.updated_objects)
         if len(remaining_variables) > 0:
             return ReturnMsg.Error.sw_remaining_variable, ','.join(remaining_variables)
 

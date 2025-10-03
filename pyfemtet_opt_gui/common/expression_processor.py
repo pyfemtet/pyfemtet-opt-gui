@@ -4,6 +4,7 @@ import sys
 import ast
 from traceback import print_exception
 from graphlib import TopologicalSorter
+import unicodedata
 
 from pyfemtet_opt_gui.common.return_msg import ReturnMsg, ReturnType
 from pyfemtet_opt_gui.common.femtet_operator_support import *
@@ -220,7 +221,10 @@ def get_dependency(expr_str):
         class Validator(ast.NodeVisitor):
             def visit_Name(self, node: ast.Name):
                 # 変数名を収集
-                dependent_vars.add(node.id)
+                # dependent_vars.add(node.id)  # 元のコードで半角ｶﾀｶﾅが全角に変換されてしまう
+                # https://docs.python.org/ja/3.10/library/ast.html#ast.AST.end_col_offset
+                b = expr_str.split('\n')[node.lineno - 1].encode("utf-8")
+                dependent_vars.add(b[node.col_offset: node.end_col_offset].decode("utf-8"))
 
             def visit_Call(self, node: ast.Call):
                 # 関数呼び出しをチェック
@@ -369,7 +373,13 @@ class Expression:
         l_ = {k.lower(): v for k, v in get_cad_buitlins().items()}
         if l is not None:
             l_.update({k.lower(): v for k, v in l.items()})
-        return float(eval(self.evalable_expr_str, l_))
+        # 半角が入っていてもいいように評価時のみ正規化する
+        return float(
+            eval(
+                unicodedata.normalize('NFKC', self.evalable_expr_str),
+                {unicodedata.normalize('NFKC', key): value for key, value in l_.items()}
+            )
+        )
 
     def __repr__(self):
         return self.__str__()
@@ -412,7 +422,7 @@ def eval_expressions(expressions: dict[str, Expression | float | str]) -> tuple[
     for key, expression in expressions.items():
         for var_name in expression.dependencies:
             if var_name not in expressions:
-                error_keys.append(key)  # error!
+                error_keys.append(f"{key}: {var_name}")  # error!
 
     # エラーがあれば終了
     if len(error_keys) > 0:
