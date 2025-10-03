@@ -919,7 +919,7 @@ class VariableItemModel(StandardItemModelWithHeader):
         """
         femopt.add_constraint(
             name='var_name',
-            fun=lambda opt_: opt['var_name'],  # output_json で add_expression しているのでこれで動作する
+            fun=lambda _, opt_: opt_.get_variables()['var_name'],  # output_json で add_expression しているのでこれで動作する
             lower_bound=...,
             upper_bound=...,
             strict=True,
@@ -973,8 +973,8 @@ class VariableItemModel(StandardItemModelWithHeader):
             # command object の組立
             args_object.update(
                 dict(
-                    name=f'"constraint_{item_name.text()}"',
-                    fun=f'lambda opt_: opt_["{item_name.text()}"]',
+                    name=f'"constraint_{item_name.data(Qt.ItemDataRole.UserRole)}"',
+                    fun=f'lambda _, opt_: opt_.get_variables()["{item_name.data(Qt.ItemDataRole.UserRole)}"]',
                     lower_bound=lb,
                     upper_bound=ub,
                     strict=True,
