@@ -12,9 +12,11 @@ from PySide6.QtGui import *
 # noinspection PyUnresolvedReferences
 from PySide6.QtWidgets import *
 
+import pyfemtet
 import pyfemtet_opt_gui
 
 print('=== pyfemtet_opt_gui version', pyfemtet_opt_gui.__version__, '===')
+print('=== pyfemtet version', pyfemtet.__version__, '===')
 print('Loading modules. It can take a few minutes for first time...')
 
 from pyfemtet_opt_gui.ui.ui_Wizard_main import Ui_Wizard
