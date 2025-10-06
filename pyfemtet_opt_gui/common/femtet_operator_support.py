@@ -87,7 +87,10 @@ FUNC_NAME_TO_FUNC = {
 # 文字列中
 def get_femtet_builtins(d: dict = None) -> dict:
 
-    d = d or {}
+    if d is None:
+        d = {}  # GUI 内部で利用
+    else:
+        d = {k.replace('@', '__at__'): v for k, v in d.items()}  # 出力スクリプト中で利用
 
     d.update({
         'Mean': lambda *args: float(mean(args)),

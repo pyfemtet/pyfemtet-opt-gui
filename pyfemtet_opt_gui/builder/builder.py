@@ -25,6 +25,7 @@ def ind(n_indent):
 # pyfemtet.__version__ 等
 def create_message():
     code = '''
+import unicodedata
 import pyfemtet
 print(f' pyfemtet ver{pyfemtet.__version__} imported.')
 print()

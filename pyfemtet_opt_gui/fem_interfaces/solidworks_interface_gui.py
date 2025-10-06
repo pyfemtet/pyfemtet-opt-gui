@@ -156,9 +156,7 @@ class SolidWorksInterfaceGUI(FemtetInterfaceGUI):
         out = dict()
         for eq in equations:
             logger.debug(f'===== {eq} =====')
-            print(eq)
             eq = eq.replace('@', '__at__')
-            print(eq)
             name = get_name_from_equation(eq)
             expr: Expression = get_expression_from_equation(eq)
 

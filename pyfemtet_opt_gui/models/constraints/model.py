@@ -77,6 +77,7 @@ class Constraint:
         self.use: bool = None
         self.name: str = None
         self.expression: str = None
+        self.expression_show: str = None
         self.lb: float | None = None
         self.ub: float | None = None
         self.var_model: 'VariableItemModel' = var_model
@@ -258,9 +259,11 @@ class ConstraintModel(StandardItemModelWithHeader):
                     c = self.get_column_by_header_data(_h)
                     item = QStandardItem()
                     item.setEditable(False)  # 編集不可
-                    item.setText(constraint.expression)  # expression をそのまま表示
-                    item.setData(Expression(constraint.expression),
-                                 Qt.ItemDataRole.UserRole)  # Expression に変換したものを UserRole に保管、finalize 出 Expression 二辺っ巻できることは確定している
+                    item.setText(constraint.expression_show)
+                    item.setData(
+                        Expression(constraint.expression),
+                        Qt.ItemDataRole.UserRole
+                    )  # Expression に変換したものを UserRole に保管、finalize で Expression に変換できることは確定している
                     self.setItem(r, c, item)
 
                 # lb
@@ -328,7 +331,7 @@ class ConstraintModel(StandardItemModelWithHeader):
                 _h = self.ColumnNames.expr
                 c = self.get_column_by_header_data(_h)
                 item = self.item(r, c)
-                expression = item.text()  # expression をそのまま表示
+                expression = item.text().replace('@', '__at__')
 
                 out.expression = expression
 
@@ -400,7 +403,6 @@ class ConstraintModel(StandardItemModelWithHeader):
             # def constraint_0 を定義
             fun_name = f'constraint_{fun_name_counter}'
             with nullcontext():
-
                 funcdef = dict(
                     function=fun_name,
                     args=['_', 'opt_'],
@@ -409,8 +411,16 @@ class ConstraintModel(StandardItemModelWithHeader):
                     commands=None,
 
                     # locals を使いたいので eval を返す
-                    ret=f'eval("{expr._converted_expr_str}", '
-                        f'dict(**locals(), **get_femtet_builtins(var)))',
+                    ret=f'eval('  # noqa
+                            f'unicodedata.normalize("NFKC", "{expr._converted_expr_str}"), '  # __at__ が使われている
+                            'dict('
+                                f'**{{unicodedata.normalize("NFKC", k): v for k, v in locals().items()}}, '
+                                f'**{{'
+                                    f'unicodedata.normalize("NFKC", k): v for k, v in get_femtet_builtins(var).items()'
+                                    f'if k not in {{unicodedata.normalize("NFKC", k_): v_ for k_, v_ in locals().items()}}'
+                                f'}}'
+                            f')'
+                        f')',  # get_femtet_builtins で @ は __at__ に変換される
                 )
 
                 # def の中身を作成

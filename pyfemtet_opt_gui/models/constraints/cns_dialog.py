@@ -71,7 +71,9 @@ class ConstraintEditorDialog(QDialog):
 
         editor = self.ui.plainTextEdit_cnsFormula
         editor.textChanged.connect(
-            lambda: self.update_evaluated_value(editor.toPlainText())
+            lambda: self.update_evaluated_value(
+                editor.toPlainText().replace('@', '__at__')  # gui 内部で完結するので AT にはしなくてよい
+            )
         )
 
         # constraint
@@ -84,7 +86,7 @@ class ConstraintEditorDialog(QDialog):
             if cns.ub is not None:
                 self.ui.lineEdit_ub.setText(str(cns.ub))
             self.ui.plainTextEdit_cnsFormula.setPlainText(
-                cns.expression
+                cns.expression_show
             )
 
     def setup_signal(self, load_femtet_fun: callable):
@@ -289,7 +291,9 @@ class ConstraintEditorDialog(QDialog):
         with nullcontext():
             constraint: Constraint = Constraint(self.original_var_model)
             constraint.name = self.ui.lineEdit_name.text() if self.ui.lineEdit_name.text() != '' else self.constraints.get_unique_name()
-            constraint.expression = self.ui.plainTextEdit_cnsFormula.toPlainText()
+            constraint.name = constraint.name.replace('@', '__at__')  # 念のため。
+            constraint.expression = self.ui.plainTextEdit_cnsFormula.toPlainText().replace('@', '__at__')
+            constraint.expression_show = self.ui.plainTextEdit_cnsFormula.toPlainText()
             constraint.lb = lb_value
             constraint.ub = ub_value
 

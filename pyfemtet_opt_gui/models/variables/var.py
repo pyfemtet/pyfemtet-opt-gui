@@ -18,6 +18,8 @@ import sys
 from contextlib import nullcontext
 from traceback import print_exception
 
+from pyfemtet._util.atmark_support_for_param_name import at, AT
+
 from pyfemtet_opt_gui.ui.ui_WizardPage_var import Ui_WizardPage
 
 from pyfemtet_opt_gui.common.qt_util import *
@@ -26,7 +28,6 @@ from pyfemtet_opt_gui.common.return_msg import *
 from pyfemtet_opt_gui.common.expression_processor import *
 from pyfemtet_opt_gui.common.titles import *
 import pyfemtet_opt_gui.fem_interfaces as fi
-
 
 # ===== model =====
 _VAR_MODEL = None
@@ -280,6 +281,10 @@ class VariableTableViewDelegate(QStyledItemDelegate):
         return super().setModelData(editor, model, index)
 
 
+def convert_to_show(text):
+    return text.replace('__at__', '@')
+
+
 # 大元の ItemModel
 # TODO: 変数の一部が更新されても式を再計算していなくない？
 class VariableItemModel(StandardItemModelWithHeader):
@@ -321,7 +326,8 @@ class VariableItemModel(StandardItemModelWithHeader):
 
                 # self.ColumnNames.name
                 elif key == self.ColumnNames.name:
-                    item.setText(str(value))
+                    item.setText(convert_to_show(str(value)))
+                    item.setData(str(value), Qt.ItemDataRole.UserRole)
                     item.setEditable(False)
 
                 # self.ColumnNames.initial_value
@@ -335,7 +341,7 @@ class VariableItemModel(StandardItemModelWithHeader):
                         or key == self.ColumnNames.step
                 ):
                     if value is not None:
-                        item.setText(str(value))
+                        item.setText(convert_to_show(str(value)))
                         item.setData(Expression(value), Qt.ItemDataRole.UserRole)
 
                 # self.ColumnNames.test_value
@@ -399,7 +405,8 @@ class VariableItemModel(StandardItemModelWithHeader):
                 with nullcontext():
                     c = self.get_column_by_header_data(self.ColumnNames.name)
                     item = QStandardItem()
-                    item.setText(name)
+                    item.setText(convert_to_show(name))
+                    item.setData(name, Qt.ItemDataRole.UserRole)
                     item.setEditable(False)
                     self.setItem(r, c, item)
 
@@ -408,7 +415,7 @@ class VariableItemModel(StandardItemModelWithHeader):
                     # これは Femtet の値を優先して stash から更新しない
                     c = self.get_column_by_header_data(self.ColumnNames.initial_value)
                     item = QStandardItem()
-                    item.setText(expression.expr)
+                    item.setText(convert_to_show(expression.expr))
                     item.setData(expression, Qt.ItemDataRole.UserRole)
                     if expression.is_expression():
                         item.setToolTip('式が文字式であるため編集できません。')
@@ -675,7 +682,7 @@ class VariableItemModel(StandardItemModelWithHeader):
                     continue
 
             # 値を更新
-            name = self.item(r, c_var_name).text()
+            name = self.item(r, c_var_name).data(Qt.ItemDataRole.UserRole)
             self.item(r, c_test_value).setData(str(evaluated_values[name]), Qt.ItemDataRole.DisplayRole)
             # self.item(r, c_test_value).setData(expressions[name], Qt.ItemDataRole.UserRole)  # なくてもいいはず
 
@@ -704,7 +711,7 @@ class VariableItemModel(StandardItemModelWithHeader):
                     continue
 
             # 変数名: 値 の dict を作成
-            var_name = self.item(r, c_var_name).text()
+            var_name = self.item(r, c_var_name).data(Qt.ItemDataRole.UserRole)
             value = self.item(r, c_test_value).text()
             variables.update(
                 {var_name: value}
@@ -730,7 +737,7 @@ class VariableItemModel(StandardItemModelWithHeader):
             c_value = self.get_column_by_header_data(self.ColumnNames.initial_value)
         out = dict()
         for r in iterable:
-            name = self.item(r, c_name).text()
+            name = self.item(r, c_name).data(Qt.ItemDataRole.UserRole)
             index = self.index(r, c_value)
             expr: Expression = self.data(index, Qt.ItemDataRole.UserRole)
             out.update({name: expr})
@@ -776,7 +783,7 @@ class VariableItemModel(StandardItemModelWithHeader):
                 with nullcontext():
                     item = self.item(r, self.get_column_by_header_data(self.ColumnNames.name))
                     args_object.update(
-                        dict(name=f'"{item.text()}"')
+                        dict(name=f'"{item.data(Qt.ItemDataRole.DisplayRole)}"')
                     )
 
                 # fun
@@ -786,13 +793,24 @@ class VariableItemModel(StandardItemModelWithHeader):
                     if expr.is_number():
                         value = f'lambda: {expr.value}'
                     else:
-                        args = list(expr.dependencies)
+                        # 必要な変数名に含まれる at を gui 仕様から pyfemtet 仕様に変換
+                        args = [name.replace('__at__', AT) for name in list(expr.dependencies)]
                         # lambda <args>: eval('<expr>', locals=...)
+                        expression = expr.expr.replace('__at__', AT)
                         value = (
-                                'lambda '
-                                + ', '.join(args)
-                                + ': '
-                                + f'eval("{expr.expr}", dict(**locals(), **get_femtet_builtins()))'
+                            'lambda '
+                            + ', '.join(args)
+                            + ': '
+                            + f'eval('  # noqa
+                                  f'unicodedata.normalize("NFKC", "{expression}"), '
+                                  'dict('
+                                      f'**{{unicodedata.normalize("NFKC", k): v for k, v in locals().items()}}, '
+                                      f'**{{'
+                                          f'unicodedata.normalize("NFKC", k): v for k, v in get_femtet_builtins().items()'
+                                          f'if k not in {{unicodedata.normalize("NFKC", k_): v_ for k_, v_ in locals().items()}}'
+                                      f'}}'
+                                  f')'
+                              f')'
                         )
                     args_object.update(
                         dict(fun=value)
@@ -818,7 +836,7 @@ class VariableItemModel(StandardItemModelWithHeader):
                 with nullcontext():
                     item = self.item(r, self.get_column_by_header_data(self.ColumnNames.name))
                     args_object.update(
-                        dict(name=f'"{item.text()}"')
+                        dict(name=f'"{item.data(Qt.ItemDataRole.DisplayRole)}"')
                     )
 
                 # initial_value
@@ -887,7 +905,7 @@ class VariableItemModel(StandardItemModelWithHeader):
                 with nullcontext():
                     item = self.item(r, self.get_column_by_header_data(self.ColumnNames.name))
                     args_object.update(
-                        dict(name=f'"{item.text()}"')
+                        dict(name=f'"{item.data(Qt.ItemDataRole.DisplayRole)}"')
                     )
 
                 # fun
@@ -974,7 +992,7 @@ class VariableItemModel(StandardItemModelWithHeader):
             args_object.update(
                 dict(
                     name=f'"constraint_{item_name.data(Qt.ItemDataRole.UserRole)}"',
-                    fun=f'lambda _, opt_: opt_.get_variables()["{item_name.data(Qt.ItemDataRole.UserRole)}"]',
+                    fun=f'lambda _, opt_: opt_.get_variables()["{item_name.data(Qt.ItemDataRole.DisplayRole)}"]',
                     lower_bound=lb,
                     upper_bound=ub,
                     strict=True,
