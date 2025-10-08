@@ -15,6 +15,7 @@ from pyfemtet._util.solidworks_variable import SolidworksVariableManager
 
 import pyfemtet_opt_gui
 from pyfemtet_opt_gui.common.expression_processor import Expression
+from pyfemtet_opt_gui.common.symbol_support import convert, revert
 from pyfemtet_opt_gui.common.return_msg import *
 from pyfemtet_opt_gui.fem_interfaces.femtet_interface_gui import (
     _search_process,
@@ -47,7 +48,7 @@ def get_name_from_equation(equation: str):
     pattern = r'^\s*"(.+?)"\s*$'  # " で囲まれた中身
     matched = re.match(pattern, equation.split('=')[0])
     if matched:
-        return matched.group(1)
+        return convert(matched.group(1))
     else:
         return None
 
@@ -55,8 +56,27 @@ def get_name_from_equation(equation: str):
 def get_expression_from_equation(equation: str):
     assert '=' in equation
     expression: str = equation.removeprefix(equation.split('=')[0] + '=')  # 最初の = 以降を取得
-    expression = expression.replace('"', '')  # SW では式中の変数を " で囲む
-    expr: Expression = Expression(expression)
+    print()
+    print(expression)
+
+    # # 1) 式全体が "..." だけの場合
+    # whole_match = re.match(r'^\s*"(.+?)"\s*$', expression)  # " で囲まれた中身
+    # if whole_match:
+    #     inner = whole_match.group(1)
+    #     converted_expression = f'"{convert(inner)}"'
+
+    # 2) 部分的に "..." が含まれる場合：すべての "..." を convert して置換
+    def repl(m: re.Match) -> str:
+        inner = m.group(1)
+        return f'"{convert(inner)}"'
+
+    # 非貪欲で " 内だけを拾う
+    converted_expression = re.sub(r'"(.+?)"', repl, expression)
+    print(converted_expression)
+
+    # " を消す
+    converted_expression = converted_expression.replace('"', '')
+    expr: Expression = Expression(converted_expression)
     return expr
 
 
@@ -156,10 +176,11 @@ class SolidWorksInterfaceGUI(FemtetInterfaceGUI):
         out = dict()
         for eq in equations:
             logger.debug(f'===== {eq} =====')
-            eq = eq.replace('@', '__at__')
             name = get_name_from_equation(eq)
             expr: Expression = get_expression_from_equation(eq)
 
+            # if expr.is_number():
+            #     out.update({name: expr})
             out.update({name: expr})
 
         return out, ReturnMsg.no_message
@@ -179,14 +200,14 @@ class SolidWorksInterfaceGUI(FemtetInterfaceGUI):
             return ret_msg, ''
 
         # Construct SWVariables:
-        x = {name.replace('__at__', '@'): str(expression).replace('__at__', '@') for name, expression in variables.items()}
+        x = {revert(name): revert(str(expression)) for name, expression in variables.items()}
 
         # Update variables
         mgr = SolidworksVariableManager(logger)
         mgr.update_global_variables_recourse(swModel=swModel, x=x)
 
         # Check the variables updated
-        remaining_variables = (set(variables.keys()) - mgr.updated_objects)
+        remaining_variables = (set(x.keys()) - mgr.updated_objects)
         if len(remaining_variables) > 0:
             return ReturnMsg.Error.sw_remaining_variable, ','.join(remaining_variables)
 

@@ -252,7 +252,7 @@ def get_dependency(expr_str):
 
     except Exception as e:
         print_exception(e)
-        raise ExpressionParseError(str(e)) from e
+        raise ExpressionParseError(expr_str) from e
 
 
 def get_cad_buitlins():
@@ -321,7 +321,7 @@ class Expression:
 
         # 変換できたら dependency を取得
         try:
-            self.dependencies = get_dependency(self._converted_expr_str)
+            self.dependencies: set[str] = get_dependency(self._converted_expr_str)
             self.is_valid = True
 
         except ExpressionParseError as e:
@@ -417,23 +417,66 @@ def eval_expressions(expressions: dict[str, Expression | float | str]) -> tuple[
         if not isinstance(expression_, Expression):
             expressions[key] = Expression(expression_)
 
+    # Solidworks 対応:
+    #   param@Part1 のように、 @ を利用して
+    #   変数に suffix がついている場合はここで修正
+    fixed_expressions: dict[str, Expression] = dict()
+    for key, expression in expressions.items():
+        dependencies = expression.dependencies
+        expr_str = expression.expr
+        for dependency in dependencies:
+            # dependency を後ろから @ で区切っていき
+            # ほかの key と一致するならば
+            # それを採用
+            parts = dependency.split('__at__')
+            for i in range(len(parts))[::-1]:
+                # @ で区切った名前
+                temp_name = '__at__'.join(parts[:i+1])
+                # それが expressions の keys に一致すれば
+                if temp_name in expressions.keys():
+                    # expr_str に含まれる @ で区切る前の変数名を
+                    # @ で区切ったものにリネームして次の dependency へ
+                    print(expr_str)
+                    expr_str = expr_str.replace(dependency, temp_name)
+                    print('↓')
+                    print(expr_str)
+                    print()
+                    break
+        # 変数名を修正した expr_str を用いて Expression を作り直す
+        fixed_expression = Expression(expr_str)
+        fixed_expressions.update(
+            {key: fixed_expression}
+        )
+    expressions = fixed_expressions
+    print(1)
+
     # 不明な変数を参照していればエラー
     expression: Expression
     for key, expression in expressions.items():
+        print("1", key, expression.expr, expression.dependencies)
         for var_name in expression.dependencies:
+            print("2", var_name)
             if var_name not in expressions:
                 error_keys.append(f"{key}: {var_name}")  # error!
+
+    print(2)
 
     # エラーがあれば終了
     if len(error_keys) > 0:
         return {}, ReturnMsg.Error.unknown_var_name, f': {error_keys}'
 
+    print(3)
+
     # トポロジカルソート
     evaluation_order = topological_sort(expressions)
+
+    print(4)
 
     # ソート順に評価
     evaluated_value = {}
     for key in evaluation_order:
+
+        print('eval', key)
 
         # 評価
         expression = expressions[key]

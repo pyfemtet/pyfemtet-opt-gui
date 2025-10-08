@@ -17,7 +17,8 @@ from pyfemtet_opt_gui.common.qt_util import *
 from pyfemtet_opt_gui.common.expression_processor import *
 from pyfemtet_opt_gui.common.pyfemtet_model_bases import *
 from pyfemtet_opt_gui.common.return_msg import *
-from pyfemtet_opt_gui.models.variables.var import VariableItemModel, get_var_model
+from pyfemtet_opt_gui.common.symbol_support import convert
+from pyfemtet_opt_gui.models.variables.var import VariableItemModel, get_var_model  # noqa
 
 import enum
 from contextlib import nullcontext
@@ -331,7 +332,7 @@ class ConstraintModel(StandardItemModelWithHeader):
                 _h = self.ColumnNames.expr
                 c = self.get_column_by_header_data(_h)
                 item = self.item(r, c)
-                out.expression = item.text().replace('@', '__at__')
+                out.expression = convert(item.text())
                 out.expression_show = item.text()
 
             # lb

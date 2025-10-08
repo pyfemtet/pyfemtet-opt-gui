@@ -18,6 +18,7 @@ from pyfemtet_opt_gui.ui.ui_Dialog_cns_edit import Ui_Dialog
 from pyfemtet_opt_gui.common.qt_util import *
 from pyfemtet_opt_gui.common.return_msg import *
 from pyfemtet_opt_gui.common.expression_processor import *
+from pyfemtet_opt_gui.common.symbol_support import convert
 
 from pyfemtet_opt_gui.models.variables.var import get_var_model, VariableItemModelForTableView, VariableItemModel, VariableTableViewDelegate
 from pyfemtet_opt_gui.models.constraints.model import get_cns_model, ConstraintModel, Constraint
@@ -291,8 +292,8 @@ class ConstraintEditorDialog(QDialog):
         with nullcontext():
             constraint: Constraint = Constraint(self.original_var_model)
             constraint.name = self.ui.lineEdit_name.text() if self.ui.lineEdit_name.text() != '' else self.constraints.get_unique_name()
-            constraint.name = constraint.name.replace('@', '__at__')  # 念のため。
-            constraint.expression = self.ui.plainTextEdit_cnsFormula.toPlainText().replace('@', '__at__')
+            constraint.name = convert(constraint.name)  # 念のため。
+            constraint.expression = convert(self.ui.plainTextEdit_cnsFormula.toPlainText())
             constraint.expression_show = self.ui.plainTextEdit_cnsFormula.toPlainText()
             constraint.lb = lb_value
             constraint.ub = ub_value

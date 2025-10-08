@@ -18,7 +18,7 @@ import sys
 from contextlib import nullcontext
 from traceback import print_exception
 
-from pyfemtet._util.atmark_support_for_param_name import at, AT
+from pyfemtet._util.symbol_support_for_param_name import AT, HYPHEN, DOT
 
 from pyfemtet_opt_gui.ui.ui_WizardPage_var import Ui_WizardPage
 
@@ -27,6 +27,7 @@ from pyfemtet_opt_gui.common.pyfemtet_model_bases import *
 from pyfemtet_opt_gui.common.return_msg import *
 from pyfemtet_opt_gui.common.expression_processor import *
 from pyfemtet_opt_gui.common.titles import *
+from pyfemtet_opt_gui.common.symbol_support import convert, revert
 import pyfemtet_opt_gui.fem_interfaces as fi
 
 # ===== model =====
@@ -281,10 +282,6 @@ class VariableTableViewDelegate(QStyledItemDelegate):
         return super().setModelData(editor, model, index)
 
 
-def convert_to_show(text):
-    return text.replace('__at__', '@')
-
-
 # 大元の ItemModel
 # TODO: 変数の一部が更新されても式を再計算していなくない？
 class VariableItemModel(StandardItemModelWithHeader):
@@ -326,7 +323,7 @@ class VariableItemModel(StandardItemModelWithHeader):
 
                 # self.ColumnNames.name
                 elif key == self.ColumnNames.name:
-                    item.setText(convert_to_show(str(value)))
+                    item.setText(revert(str(value)))
                     item.setData(str(value), Qt.ItemDataRole.UserRole)
                     item.setEditable(False)
 
@@ -341,7 +338,7 @@ class VariableItemModel(StandardItemModelWithHeader):
                         or key == self.ColumnNames.step
                 ):
                     if value is not None:
-                        item.setText(convert_to_show(str(value)))
+                        item.setText(revert(str(value)))
                         item.setData(Expression(value), Qt.ItemDataRole.UserRole)
 
                 # self.ColumnNames.test_value
@@ -405,7 +402,7 @@ class VariableItemModel(StandardItemModelWithHeader):
                 with nullcontext():
                     c = self.get_column_by_header_data(self.ColumnNames.name)
                     item = QStandardItem()
-                    item.setText(convert_to_show(name))
+                    item.setText(revert(name))
                     item.setData(name, Qt.ItemDataRole.UserRole)
                     item.setEditable(False)
                     self.setItem(r, c, item)
@@ -415,7 +412,7 @@ class VariableItemModel(StandardItemModelWithHeader):
                     # これは Femtet の値を優先して stash から更新しない
                     c = self.get_column_by_header_data(self.ColumnNames.initial_value)
                     item = QStandardItem()
-                    item.setText(convert_to_show(expression.expr))
+                    item.setText(revert(expression.expr))
                     item.setData(expression, Qt.ItemDataRole.UserRole)
                     if expression.is_expression():
                         item.setToolTip('式が文字式であるため編集できません。')
@@ -793,10 +790,21 @@ class VariableItemModel(StandardItemModelWithHeader):
                     if expr.is_number():
                         value = f'lambda: {expr.value}'
                     else:
-                        # 必要な変数名に含まれる at を gui 仕様から pyfemtet 仕様に変換
-                        args = [name.replace('__at__', AT) for name in list(expr.dependencies)]
+                        # 必要な変数名に含まれる 記号 を gui 仕様から pyfemtet 仕様に変換
+                        args = [
+                            name
+                            .replace('__at__', AT)
+                            .replace('__dot__', DOT)
+                            .replace('__hyphen__', HYPHEN)
+                            for name in list(expr.dependencies)
+                        ]
                         # lambda <args>: eval('<expr>', locals=...)
-                        expression = expr.expr.replace('__at__', AT)
+                        expression = (
+                            expr.expr
+                            .replace('__at__', AT)
+                            .replace('__dot__', DOT)
+                            .replace('__hyphen__', HYPHEN)
+                        )
                         value = (
                             'lambda '
                             + ', '.join(args)
@@ -975,7 +983,8 @@ class VariableItemModel(StandardItemModelWithHeader):
             item_ub = self.item(r, c_ub)
 
             # item が expression でなければ無視
-            if not Expression(item_expression.text()).is_expression():
+            expression = item_expression.data(Qt.ItemDataRole.UserRole)
+            if not expression.is_expression():
                 continue
 
             # lb, ub
