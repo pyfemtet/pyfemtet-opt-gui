@@ -179,9 +179,9 @@ class SolidWorksInterfaceGUI(FemtetInterfaceGUI):
             name = get_name_from_equation(eq)
             expr: Expression = get_expression_from_equation(eq)
 
-            # if expr.is_number():
-            #     out.update({name: expr})
-            out.update({name: expr})
+            if expr.is_number():
+                out.update({name: expr})
+            # out.update({name: expr})
 
         return out, ReturnMsg.no_message
 
