@@ -7,6 +7,7 @@ import json
 from PySide6.QtCore import Qt
 from pytestqt.qtbot import QtBot
 
+import pyfemtet_opt_gui.fem_interfaces  # noqa  # expression_processor の import error の暫定対策
 import pyfemtet_opt_gui.models.config.config as cfg_mod  # for monkeypatch
 from pyfemtet_opt_gui.models.config.config import (
     get_config_model, ConfigItemModel, ConfigWizardPage, QConfigItemModelForProblem, ConfigHeaderNames,

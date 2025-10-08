@@ -1,4 +1,5 @@
 from pyfemtet_opt_gui.common.return_msg import ReturnMsg
+import pyfemtet_opt_gui.fem_interfaces  # noqa  # expression_processor の import error の暫定対策
 from pyfemtet_opt_gui.common.expression_processor import Expression, eval_expressions
 
 
@@ -47,5 +48,5 @@ def test_2():
 
 
 if __name__ == '__main__':
-    test_1()
+    # test_1()
     test_2()

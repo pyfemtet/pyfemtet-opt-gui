@@ -1,5 +1,6 @@
 from pyfemtet_opt_gui.common.qt_util import *
 
+import pyfemtet_opt_gui.fem_interfaces  # noqa  # expression_processor の import error の暫定対策
 from pyfemtet_opt_gui.models.constraints.model import *
 from pyfemtet_opt_gui.models.constraints.model import _reset_cns_model
 import pyfemtet_opt_gui.models.constraints.cns as cns_mod  # for monkey patch

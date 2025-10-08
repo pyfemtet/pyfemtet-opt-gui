@@ -1,8 +1,14 @@
 # noinspection PyUnresolvedReferences
-from time import sleep
 from femtetutils import util
-from pyfemtet_opt_gui.models.variables.var import *
-from pyfemtet_opt_gui.models.variables.var import _reset_var_model
+import pyfemtet_opt_gui.fem_interfaces  # noqa  # expression_processor の import error の暫定対策
+from PySide6.QtCore import Qt
+from PySide6.QtWidgets import QMessageBox
+from pyfemtet_opt_gui.models.variables.var import (
+    VariableColumnNames,
+    _reset_var_model,
+    VariableWizardPage,
+)
+from pyfemtet_opt_gui.common.return_msg import ReturnMsg
 import pyfemtet_opt_gui.fem_interfaces as fi
 
 from pytestqt.qtbot import QtBot
