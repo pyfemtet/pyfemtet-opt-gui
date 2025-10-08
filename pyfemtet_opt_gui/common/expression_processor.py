@@ -297,7 +297,7 @@ class Expression:
         # 最低限の整形を行う
         if isinstance(self._expr, str):
             # Femtet, SW ではスペース削除可
-            self._expr = self._expr.replace(' ', '')
+            self._expr = self._expr.strip()
 
         # 単位があれば分離
         if isinstance(self._expr, str):
