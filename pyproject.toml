@@ -8,7 +8,7 @@ readme = "README.md"
 license = "LGPL-3.0"
 dependencies = [
     "pyside6>=6.7.1, <6.9.0",
-    "pyfemtet>=0.8.10,<2.0.0",
+    "pyfemtet>=1.2.0,<2.0.0",
 ]
 
 [project.urls]
@@ -32,6 +32,3 @@ dev = [
 
 [tool.hatch.version]
 source = "uv-dynamic-versioning"
-
-[tool.uv.sources]
-pyfemtet = { path = "../pyfemtet", editable = true }
