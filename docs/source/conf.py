@@ -17,6 +17,7 @@ extensions = []
 
 exclude_patterns = []
 
+language = 'ja'
 
 
 # -- Options for HTML output -------------------------------------------------

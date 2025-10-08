@@ -1,17 +1,37 @@
-Introduction
-============
+はじめに
+========
 
-Overview of pyfemtet.opt
-------------------------
-pyfemtet.opt is a GUI tool for optimization design using Femtet. It provides an intuitive interface for setting up, running, and analyzing optimization tasks.
+pyfemtet-opt-gui は、Femtet の拡張機能として pyfemtet.opt ライブラリを用いた最適設計を支援する GUI ツールです。
+また、Solidworks との連携機能も備えています。
 
-Key Features
-------------
-- User-friendly GUI for optimization workflows
-- Integration with Femtet project files
-- Support for various optimization algorithms
+このドキュメントでは、インストール方法から基本的な使い方、Femtet最適化機能・Solidworks連携機能の詳細、サンプルやトラブルシューティングまでを解説します。
 
-Project Goals
--------------
-- Simplify optimization design with Femtet
-- Provide extensible and maintainable codebase
+
+概要
+----
+pyfemtet-opt-gui は、pyfemtet.opt を用いた最適化プログラムを
+コーディングなしで GUI から作成・実行できる設計エンジニア向けの支援ツールです。
+
+本ツールは、Femtet を用いた最適化だけでなく、
+Solidworks との連携機能も備えています
+（ただし Solidworks 連携時は一部機能が制限されます）。
+
+Femtet最適化機能やSolidworks統合の詳細については、
+詳細については、
+`pyfemtet.opt の公式サイト <https://pyfemtet.readthedocs.io/ja/stable/>`_
+もご参照ください。
+
+
+開発背景
+--------
+設計現場から「コーディングせずに最適化を実施したい」という要望があり、
+その補助ツールとして開発されました。
+
+
+サポート環境・注意事項
+----------------------
+- サポートFemtetバージョン: 2023.1 以降
+- サポートpyfemtetバージョン: 1.2.0 以降
+- Solidworks: 開発は2023で行われています。必須ソフトウェアではありません。
+- 本プログラムは Python スクリプトとして動作します。一般的なアプリケーションのようなインストール作業は不要です。
+

@@ -1,0 +1,50 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, pyfemtet
+# This file is distributed under the same license as the pyfemtet-opt-gui
+# package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: pyfemtet-opt-gui \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-08 20:25+0900\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/solidworks_integration.rst:2
+msgid "Solidworks連携機能の使い方"
+msgstr ""
+
+#: ../../source/solidworks_integration.rst:4
+msgid "この章では、Solidworks 連携機能の概要と使い方、利用可能な機能や制限事項について説明します。"
+msgstr ""
+
+#: ../../source/solidworks_integration.rst:6
+msgid "連携の概要"
+msgstr ""
+
+#: ../../source/solidworks_integration.rst:7
+msgid "使える機能・制限事項"
+msgstr ""
+
+#: ../../source/solidworks_integration.rst:8
+msgid "操作手順"
+msgstr ""
+
+#: ../../source/solidworks_integration.rst:9
+msgid "注意点"
+msgstr ""
+
+#: ../../source/solidworks_integration.rst:11
+msgid "Solidworks連携時は一部機能が制限されます。"
+msgstr ""
+

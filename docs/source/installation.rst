@@ -1,18 +1,19 @@
-Installation
-============
+インストール方法
+=============
 
-System Requirements
--------------------
-- Windows OS
-- Python 3.8 or later
-- Femtet installed
+必要な環境
+----------
+- Python 3.8 以降
+- Femtet（Femtet最適化機能を利用する場合）
+- Solidworks（Solidworks連携機能を利用する場合）
 
-Installation Steps
-------------------
-1. Clone the repository.
-2. Install dependencies: `pip install -r requirements.txt`
-3. Run the application.
+インストール手順
+----------------
+1. Python仮想環境の作成（推奨）
+2. 必要なパッケージのインストール
+3. 本ツールの配置
 
-Dependencies
-------------
-- See `requirements.txt` for details.
+動作確認
+--------
+- サンプルプロジェクトの起動
+- GUIの起動確認

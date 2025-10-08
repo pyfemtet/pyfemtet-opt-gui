@@ -1,20 +1,16 @@
 [https://www.sphinx-doc.org/ja/master/usage/advanced/intl.html]
 
-### Make .pot
+### Make .pot and .po
 
-uv run .\make.bat gettext
-
-
-### Make .po
-
-uv run sphinx-intl update -p .\build\gettext -l ja
+uv run sphinx-build -b gettext .\source .\build\gettext
+uv run sphinx-intl update -p .\build\gettext --language=en --line-width=-1
 
 
 ### Build .mo
 
-uv run sphinx-intl build --language ja
+uv run sphinx-intl build --language en
 
 
 ### Rebuild docs
 
-uv run sphinx-build -b html .\source .\build\html -D language=ja
+uv run sphinx-build -b html .\source .\build\html -D language=en

@@ -4,23 +4,20 @@
    contain the root `toctree` directive.
 
 
-pyfemtet.opt Documentation
-==========================
-
-Welcome to the documentation for pyfemtet-opt-gui,
-a GUI tool for optimization design using Femtet.
+pyfemtet-opt-gui documentation
+==============================
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: 目次
 
    introduction
    installation
-   quick_start
-   user_guide
-   advanced_usage
-   models_and_algorithms
+   quickstart
+   usage
+   femtet_optimization
+   solidworks_integration
+   samples_and_tutorials
    troubleshooting
-   license_and_credits
-   changelog
+   references
 

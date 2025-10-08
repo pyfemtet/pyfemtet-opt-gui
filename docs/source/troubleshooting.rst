@@ -1,10 +1,7 @@
-Troubleshooting & FAQ
-=====================
+トラブルシューティング
+==================
 
-Common Issues and Solutions
---------------------------
-- List of common problems and how to resolve them.
+この章では、よくある質問やエラーとその対処法についてまとめます。
 
-Error Messages
---------------
-- Explanation of frequent error messages.
+- よくある質問
+- エラーと対処法
