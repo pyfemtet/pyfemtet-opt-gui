@@ -1,1 +1,1 @@
-﻿"common_variable" = 2.0223715563438835
+﻿"common_variable" = 2.0223715563438835
