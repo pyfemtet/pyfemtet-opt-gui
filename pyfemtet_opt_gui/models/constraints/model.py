@@ -331,9 +331,8 @@ class ConstraintModel(StandardItemModelWithHeader):
                 _h = self.ColumnNames.expr
                 c = self.get_column_by_header_data(_h)
                 item = self.item(r, c)
-                expression = item.text().replace('@', '__at__')
-
-                out.expression = expression
+                out.expression = item.text().replace('@', '__at__')
+                out.expression_show = item.text()
 
             # lb
             with nullcontext():
