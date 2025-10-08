@@ -436,11 +436,7 @@ def eval_expressions(expressions: dict[str, Expression | float | str]) -> tuple[
                 if temp_name in expressions.keys():
                     # expr_str に含まれる @ で区切る前の変数名を
                     # @ で区切ったものにリネームして次の dependency へ
-                    print(expr_str)
                     expr_str = expr_str.replace(dependency, temp_name)
-                    print('↓')
-                    print(expr_str)
-                    print()
                     break
         # 変数名を修正した expr_str を用いて Expression を作り直す
         fixed_expression = Expression(expr_str)
@@ -448,35 +444,24 @@ def eval_expressions(expressions: dict[str, Expression | float | str]) -> tuple[
             {key: fixed_expression}
         )
     expressions = fixed_expressions
-    print(1)
 
     # 不明な変数を参照していればエラー
     expression: Expression
     for key, expression in expressions.items():
-        print("1", key, expression.expr, expression.dependencies)
         for var_name in expression.dependencies:
-            print("2", var_name)
             if var_name not in expressions:
                 error_keys.append(f"{key}: {var_name}")  # error!
-
-    print(2)
 
     # エラーがあれば終了
     if len(error_keys) > 0:
         return {}, ReturnMsg.Error.unknown_var_name, f': {error_keys}'
 
-    print(3)
-
     # トポロジカルソート
     evaluation_order = topological_sort(expressions)
-
-    print(4)
 
     # ソート順に評価
     evaluated_value = {}
     for key in evaluation_order:
-
-        print('eval', key)
 
         # 評価
         expression = expressions[key]

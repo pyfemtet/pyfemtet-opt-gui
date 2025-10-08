@@ -140,10 +140,7 @@ class ConstraintWizardPage(TitledWizardPage):
             parent=self.parent(),
         )
         if should_delete:
-            print(self.source_model.rowCount())
             self.source_model.delete_constraint(name)
-            print(self.source_model.rowCount())
-            print()
         else:
             pass
 

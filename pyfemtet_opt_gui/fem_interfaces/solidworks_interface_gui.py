@@ -56,8 +56,6 @@ def get_name_from_equation(equation: str):
 def get_expression_from_equation(equation: str):
     assert '=' in equation
     expression: str = equation.removeprefix(equation.split('=')[0] + '=')  # 最初の = 以降を取得
-    print()
-    print(expression)
 
     # # 1) 式全体が "..." だけの場合
     # whole_match = re.match(r'^\s*"(.+?)"\s*$', expression)  # " で囲まれた中身
@@ -72,7 +70,6 @@ def get_expression_from_equation(equation: str):
 
     # 非貪欲で " 内だけを拾う
     converted_expression = re.sub(r'"(.+?)"', repl, expression)
-    print(converted_expression)
 
     # " を消す
     converted_expression = converted_expression.replace('"', '')
