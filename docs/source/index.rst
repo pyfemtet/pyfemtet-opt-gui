@@ -7,6 +7,9 @@
 pyfemtet-opt-gui documentation
 ==============================
 
+pyfemtet-opt-gui のドキュメントです。
+
+
 .. toctree::
    :maxdepth: 2
    :caption: 目次
@@ -15,9 +18,7 @@ pyfemtet-opt-gui documentation
    installation
    quickstart
    usage
-   femtet_optimization
    solidworks_integration
-   samples_and_tutorials
    troubleshooting
    references
 

@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pyfemtet-opt-gui \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-08 20:25+0900\n"
+"POT-Creation-Date: 2025-10-09 13:18+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -22,17 +22,28 @@ msgstr ""
 
 #: ../../source/references.rst:2
 msgid "参考文献・リンク"
-msgstr ""
+msgstr "References & Links"
 
 #: ../../source/references.rst:4
 msgid "関連プロジェクト"
-msgstr ""
+msgstr "Related Projects"
 
-#: ../../source/references.rst:5
+#: ../../source/references.rst:6
+msgid "pyfemtet: `https://pyfemtet.readthedocs.io/ja/stable/ <https://pyfemtet.readthedocs.io/ja/stable/>`_"
+msgstr "pyfemtet: `https://pyfemtet.readthedocs.io/en/stable/ <https://pyfemtet.readthedocs.io/en/stable/>`_"
+
+#: ../../source/references.rst:8
 msgid "外部リンク"
-msgstr ""
+msgstr "External Links"
 
-#: ../../source/references.rst:7
-msgid "Femtet, Solidworks, pyfemtet.opt などの公式サイトや参考資料へのリンクを掲載します。"
-msgstr ""
+#: ../../source/references.rst:10
+msgid "murata software: `https://www.muratasoftware.com/ <https://www.muratasoftware.com/>`_"
+msgstr "murata software: `https://www.muratasoftware.com/ <https://www.muratasoftware.com/>`_"
+
+#: ../../source/references.rst:11
+msgid "Python: `https://www.python.org/ <https://www.python.org/>`_"
+msgstr "Python: `https://www.python.org/ <https://www.python.org/>`_"
+
+#~ msgid "Femtet, Solidworks, pyfemtet.opt などの公式サイトや参考資料へのリンクを掲載します。"
+#~ msgstr ""
 

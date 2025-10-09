@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pyfemtet-opt-gui \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-08 20:25+0900\n"
+"POT-Creation-Date: 2025-10-09 12:20+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -20,12 +20,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: ../../source/index.rst:10
+#: ../../source/index.rst:13
 msgid "目次"
 msgstr ""
 
 #: ../../source/index.rst:8
-#, fuzzy
 msgid "pyfemtet-opt-gui documentation"
-msgstr "pyfemtet.opt Documentation 英語版"
+msgstr ""
+
+#: ../../source/index.rst:10
+msgid "pyfemtet-opt-gui のドキュメントです。"
+msgstr "The documentation of pyfemtet-opt-gui. **Note that the application is Japanese only**."
 

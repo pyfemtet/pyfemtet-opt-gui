@@ -1,7 +1,11 @@
 参考文献・リンク
-=============
+================
 
 - 関連プロジェクト
+
+  - pyfemtet: `https://pyfemtet.readthedocs.io/ja/stable/ <https://pyfemtet.readthedocs.io/ja/stable/>`_
+
 - 外部リンク
 
-Femtet, Solidworks, pyfemtet.opt などの公式サイトや参考資料へのリンクを掲載します。
+  - murata software: `https://www.muratasoftware.com/ <https://www.muratasoftware.com/>`_
+  - Python: `https://www.python.org/ <https://www.python.org/>`_
