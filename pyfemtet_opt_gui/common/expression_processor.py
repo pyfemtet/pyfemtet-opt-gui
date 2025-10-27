@@ -163,7 +163,7 @@ def check_expr_str_and_bounds(
 
     # expression が None ならエラー
     if expr_str is None:
-        return ReturnMsg.Error.cannot_recognize_as_an_expression, '式が入力されていません。'
+        return (ReturnMsg.Error.cannot_recognize_as_an_expression, QCoreApplication.translate('pyfemtet_opt_gui.common.expression_processor', '式が入力されていません。'))
 
     # expression が None でなくとも
     # Expression にできなければエラー

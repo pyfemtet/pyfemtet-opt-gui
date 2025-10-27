@@ -28,6 +28,9 @@ build-backend = "hatchling.build"
 dev = [
     "pytest>=8.3.5",
     "pytest-qt>=4.4.0",
+    "sphinx==8.2.3",  # Should copy to docs/requirements.txt
+    "sphinx-intl==2.3.2",  # Should copy to docs/requirements.txt
+    "sphinx-rtd-theme==3.0.2",  # Should copy to docs/requirements.txt
 ]
 
 [tool.hatch.version]

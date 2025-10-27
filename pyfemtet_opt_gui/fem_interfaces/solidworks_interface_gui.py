@@ -10,6 +10,7 @@ from pythoncom import CoInitialize, CoUninitialize
 
 # noinspection PyUnresolvedReferences
 from PySide6.QtWidgets import *
+from PySide6.QtCore import QCoreApplication
 
 from pyfemtet._util.solidworks_variable import SolidworksVariableManager
 
@@ -81,17 +82,20 @@ class SolidWorksInterfaceGUI(FemtetInterfaceGUI):
 
     # ===== process & object handling =====
     @classmethod
-    def get_femtet(cls, progress: QProgressDialog = None) -> tuple[CDispatch | None, ReturnType]:
+    def get_femtet(cls, progress: QProgressDialog | None = None) -> tuple[CDispatch | None, ReturnType]:
         cls.get_sw(progress)
         return FemtetInterfaceGUI.get_femtet(progress)
 
     @classmethod
-    def get_sw(cls, progress: QProgressDialog = None) -> tuple[CDispatch | None, ReturnType]:
+    def get_sw(cls, progress: QProgressDialog | None = None) -> tuple[CDispatch | None, ReturnType]:
 
         global _sw
 
         if progress is not None:
-            progress.setLabelText('Solidworks を起動しています...')
+            progress.setLabelText(QCoreApplication.translate(
+                'pyfemtet_opt_gui.fem_interfaces.solidworks_interface_gui',
+                'Solidworks を起動しています...'
+            ))
 
         should_restart = False
 
@@ -105,7 +109,10 @@ class SolidWorksInterfaceGUI(FemtetInterfaceGUI):
 
         # 再起動する
         if should_restart:
-            logger.info('Solidworks を起動しています。')
+            logger.info(QCoreApplication.translate(
+                'pyfemtet_opt_gui.fem_interfaces.solidworks_interface_gui',
+                'Solidworks を起動しています。'
+            ))
             succeeded = launch_solidworks()
 
         else:
@@ -280,7 +287,10 @@ class SolidWorksInterfaceGUI(FemtetInterfaceGUI):
 
         swDoc = _sw.ActiveDoc
         if swDoc is None:
-            return '.sldprt ファイルが開かれていません', ReturnMsg.no_message
+            return QCoreApplication.translate(
+                'pyfemtet_opt_gui.fem_interfaces.solidworks_interface_gui',
+                '.sldprt ファイルが開かれていません'
+            ), ReturnMsg.no_message
 
         path = swDoc.GetPathName
         if path is None or not os.path.isfile(path):
@@ -314,10 +324,13 @@ class SolidWorksInterfaceGUI(FemtetInterfaceGUI):
         return True, (ReturnMsg.no_message, '')
 
     @classmethod
-    def open_sample(cls, progress: QProgressDialog = None) -> tuple[ReturnType, str]:
+    def open_sample(cls, progress: QProgressDialog | None = None) -> tuple[ReturnType, str]:
 
         if progress is not None:
-            progress.setLabelText('Femtet のサンプルファイルを開いています...')
+            progress.setLabelText(QCoreApplication.translate(
+                'pyfemtet_opt_gui.fem_interfaces.solidworks_interface_gui',
+                'Femtet のサンプルファイルを開いています...'
+            ))
 
         # get path
         # noinspection PyTypeChecker
@@ -338,7 +351,10 @@ class SolidWorksInterfaceGUI(FemtetInterfaceGUI):
             return ReturnMsg.Error.cannot_open_sample_femprj, path
 
         if progress is not None:
-            progress.setLabelText('Solidworks のサンプルファイルを開いています...')
+            progress.setLabelText(QCoreApplication.translate(
+                'pyfemtet_opt_gui.fem_interfaces.solidworks_interface_gui',
+                'Solidworks のサンプルファイルを開いています...'
+            ))
 
         # get path
         # noinspection PyTypeChecker

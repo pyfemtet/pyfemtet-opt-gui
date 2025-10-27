@@ -1,0 +1,96 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, pyfemtet
+# This file is distributed under the same license as the pyfemtet-opt-gui
+# package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: pyfemtet-opt-gui \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-09 12:52+0900\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/solidworks_integration.rst:2
+msgid "Solidworks連携機能の使い方"
+msgstr "How to Use Solidworks Integration Features"
+
+#: ../../source/solidworks_integration.rst:5
+msgid "機能"
+msgstr "Features"
+
+#: ../../source/solidworks_integration.rst:7
+msgid "Solidworks 連携機能では、以下のようなワークフローを自動化します。"
+msgstr "The Solidworks integration feature automates the following workflow."
+
+#: ../../source/solidworks_integration.rst:9
+msgid "Solidworks の「関係式」ダイアログで設定したパラメータを変更し、Solidworks モデルを再構築する。"
+msgstr "Change parameters set in the Solidworks 'Equation' dialog and rebuild the Solidworks model."
+
+#: ../../source/solidworks_integration.rst:10
+msgid "Solidworks からモデルをエクスポートし、Femtet にインポートする。"
+msgstr "Export the model from Solidworks and import it into Femtet."
+
+#: ../../source/solidworks_integration.rst:11
+msgid "モデル変更に伴い Femtet のメッシュを再生成する。"
+msgstr "Regenerate the mesh in Femtet as the model changes."
+
+#: ../../source/solidworks_integration.rst:12
+msgid "Femtet で解析を実行し、結果を取得する。"
+msgstr "Run analysis in Femtet and obtain the results."
+
+#: ../../source/solidworks_integration.rst:13
+msgid "解析結果に基づき、最適化アルゴリズムが次のパラメータを決定する。"
+msgstr "Based on the analysis results, the optimization algorithm determines the next parameters."
+
+#: ../../source/solidworks_integration.rst:17
+msgid "必要なもの"
+msgstr "Requirements"
+
+#: ../../source/solidworks_integration.rst:19
+msgid "Solidworks 連携機能を使用するには、以下のものが必要です。"
+msgstr "The following are required to use the Solidworks integration feature."
+
+#: ../../source/solidworks_integration.rst:21
+msgid "変数を設定した Solidworks （開発は Solidworks 2023 で行われています） のパートモデル・アセンブリモデル"
+msgstr "A Solidworks part or assembly model with parameters set (development is done with Solidworks 2023)."
+
+#: ../../source/solidworks_integration.rst:22
+msgid "[1] からエクスポートした .x_t ファイルを CAD データインポート機能を使って取り込み、解析設定を行った Fmetet のプロジェクトファイル"
+msgstr "A Femtet project file in which a .x_t file exported from [1] is imported using the CAD data import feature and analysis settings are configured."
+
+#: ../../source/solidworks_integration.rst:26
+msgid "注意事項"
+msgstr "Notes"
+
+#: ../../source/solidworks_integration.rst:27
+msgid "Femtet のプロジェクトファイルのモデルヒストリに複数の CAD データインポートコマンドがある場合、 最も最後の CAD データインポートコマンドのみが Solidworks 連携時に更新されます。"
+msgstr "If there are multiple CAD data import commands in the model history of the Femtet project file, only the last CAD data import command will be updated when using Solidworks integration."
+
+#~ msgid "この章では、Solidworks 連携機能の概要と使い方、利用可能な機能や制限事項について説明します。"
+#~ msgstr ""
+
+#~ msgid "連携の概要"
+#~ msgstr ""
+
+#~ msgid "使える機能・制限事項"
+#~ msgstr ""
+
+#~ msgid "操作手順"
+#~ msgstr ""
+
+#~ msgid "注意点"
+#~ msgstr ""
+
+#~ msgid "Solidworks連携時は一部機能が制限されます。"
+#~ msgstr ""
+

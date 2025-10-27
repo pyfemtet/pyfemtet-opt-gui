@@ -1,0 +1,136 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, pyfemtet
+# This file is distributed under the same license as the pyfemtet-opt-gui
+# package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: pyfemtet-opt-gui \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-09 12:44+0900\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/usage.rst:2
+msgid "使い方"
+msgstr "Usage"
+
+#: ../../source/usage.rst:4
+msgid "この章では、pyfemtet-opt-gui の基本的な仕様について説明します。"
+msgstr "This section explains the basic specifications of pyfemtet-opt-gui."
+
+#: ../../source/usage.rst:6
+msgid "画面構成の説明については現在準備中です。"
+msgstr "The explanation of the screen layout is currently in preparation."
+
+#: ../../source/usage.rst:10
+msgid "メイン画面"
+msgstr "Main screen"
+
+#: ../../source/usage.rst:11
+msgid "Femtet や Solidworks に接続するための画面です。"
+msgstr "This is the screen for connecting to Femtet or Solidworks."
+
+#: ../../source/usage.rst:15
+msgid "解析モデル確認画面"
+msgstr "Analysis model confirmation screen"
+
+#: ../../source/usage.rst:16
+msgid "最適化対象にする femprj ファイルや解析モデル名が表示されます。 対象ファイルが正しいか確認してください。"
+msgstr "The femprj file and analysis model name to be optimized are displayed. Please check that the target file is correct."
+
+#: ../../source/usage.rst:21
+msgid "パラメータ設定画面"
+msgstr "Parameter setting screen"
+
+#: ../../source/usage.rst:22
+msgid "最適化に使用するパラメータを設定します。"
+msgstr "Set the parameters to be used for optimization."
+
+#: ../../source/usage.rst:24
+msgid "Femtet の解析モデルに設定された変数一覧を取得して表示します。"
+msgstr "Displays a list of variables set in the Femtet analysis model."
+
+#: ../../source/usage.rst:25
+msgid "数が設定された変数はチェック可能になり、チェックすると入力変数とみなされます。"
+msgstr "Variables with assigned values can be checked and are treated as input variables."
+
+#: ../../source/usage.rst:26
+msgid "式が設定された変数はチェック不可能ですが、後述する拘束式で使用できます。"
+msgstr "Variables with formulas cannot be checked, but can be used in constraint expressions described later."
+
+#: ../../source/usage.rst:27
+msgid "Solidworks 連携時は、Solidworks の「関係式ダイアログ」で数が設定されたパラメータのみ表示されます。"
+msgstr "When using Solidworks integration, only parameters with assigned values in the Solidworks 'Equation Dialog' are displayed."
+
+#: ../../source/usage.rst:29
+msgid "**ただし、Solidworks 連携時は式が設定された変数は表示されず、拘束式でも使用できません。**"
+msgstr "**However, when using Solidworks integration, variables with formulas are not displayed and cannot be used in constraint expressions.**"
+
+#: ../../source/usage.rst:33
+msgid "目的関数設定画面"
+msgstr "Objective function setting screen"
+
+#: ../../source/usage.rst:34
+msgid "最適化の目的関数を設定します。"
+msgstr "Set the objective function for optimization."
+
+#: ../../source/usage.rst:36
+msgid "Femtet の解析モデルに設定されたパラメトリック解析結果出力設定の一覧を表示します。"
+msgstr "Displays a list of parametric analysis result output settings set in the Femtet analysis model."
+
+#: ../../source/usage.rst:37
+msgid "チェックした出力設定が目的関数として使用されます。"
+msgstr "Checked output settings are used as objective functions."
+
+#: ../../source/usage.rst:38
+msgid "Solidworks 連携時であっても、目的関数として利用できるのは Femtet の出力設定のみです。"
+msgstr "Even when using Solidworks integration, only Femtet output settings can be used as objective functions."
+
+#: ../../source/usage.rst:42
+msgid "変数拘束式設定画面"
+msgstr "Variable constraint expression setting screen"
+
+#: ../../source/usage.rst:43
+msgid "最適化の変数拘束式を設定します。"
+msgstr "Set variable constraint expressions for optimization."
+
+#: ../../source/usage.rst:47
+msgid "変数拘束式とは、ここでは最適化の試行中に「その不等式が満たされるような 変数の組み合わせのみ解析実行されるようにする」ための条件式を指します。"
+msgstr "Here, a variable constraint expression refers to a conditional expression that ensures only combinations of variables satisfying the inequality are analyzed during optimization trials."
+
+#: ../../source/usage.rst:52
+msgid "実行設定"
+msgstr "Execution settings"
+
+#: ../../source/usage.rst:53
+msgid "解析実行回数やアルゴリズムなどの最適化実行に関する設定を行います。"
+msgstr "Configure settings related to optimization execution, such as the number of analysis runs and the algorithm."
+
+#~ msgid "この章では、pyfemtet-opt-gui の基本的な操作方法や画面構成について説明します。"
+#~ msgstr ""
+
+#~ msgid "メイン画面の説明"
+#~ msgstr ""
+
+#~ msgid "各ウィジェット・ダイアログの説明"
+#~ msgstr ""
+
+#~ msgid "操作フロー"
+#~ msgstr ""
+
+#~ msgid "その他"
+#~ msgstr "Other"
+
+#~ msgid "個別機能の詳細な使い方は、 各 UI 要素内のツールチップで説明しています。"
+#~ msgstr "Detailed usage of individual features is explained in the tooltips within each UI element."
+

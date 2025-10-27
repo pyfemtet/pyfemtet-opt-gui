@@ -1,0 +1,133 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, pyfemtet
+# This file is distributed under the same license as the pyfemtet-opt-gui
+# package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: pyfemtet-opt-gui \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-09 12:23+0900\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/quickstart.rst:2
+msgid "クイックスタート"
+msgstr "Quick Start"
+
+#: ../../source/quickstart.rst:4
+msgid "この章では、pyfemtet-opt-gui の基本的な使い方を簡単に説明します。"
+msgstr "This section provides a simple explanation of the basic usage of pyfemtet-opt-gui."
+
+#: ../../source/quickstart.rst:8
+msgid "1. ツールの起動方法"
+msgstr "1. How to launch the tool"
+
+#: ../../source/quickstart.rst:10
+msgid "自動インストールを行った場合は、デスクトップにショートカットが作成されます。"
+msgstr "If you performed an automatic installation, a shortcut will be created on your desktop."
+
+#: ../../source/quickstart.rst:12
+msgid "または、コマンドプロンプトやターミナルで以下のコマンドを実行して起動できます。"
+msgstr "Alternatively, you can launch it by running the following command in a command prompt or terminal."
+
+#: ../../source/quickstart.rst:19
+msgid "2. サンプルプロジェクトの読み込み"
+msgstr "2. Loading a sample project"
+
+#: ../../source/quickstart.rst:21
+msgid "GUI ツールを開くと、メイン画面が表示されます。"
+msgstr "When you open the GUI tool, the main screen will be displayed."
+
+#: ../../source/quickstart.rst:23
+msgid "[1] 「Femtet に接続」ボタン: 起動中の Femtet に接続、未起動なら新規起動して接続します。"
+msgstr "[1] 'Connect to Femtet' button: Connects to a running Femtet instance, or starts and connects if not running."
+
+#: ../../source/quickstart.rst:24
+msgid "[2] 「接続時にサンプルファイルを開く」チェック: 有効にすると「Femtet に接続」時にサンプルプロジェクトが自動で読み込まれます。"
+msgstr "[2] 'Open sample file on connect' checkbox: If enabled, the sample project will be loaded automatically when connecting to Femtet."
+
+#: ../../source/quickstart.rst:25
+msgid "[3] 「CAD 連携」から「Solidworks」を選択: Solidworks がインストールされていれば、連携して接続します。"
+msgstr "[3] Select 'Solidworks' from 'CAD Integration': If Solidworks is installed, it will connect and integrate."
+
+#: ../../source/quickstart.rst:27
+msgid "Solidworks が起動中なら接続、未起動なら新規起動して接続します。"
+msgstr "If Solidworks is already running, it will connect; if not, it will start and connect."
+
+#: ../../source/quickstart.rst:28
+msgid "[2]「接続時にサンプルファイルを開く」が有効な場合、Solidworks でもサンプルファイルが開かれます。"
+msgstr "If [2] 'Open sample file on connect' is enabled, the sample file will also be opened in Solidworks."
+
+#: ../../source/quickstart.rst:30
+msgid "メイン画面"
+msgstr "Main screen"
+
+#: ../../source/quickstart.rst:37
+msgid "3. 動作確認"
+msgstr "3. Operation check"
+
+#: ../../source/quickstart.rst:39
+msgid "「Next」を押すと、ウィザード形式の最適化設定画面に進みます。"
+msgstr "Press 'Next' to proceed to the wizard-style optimization settings screen."
+
+#: ../../source/quickstart.rst:40
+msgid "すぐに動作確認ができるように、プロジェクトのロード時点でデフォルトの最適化設定が入力されています。"
+msgstr "Default optimization settings are pre-filled when the project is loaded, so you can quickly check the operation."
+
+#: ../../source/quickstart.rst:41
+msgid "各ステップで「Next」を押していくと、最後に「確認」画面が表示されます。"
+msgstr "By pressing 'Next' at each step, a final 'Confirmation' screen will be displayed."
+
+#: ../../source/quickstart.rst:43
+msgid "[1] 「スクリプトを保存する」を押すと、最適化スクリプトが保存されます。"
+msgstr "[1] Press 'Save Script' to save the optimization script."
+
+#: ../../source/quickstart.rst:44
+msgid "[2] 「スクリプトの保存後、すぐ実行する」にチェックがあると、スクリプト保存後に自動で最適化が実行されます。デフォルトではチェックが入っています。"
+msgstr "[2] If 'Run immediately after saving script' is checked, optimization will start automatically after saving the script (checked by default)."
+
+#: ../../source/quickstart.rst:47
+msgid "確認画面"
+msgstr "Confirmation screen"
+
+#: ../../source/quickstart.rst:53
+msgid "詳細な使い方は次章以降を参照してください。"
+msgstr "For more detailed instructions, please refer to the following chapters."
+
+#~ msgid "ツールの起動方法"
+#~ msgstr ""
+
+#~ msgid "サンプルプロジェクトの読み込み"
+#~ msgstr ""
+
+#~ msgid "最適化の実行手順"
+#~ msgstr ""
+
+#~ msgid "`(1)` 「Femtet に接続」ボタン：起動中の Femtet に接続、未起動なら新規起動して接続します。"
+#~ msgstr ""
+
+#~ msgid "`(2)` 「接続時にサンプルファイルを開く」チェック：有効にすると「Femtet に接続」時にサンプルプロジェクトが自動で読み込まれます。"
+#~ msgstr ""
+
+#~ msgid "`(3)` 「CAD 連携」から「Solidworks」を選択：Solidworks がインストールされていれば、連携して接続します。 - Solidworks が起動中なら接続、未起動なら新規起動して接続します。 - `(2)`「接続時にサンプルファイルを開く」が有効な場合、Solidworks でもサンプルファイルが開かれます。"
+#~ msgstr ""
+
+#~ msgid "3. 動作確認"
+#~ msgstr ""
+
+#~ msgid "`(1)` 「スクリプトを保存する」を押すと、最適化スクリプトが保存されます。"
+#~ msgstr ""
+
+#~ msgid "`(2)` 「スクリプトの保存後、すぐ実行する」にチェックがあると、スクリプト保存後に自動で最適化が実行されます。デフォルトではチェックが入っています。"
+#~ msgstr ""
+

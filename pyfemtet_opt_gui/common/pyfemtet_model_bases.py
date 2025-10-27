@@ -32,8 +32,8 @@ ICON_PATH = r'pyfemtet-opt-gui\pyfemtet_opt_gui_2\assets\icon\arrow.svg'
 
 # pyfemtet.opt で使う Item の共通部分の列挙体
 class CommonItemColumnName(enum.StrEnum):
-    use = '使用'
-    name = '名前'
+    use = QCoreApplication.translate('pyfemtet_opt_gui.common.pyfemtet_model_bases', '使用')
+    name = QCoreApplication.translate('pyfemtet_opt_gui.common.pyfemtet_model_bases', '名前')
 
 
 # QStandardItemModel に自動でクラスメンバーに応じた

@@ -1,0 +1,49 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, pyfemtet
+# This file is distributed under the same license as the pyfemtet-opt-gui
+# package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: pyfemtet-opt-gui \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-09 13:18+0900\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/references.rst:2
+msgid "参考文献・リンク"
+msgstr "References & Links"
+
+#: ../../source/references.rst:4
+msgid "関連プロジェクト"
+msgstr "Related Projects"
+
+#: ../../source/references.rst:6
+msgid "pyfemtet: `https://pyfemtet.readthedocs.io/ja/stable/ <https://pyfemtet.readthedocs.io/ja/stable/>`_"
+msgstr "pyfemtet: `https://pyfemtet.readthedocs.io/en/stable/ <https://pyfemtet.readthedocs.io/en/stable/>`_"
+
+#: ../../source/references.rst:8
+msgid "外部リンク"
+msgstr "External Links"
+
+#: ../../source/references.rst:10
+msgid "murata software: `https://www.muratasoftware.com/ <https://www.muratasoftware.com/>`_"
+msgstr "murata software: `https://www.muratasoftware.com/ <https://www.muratasoftware.com/>`_"
+
+#: ../../source/references.rst:11
+msgid "Python: `https://www.python.org/ <https://www.python.org/>`_"
+msgstr "Python: `https://www.python.org/ <https://www.python.org/>`_"
+
+#~ msgid "Femtet, Solidworks, pyfemtet.opt などの公式サイトや参考資料へのリンクを掲載します。"
+#~ msgstr ""
+

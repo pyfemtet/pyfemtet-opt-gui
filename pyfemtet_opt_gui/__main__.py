@@ -1,3 +1,23 @@
+import os
+import locale
+from PySide6.QtCore import QTranslator
+from PySide6.QtWidgets import QApplication
+
+# Detect the locale before loading other modules
+if __name__ == '__main__':
+    app = QApplication()
+    app.setStyle('fusion')
+
+    langage_region, _ = locale.getlocale()
+    # if True:  # debug
+    if langage_region != 'Japanese_Japan':
+        here = os.path.dirname(__file__)    
+        qm_path = os.path.join(here, 'qml_en_us.qm')
+        translator = QTranslator()
+        translator.load(qm_path)
+        app.installTranslator(translator)
+
+
 import sys
 
 # noinspection PyUnresolvedReferences
@@ -19,7 +39,7 @@ print('=== pyfemtet_opt_gui version', pyfemtet_opt_gui.__version__, '===')
 print('=== pyfemtet version', pyfemtet.__version__, '===')
 print('Loading modules. It can take a few minutes for first time...')
 
-from pyfemtet_opt_gui.ui.ui_Wizard_main import Ui_Wizard
+from pyfemtet_opt_gui.ui.ui_Wizard_main import Ui_Main
 from pyfemtet_opt_gui.models.analysis_model.analysis_model import AnalysisModelWizardPage
 from pyfemtet_opt_gui.models.variables.var import VariableWizardPage
 from pyfemtet_opt_gui.models.objectives.obj import ObjectiveWizardPage
@@ -40,7 +60,7 @@ import torch
 
 
 class Main(QWizard):
-    ui: Ui_Wizard
+    ui: Ui_Main
     am_page: 'AnalysisModelWizardPage'
     var_page: 'VariableWizardPage'
     obj_page: 'ObjectiveWizardPage'
@@ -54,7 +74,7 @@ class Main(QWizard):
         self.setup_page()
 
     def setup_ui(self):
-        self.ui = Ui_Wizard()
+        self.ui = Ui_Main()
         self.ui.setupUi(self)
 
         # Connect Femtet button
@@ -140,7 +160,7 @@ class Main(QWizard):
         task.finished.connect(lambda ret_code: when_finished(ret_code))
         task.start()
 
-    def load_femtet(self, progress: QProgressDialog = None):
+    def load_femtet(self, progress: QProgressDialog | None = None):
 
         if progress is not None:
             progress.setMinimum(0)
@@ -148,7 +168,9 @@ class Main(QWizard):
             progress.show()
 
         if progress is not None:
-            progress.setLabelText('ファイル情報を読み込んでいます...')
+            progress.setLabelText(
+                self.tr('ファイル情報を読み込んでいます...')
+            )
             progress.setValue(progress.value() + 1)
             progress.forceShow()
         ret_msg = self.am_page.source_model.load_femtet(progress)  # progress +3
@@ -156,7 +178,9 @@ class Main(QWizard):
             return
 
         if progress is not None:
-            progress.setLabelText('変数を読み込んでいます...')
+            progress.setLabelText(
+                self.tr('変数を読み込んでいます...')
+            )
             progress.setValue(progress.value() + 1)
             progress.forceShow()
         ret_msg = self.var_page.source_model.load_femtet()
@@ -164,7 +188,9 @@ class Main(QWizard):
             return
 
         if progress is not None:
-            progress.setLabelText('解析設定を読み込んでいます...')
+            progress.setLabelText(
+                self.tr('解析設定を読み込んでいます...')                
+            )
             progress.setValue(progress.value() + 1)
             progress.forceShow()
         ret_msg = self.obj_page.source_model.load_femtet()
@@ -172,17 +198,11 @@ class Main(QWizard):
             return
 
 
-def main():
+if __name__ == '__main__':
     print('Module loaded. Initializing...')
-    app = QApplication()
-    app.setStyle('fusion')
 
     page_obj = Main()
     page_obj.show()
     print('pyfemtet-opt-gui successfully launched!')
 
     sys.exit(app.exec())
-
-
-if __name__ == '__main__':
-    main()

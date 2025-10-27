@@ -53,11 +53,11 @@ def _reset_cns_model():
 # ===== header data =====
 class ConstraintColumnNames(enum.StrEnum):
     use = CommonItemColumnName.use
-    name = '名前'
-    expr = '式'
-    lb = '下限'
-    ub = '上限'
-    note = 'メモ欄'
+    name = QCoreApplication.translate('pyfemtet_opt_gui.models.constraints.model', '名前')
+    expr = QCoreApplication.translate('pyfemtet_opt_gui.models.constraints.model', '式')
+    lb = QCoreApplication.translate('pyfemtet_opt_gui.models.constraints.model', '下限')
+    ub = QCoreApplication.translate('pyfemtet_opt_gui.models.constraints.model', '上限')
+    note = QCoreApplication.translate('pyfemtet_opt_gui.models.constraints.model', 'メモ欄')
 
 
 _default_dummy_data = {
@@ -278,7 +278,7 @@ class ConstraintModel(StandardItemModelWithHeader):
                         item.setText(expr.expr)
                         item.setData(expr, Qt.ItemDataRole.UserRole)
                     else:
-                        item.setText('なし')
+                        item.setText(QCoreApplication.translate('pyfemtet_opt_gui.models.constraints.model', 'なし'))
                         item.setData(None, Qt.ItemDataRole.UserRole)
                     self.setItem(r, c, item)
 
@@ -293,7 +293,7 @@ class ConstraintModel(StandardItemModelWithHeader):
                         item.setText(expr.expr)
                         item.setData(expr, Qt.ItemDataRole.UserRole)
                     else:
-                        item.setText('なし')
+                        item.setText(QCoreApplication.translate('pyfemtet_opt_gui.models.constraints.model', 'なし'))
                         item.setData(None, Qt.ItemDataRole.UserRole)
                     self.setItem(r, c, item)
 

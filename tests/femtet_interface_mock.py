@@ -113,7 +113,7 @@ _femtet_mock = FemtetMock()
 class FemtetInterfaceMock(FemtetInterfaceGUI):
 
     @classmethod
-    def get_femtet(cls, progress: QProgressDialog = None) -> tuple[FemtetMock | None, ReturnType]:
+    def get_femtet(cls, progress: QProgressDialog | None = None) -> tuple[FemtetMock | None, ReturnType]:
         return _femtet_mock, ReturnMsg.no_message
 
     @classmethod

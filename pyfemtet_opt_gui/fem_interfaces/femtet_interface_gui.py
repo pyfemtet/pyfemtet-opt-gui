@@ -14,6 +14,9 @@ from pythoncom import CoInitialize, CoUninitialize
 # noinspection PyUnresolvedReferences
 from PySide6.QtWidgets import *
 
+from PySide6 import QtCore
+from PySide6.QtCore import QCoreApplication
+
 import pyfemtet_opt_gui
 from pyfemtet_opt_gui.logger import get_logger
 from pyfemtet_opt_gui.common.return_msg import ReturnMsg, ReturnType
@@ -56,11 +59,14 @@ class FemtetInterfaceGUI:
 
     # ===== Femtet process & object handling =====
     @classmethod
-    def get_femtet(cls, progress: QProgressDialog = None) -> tuple[CDispatch | None, ReturnType]:
+    def get_femtet(cls, progress: QProgressDialog | None = None) -> tuple[CDispatch | None, ReturnType]:
         global _Femtet
 
         if progress is not None:
-            progress.setLabelText('Femtet を起動しています...')
+            progress.setLabelText(QCoreApplication.translate(
+                "pyfemtet_opt_gui.fem_interfaces.femtet_interface_gui",
+                "Femtet を起動しています...",
+            ))
 
         should_restart_femtet = False
 
@@ -74,7 +80,10 @@ class FemtetInterfaceGUI:
 
         # Femtet を再起動する
         if should_restart_femtet:
-            logger.info('Femtet を起動しています。')
+            logger.info(QCoreApplication.translate(
+                "pyfemtet_opt_gui.fem_interfaces.femtet_interface_gui",
+                "Femtet を起動しています。",
+            ))
 
             # 内部で Dispatch 実行も行うので
             # その可否も含め接続成功判定が可能
@@ -225,7 +234,10 @@ class FemtetInterfaceGUI:
                 value = float(value)
                 _variables.update({var_name: value})
             except ValueError:
-                additional_msg = f'変数: {var_name}, 値: {value}'
+                additional_msg = QCoreApplication.translate(
+                    "pyfemtet_opt_gui.fem_interfaces.femtet_interface_gui",
+                    "変数: {var_name}, 値: {value}",
+                ).format(var_name=var_name, value=value)
                 return ReturnMsg.Error.not_a_number, additional_msg
         variables: dict[str, float] = _variables
 
@@ -249,8 +261,10 @@ class FemtetInterfaceGUI:
         except com_error as e:
             return_msg = ReturnMsg.Error.femtet_macro_failed
             exception_msg = ' '.join([str(a) for a in e.args])
-            additional_msg = (f'マクロ名: `UpdateVariable` '
-                              f'エラーメッセージ: {exception_msg}')
+            additional_msg = QCoreApplication.translate(
+                "pyfemtet_opt_gui.fem_interfaces.femtet_interface_gui",
+                "マクロ名: `UpdateVariable` エラーメッセージ: {exception_msg}",
+            ).format(exception_msg=exception_msg)
 
         finally:
 
@@ -279,8 +293,10 @@ class FemtetInterfaceGUI:
 
         except Exception as e:  # com_error or NoAttribute
             exception_msg = ' '.join([str(a) for a in e.args])
-            additional_msg = (f'マクロ名: ReExecute, '
-                              f'エラーメッセージ: {exception_msg}')
+            additional_msg = QCoreApplication.translate(
+                "pyfemtet_opt_gui.fem_interfaces.femtet_interface_gui",
+                "マクロ名: ReExecute, エラーメッセージ: {exception_msg}",
+            ).format(exception_msg=exception_msg)
             return ReturnMsg.Error.femtet_macro_failed, additional_msg
 
     @classmethod
@@ -349,7 +365,10 @@ class FemtetInterfaceGUI:
 
         # check something opened
         if _Femtet.Project == '':
-            return (['解析プロジェクトが開かれていません',], ''), ReturnMsg.no_message
+            return ([QCoreApplication.translate(
+                "pyfemtet_opt_gui.fem_interfaces.femtet_interface_gui",
+                "解析プロジェクトが開かれていません",
+            ),], ''), ReturnMsg.no_message
 
         # else, return them
         return ([_Femtet.Project,], _Femtet.AnalysisModelName), ReturnMsg.no_message
@@ -382,10 +401,13 @@ class FemtetInterfaceGUI:
         return True, (ReturnMsg.no_message, a_msg)
 
     @classmethod
-    def open_sample(cls, progress: QProgressDialog = None) -> tuple[ReturnType, str]:
+    def open_sample(cls, progress: QProgressDialog | None = None) -> tuple[ReturnType, str]:
 
         if progress is not None:
-            progress.setLabelText('Femtet のサンプルファイルを開いています...')
+            progress.setLabelText(QCoreApplication.translate(
+                "pyfemtet_opt_gui.fem_interfaces.femtet_interface_gui",
+                "Femtet のサンプルファイルを開いています...",
+            ))
 
         # get path
         # noinspection PyTypeChecker

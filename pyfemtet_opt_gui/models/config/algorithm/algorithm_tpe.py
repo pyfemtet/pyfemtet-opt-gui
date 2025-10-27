@@ -33,15 +33,14 @@ import enum
 # （アルゴリズムごとの）設定項目
 class TPEAlgorithmConfig(AbstractAlgorithmConfig):
     name = 'TPE'
-    note = 'Optuna 実装に基づくベイズ最適化'
+    note = QCoreApplication.translate('pyfemtet_opt_gui.models.config.algorithm.algorithm_tpe', 'Optuna 実装に基づくベイズ最適化')
 
     class Items(enum.Enum):
         @enum.member
         class n_startup_trials(AbstractAlgorithmConfigItem):
-            name = 'スタートアップ試行数'
+            name = QCoreApplication.translate('pyfemtet_opt_gui.models.config.algorithm.algorithm_tpe', 'スタートアップ試行数')
             default = 10
-            note = ('TPE アルゴリズムを使う前に必要なランダムにパラメータを\n'
-                    '決める試行の回数です。')
+            note = QCoreApplication.translate('pyfemtet_opt_gui.models.config.algorithm.algorithm_tpe', 'TPE アルゴリズムを使う前に必要なランダムにパラメータを\n決める試行の回数です。')
 
 
 # （アルゴリズムごとの）設定値の入力ルール

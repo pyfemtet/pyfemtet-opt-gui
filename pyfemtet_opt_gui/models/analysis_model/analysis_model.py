@@ -56,12 +56,12 @@ _WARNED = False
 # original model
 class FemprjModel(StandardItemModelWithHeader):
     class RowNames(enum.StrEnum):
-        femprj_path = 'プロジェクトファイルのパス'
-        model_name = '解析モデル名'
+        femprj_path = QCoreApplication.translate('pyfemtet_opt_gui.models.analysis_model.analysis_model', 'プロジェクトファイルのパス')
+        model_name = QCoreApplication.translate('pyfemtet_opt_gui.models.analysis_model.analysis_model', '解析モデル名')
 
     class ColumnNames(enum.StrEnum):
-        item = '項目'
-        value = '値'
+        item = QCoreApplication.translate('pyfemtet_opt_gui.models.analysis_model.analysis_model', '項目')
+        value = QCoreApplication.translate('pyfemtet_opt_gui.models.analysis_model.analysis_model', '値')
 
     def __init__(self, parent=None, _dummy_data=None, with_first_row=True):
         super().__init__(parent, _dummy_data, with_first_row)
@@ -115,7 +115,7 @@ class FemprjModel(StandardItemModelWithHeader):
     def _set_dummy_data(self, _dummy_data: dict):
         raise NotImplementedError('Use FemtetMock instead.')
 
-    def load_femtet(self, progress: QProgressDialog = None) -> ReturnMsg:
+    def load_femtet(self, progress: QProgressDialog | None = None) -> ReturnType:
 
         # 名前を取得
         if progress is not None:
@@ -124,10 +124,11 @@ class FemprjModel(StandardItemModelWithHeader):
         names, ret_msg = fi.get().get_name()
 
         # Femtet エラーならば何もしない
-        if not can_continue(ret_msg, parent=self.parent()):
+        if not can_continue(ret_msg, parent=self.parent()):  # type: ignore
             return ret_msg
 
         # 名前を更新
+        assert names is not None
         file_paths, model_name = names
 
         # femprj_path

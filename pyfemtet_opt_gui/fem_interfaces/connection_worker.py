@@ -8,6 +8,7 @@ from PySide6 import QtWidgets, QtCore, QtGui
 
 # noinspection PyUnresolvedReferences
 from PySide6.QtCore import *
+from PySide6.QtCore import QCoreApplication
 
 # noinspection PyUnresolvedReferences
 from PySide6.QtGui import *
@@ -36,9 +37,18 @@ class QThreadWithReturnMsg(QThread):
 
 
 class ConnectionMessage(enum.StrEnum):
-    no_connection = '接続されていません。'
-    connecting = '接続可能な Femtet を探しています...\n見つからない場合は起動して接続します...'
-    connected = '接続されています。'
+    no_connection = QCoreApplication.translate(
+        'pyfemtet_opt_gui.fem_interfaces.connection_worker',
+        '接続されていません。'
+    )
+    connecting = QCoreApplication.translate(
+        'pyfemtet_opt_gui.fem_interfaces.connection_worker',
+        '接続可能な Femtet を探しています...\n見つからない場合は起動して接続します...'
+    )
+    connected = QCoreApplication.translate(
+        'pyfemtet_opt_gui.fem_interfaces.connection_worker',
+        '接続されています。'
+    )
 
 
 class ConnectionWorker(QThreadWithReturnMsg):
@@ -46,11 +56,11 @@ class ConnectionWorker(QThreadWithReturnMsg):
     def __init__(
             self,
             parent,
-            ui: ui_Wizard_main,
-            progress: QProgressDialog = None,
+            ui: ui_Wizard_main.Ui_Main,
+            progress: QProgressDialog | None = None,
     ):
         super().__init__(parent)
-        self.ui: ui_Wizard_main = ui
+        self.ui: ui_Wizard_main.Ui_Main = ui
         self.progress: QProgressDialog | None = progress
 
     def run(self):
@@ -58,7 +68,7 @@ class ConnectionWorker(QThreadWithReturnMsg):
         CoInitialize()
 
         # Femtet との接続がすでに OK
-        ret: ReturnMsg = fi.get().get_connection_state()
+        ret: ReturnType = fi.get().get_connection_state()
         if ret == ReturnMsg.no_message:
             self.update_connection_state_label(ConnectionMessage.connected)
 

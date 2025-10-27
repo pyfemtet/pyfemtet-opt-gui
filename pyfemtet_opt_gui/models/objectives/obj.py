@@ -57,10 +57,10 @@ def _reset_obj_model():
 # ===== constants =====
 class ObjectiveColumnNames(enum.StrEnum):
     use = CommonItemColumnName.use
-    name = '名前'
-    direction = '最適化の目標'
-    target_value = '目標値'
-    note = 'メモ欄'
+    name = QCoreApplication.translate('pyfemtet_opt_gui.models.objectives.obj', '名前')
+    direction = QCoreApplication.translate('pyfemtet_opt_gui.models.objectives.obj', '最適化の目標')
+    target_value = QCoreApplication.translate('pyfemtet_opt_gui.models.objectives.obj', '目標値')
+    note = QCoreApplication.translate('pyfemtet_opt_gui.models.objectives.obj', 'メモ欄')
 
 
 class ObjectiveDirection(enum.StrEnum):  # python >= 3.11
@@ -199,7 +199,7 @@ class ObjectiveTableItemModel(StandardItemModelWithHeader):
                         item.setText(str(value))
 
                 else:
-                    raise Exception(f'ダミーデータが不正, {key}')
+                    raise Exception(QCoreApplication.translate('pyfemtet_opt_gui.models.objectives.obj', 'ダミーデータが不正, {key}').format(key=key))
 
                 self.setItem(r, c, item)
 

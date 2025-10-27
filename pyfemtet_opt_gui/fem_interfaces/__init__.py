@@ -1,9 +1,10 @@
 import enum
+from PySide6.QtCore import QCoreApplication
 
 
 class CADIntegration(enum.StrEnum):
-    no = 'なし'
-    solidworks = 'Solidworks'
+    no = QCoreApplication.translate('CAD', 'なし')
+    solidworks = QCoreApplication.translate('CAD', 'Solidworks')
 
 
 current_cad: CADIntegration = CADIntegration.no

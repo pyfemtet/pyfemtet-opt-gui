@@ -21,16 +21,16 @@ __all__ = [
 
 class PageSubTitles(enum.StrEnum):
     initial = ''  # スタートページ。使わない。
-    analysis_model = '解析モデル'
-    var = 'パラメータ'
-    obj = '目的関数'
-    cns = '変数拘束式'
-    cfg = '実行設定'
-    confirm = '確認'  # 使わない？
+    analysis_model = QCoreApplication.translate('pyfemtet_opt_gui.common.titles', '解析モデル')
+    var = QCoreApplication.translate('pyfemtet_opt_gui.common.titles', 'パラメータ')
+    obj = QCoreApplication.translate('pyfemtet_opt_gui.common.titles', '目的関数')
+    cns = QCoreApplication.translate('pyfemtet_opt_gui.common.titles', '変数拘束式')
+    cfg = QCoreApplication.translate('pyfemtet_opt_gui.common.titles', '実行設定')
+    confirm = QCoreApplication.translate('pyfemtet_opt_gui.common.titles', '確認')  # 使わない？
 
 
 def get_html_title(sub_title: PageSubTitles):
-    return f'現在の項目: {[s for s in PageSubTitles].index(sub_title)}/{len(PageSubTitles) - 1}'
+    return QCoreApplication.translate('pyfemtet_opt_gui.common.titles', '現在の項目: {_s_for_s_in_PageSubTitles__index_sub_title_}/{len_PageSubTitles____1}').format(_s_for_s_in_PageSubTitles__index_sub_title_=[s for s in PageSubTitles].index(sub_title), len_PageSubTitles____1=len(PageSubTitles) - 1)
 
 
 def get_html_subtitle(sub_title: PageSubTitles):

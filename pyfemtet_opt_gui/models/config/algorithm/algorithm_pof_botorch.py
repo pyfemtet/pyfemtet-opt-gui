@@ -33,15 +33,14 @@ import enum
 # （アルゴリズムごとの）設定項目
 class PoFBoTorchAlgorithmConfig(AbstractAlgorithmConfig):
     name = 'PoFBoTorch'
-    note = '実行可能性考慮付きガウス過程回帰ベイズ最適化'
+    note = QCoreApplication.translate('pyfemtet_opt_gui.models.config.algorithm.algorithm_pof_botorch', '実行可能性考慮付きガウス過程回帰ベイズ最適化')
 
     class Items(enum.Enum):
         @enum.member
         class n_startup_trials(AbstractAlgorithmConfigItem):
-            name = 'スタートアップ試行数'
+            name = QCoreApplication.translate('pyfemtet_opt_gui.models.config.algorithm.algorithm_pof_botorch', 'スタートアップ試行数')
             default = 10
-            note = ('PoFBoTorch アルゴリズムを使う前に必要なランダムにパラメータを\n'
-                    '決める試行の回数です。')
+            note = QCoreApplication.translate('pyfemtet_opt_gui.models.config.algorithm.algorithm_pof_botorch', 'PoFBoTorch アルゴリズムを使う前に必要なランダムにパラメータを\n決める試行の回数です。')
 
 
 # （アルゴリズムごとの）設定値の入力ルール

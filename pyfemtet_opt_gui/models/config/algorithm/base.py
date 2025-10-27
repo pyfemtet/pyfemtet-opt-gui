@@ -52,30 +52,30 @@ class QAlgorithmStandardItem(StandardItemModelAsQStandardItem):
 
 # （共通の）アルゴリズムの設定の HeaderData
 class AlgorithmItemModelColumnNames(enum.StrEnum):
-    name = '項目'
-    value = '値'
-    note = '備考'
+    name = QCoreApplication.translate('pyfemtet_opt_gui.models.config.algorithm.base', '項目')
+    value = QCoreApplication.translate('pyfemtet_opt_gui.models.config.algorithm.base', '値')
+    note = QCoreApplication.translate('pyfemtet_opt_gui.models.config.algorithm.base', '備考')
 
 
 # ===== ここから下のクラスを継承する =====
 
 # （アルゴリズムごとの）設定項目のベース
 class AbstractAlgorithmConfigItem(ABC):
-    name = '何かの設定項目'
-    default = '何かのデフォルト値'
-    note = '設定項目の説明'
+    name = QCoreApplication.translate('pyfemtet_opt_gui.models.config.algorithm.base', '何かの設定項目')
+    default = QCoreApplication.translate('pyfemtet_opt_gui.models.config.algorithm.base', '何かのデフォルト値')
+    note = QCoreApplication.translate('pyfemtet_opt_gui.models.config.algorithm.base', '設定項目の説明')
 
 
 # （アルゴリズムごとの）設定全体
 class AbstractAlgorithmConfig:
     name = 'Abstract Algorithm'
-    note = 'GUI のデバッグ用の項目です。'
+    note = QCoreApplication.translate('pyfemtet_opt_gui.models.config.algorithm.base', 'GUI のデバッグ用の項目です。')
 
     class Items(enum.Enum):
         # abstract class
         @enum.member
         class FloatItem(AbstractAlgorithmConfigItem):
-            name = '数値の設定項目'
+            name = QCoreApplication.translate('pyfemtet_opt_gui.models.config.algorithm.base', '数値の設定項目')
             default = 0.
             ub = None
             lb = None
@@ -83,12 +83,12 @@ class AbstractAlgorithmConfig:
         # abstract class
         @enum.member
         class StrItem(AbstractAlgorithmConfigItem):
-            name = '文字列の設定項目'
-            default = '既定の値'
+            name = QCoreApplication.translate('pyfemtet_opt_gui.models.config.algorithm.base', '文字列の設定項目')
+            default = QCoreApplication.translate('pyfemtet_opt_gui.models.config.algorithm.base', '既定の値')
             choices = [
                 default,
-                '選択肢2',
-                '選択肢3'
+                QCoreApplication.translate('pyfemtet_opt_gui.models.config.algorithm.base', '選択肢2'),
+                QCoreApplication.translate('pyfemtet_opt_gui.models.config.algorithm.base', '選択肢3'),
             ]
 
 

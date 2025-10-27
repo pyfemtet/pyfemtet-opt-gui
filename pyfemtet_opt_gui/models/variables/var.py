@@ -34,17 +34,14 @@ import pyfemtet_opt_gui.fem_interfaces as fi
 _VAR_MODEL = None
 
 
-def get_var_model(parent, _dummy_data=None) -> 'VariableItemModel':
+def get_var_model(parent, _dummy_data=None) -> "VariableItemModel":
     global _VAR_MODEL
     if _VAR_MODEL is None:
         if not _is_debugging():
             assert parent is not None
         _VAR_MODEL = VariableItemModel(
             parent,
-            _dummy_data=(
-                _default_dummy_data if _dummy_data is True
-                else _dummy_data
-            )
+            _dummy_data=(_default_dummy_data if _dummy_data is True else _dummy_data),
         )
     return _VAR_MODEL
 
@@ -55,7 +52,7 @@ def _reset_var_model():
 
 
 def get_var_model_for_problem(parent, _dummy_data=None):
-    var_model = get_var_model(parent,_dummy_data)
+    var_model = get_var_model(parent, _dummy_data)
     var_model_for_problem = QVariableItemModelForProblem(parent)
     var_model_for_problem.setSourceModel(var_model)
     return var_model_for_problem
@@ -63,25 +60,48 @@ def get_var_model_for_problem(parent, _dummy_data=None):
 
 # ===== constants =====
 class VariableColumnNames(enum.StrEnum):
-    use = CommonItemColumnName.use  # 基幹なので見た目を変更するときは column_name_display_map で
-    name = '変数名'
-    initial_value = '初期値 または\n文字式'
-    lower_bound = '下限'
-    upper_bound = '上限'
-    step = 'ステップ'
-    test_value = 'テスト値 または\n文字式の計算結果'
-    note = 'メモ欄'
+    use = (
+        CommonItemColumnName.use
+    )  # 基幹なので見た目を変更するときは column_name_display_map で
+    name = QCoreApplication.translate(
+        "pyfemtet_opt_gui.models.variables.var",
+        "変数名",
+    )
+    initial_value = QCoreApplication.translate(
+        "pyfemtet_opt_gui.models.variables.var",
+        "初期値 または\n文字式",
+    )
+    lower_bound = QCoreApplication.translate(
+        "pyfemtet_opt_gui.models.variables.var",
+        "下限",
+    )
+    upper_bound = QCoreApplication.translate(
+        "pyfemtet_opt_gui.models.variables.var",
+        "上限",
+    )
+    step = QCoreApplication.translate(
+        "pyfemtet_opt_gui.models.variables.var",
+        "ステップ",
+    )
+    test_value = QCoreApplication.translate(
+        "pyfemtet_opt_gui.models.variables.var",
+        "テスト値 または\n文字式の計算結果",
+    )
+    note = QCoreApplication.translate(
+        "pyfemtet_opt_gui.models.variables.var",
+        "メモ欄",
+    )
 
 
 # dummy data
 _default_dummy_data = {
     VariableColumnNames.use: [True, True, True, False],
-    VariableColumnNames.name: ['x1', 'x2', 'x3', 'x4'],
-    VariableColumnNames.initial_value: [0., 3.14, 'x1 + x2', 'x1 / x2'],
+    VariableColumnNames.name: ["x1", "x2", "x3", "x4"],
+    VariableColumnNames.initial_value: [0.0, 3.14, "x1 + x2", "x1 / x2"],
     VariableColumnNames.lower_bound: [-1, -1, None, None],
-    VariableColumnNames.upper_bound: [1, 10., None, None],
+    VariableColumnNames.upper_bound: [1, 10.0, None, None],
     VariableColumnNames.step: [1, None, None, None],
-    VariableColumnNames.test_value: [0., 3.14, 'x1 + x2', 'x1 / x2'],
+    VariableColumnNames.test_value: [0.0, 3.14, "x1 + x2", "x1 / x2"],
     VariableColumnNames.note: [None, None, None, None],
 }
 
@@ -89,7 +109,6 @@ _default_dummy_data = {
 # ===== qt objects =====
 # 個別ページに表示される TableView の Delegate
 class VariableTableViewDelegate(QStyledItemDelegate):
-
     @staticmethod
     def get_name(header_data_, model, index):
         # get name of initial_value
@@ -106,12 +125,19 @@ class VariableTableViewDelegate(QStyledItemDelegate):
         expression_: Expression | None = model.data(index_, Qt.ItemDataRole.UserRole)
         return expression_
 
-    def check_bounds(self, new_expression, header_data, model, index) -> tuple[ReturnType, str | None]:
-
+    def check_bounds(
+        self, new_expression, header_data, model, index
+    ) -> tuple[ReturnType, str | None]:
         # get current value
-        init: Expression = self.get_expression(VariableColumnNames.initial_value, model, index)
-        lb: Expression | None = self.get_expression(VariableColumnNames.lower_bound, model, index)
-        ub: Expression | None = self.get_expression(VariableColumnNames.upper_bound, model, index)
+        init: Expression = self.get_expression(
+            VariableColumnNames.initial_value, model, index
+        )
+        lb: Expression | None = self.get_expression(
+            VariableColumnNames.lower_bound, model, index
+        )
+        ub: Expression | None = self.get_expression(
+            VariableColumnNames.upper_bound, model, index
+        )
         assert isinstance(init, Expression)
 
         # overwrite it with the new user-input
@@ -140,22 +166,25 @@ class VariableTableViewDelegate(QStyledItemDelegate):
             get_var_model(None).get_current_variables(),
         )
 
-    def check_valid(self, text, header_data, model, index) -> tuple[ReturnType, str, Expression | None]:
-
+    def check_valid(
+        self, text, header_data, model, index
+    ) -> tuple[ReturnType, str, Expression | None]:
         new_expression: Expression | None = None
 
         # Femtet に文字式が書いている場合は
         # ub, lb は constraint 扱いなので
         # None でもよい
-        expression = self.get_expression(VariableColumnNames.initial_value, model, index)
+        expression = self.get_expression(
+            VariableColumnNames.initial_value, model, index
+        )
         assert isinstance(expression, Expression)
         if expression.is_expression():
             if (
-                    header_data == VariableColumnNames.lower_bound
-                    or header_data == VariableColumnNames.upper_bound
+                header_data == VariableColumnNames.lower_bound
+                or header_data == VariableColumnNames.upper_bound
             ):
-                if text == '':
-                    return ReturnMsg.no_message, '', new_expression
+                if text == "":
+                    return ReturnMsg.no_message, "", new_expression
 
         # text をチェックする
         try:
@@ -165,43 +194,42 @@ class VariableTableViewDelegate(QStyledItemDelegate):
         except Exception as e:
             print_exception(e)
             ret_msg = ReturnMsg.Error.cannot_recognize_as_an_expression
-            return ret_msg, '', None
+            return ret_msg, "", None
 
         # Valid expression
         if new_expression is not None:
-
             #  but not a number
             if not new_expression.is_number():
-
                 # if initial_value or test_value, it must be a number.
                 if (
-                        header_data == VariableColumnNames.initial_value
-                        or header_data == VariableColumnNames.step
-                        or header_data == VariableColumnNames.test_value
+                    header_data == VariableColumnNames.initial_value
+                    or header_data == VariableColumnNames.step
+                    or header_data == VariableColumnNames.test_value
                 ):
                     ret_msg = ReturnMsg.Error.not_a_number
 
                 # lower_bound or upper_bound must be a number too,
                 # but it can be set later, so switch ret_msg.
                 elif (
-                        header_data == VariableColumnNames.lower_bound
-                        or header_data == VariableColumnNames.upper_bound
+                    header_data == VariableColumnNames.lower_bound
+                    or header_data == VariableColumnNames.upper_bound
                 ):
                     ret_msg = ReturnMsg.Error.not_a_number_expression_setting_is_enable_in_constraint
 
                 else:
-                    raise RuntimeError('Internal Error! Unexpected header_data in VariableTableDelegate.')
+                    raise RuntimeError(
+                        "Internal Error! Unexpected header_data in VariableTableDelegate."
+                    )
 
                 # show error dialog
-                return ret_msg, '', None
+                return ret_msg, "", None
 
             # but raises other expression's error
             # (for example, division by zero)
             if (
-                    header_data == VariableColumnNames.initial_value
-                    or header_data == VariableColumnNames.test_value
+                header_data == VariableColumnNames.initial_value
+                or header_data == VariableColumnNames.test_value
             ):
-
                 name = self.get_name(VariableColumnNames.name, model, index)
                 expressions = get_var_model(self.parent()).get_current_variables()
                 expressions.update({name: new_expression})
@@ -210,22 +238,21 @@ class VariableTableViewDelegate(QStyledItemDelegate):
                     return ReturnMsg.Error.raises_other_expression_error, a_msg, None
 
         # check end
-        return ReturnMsg.no_message, '', new_expression
+        return ReturnMsg.no_message, "", new_expression
 
     def setModelData(self, editor, model, index) -> None:
-
-        assert isinstance(model, VariableItemModelForTableView), f'{type(model)=}'
+        assert isinstance(model, VariableItemModelForTableView), f"{type(model)=}"
 
         # QLineEdit を使いたいので str を setText すること
 
         header_data = get_internal_header_data(index)
 
         if (
-                header_data == VariableColumnNames.initial_value
-                or header_data == VariableColumnNames.lower_bound
-                or header_data == VariableColumnNames.upper_bound
-                or header_data == VariableColumnNames.step
-                or header_data == VariableColumnNames.test_value
+            header_data == VariableColumnNames.initial_value
+            or header_data == VariableColumnNames.lower_bound
+            or header_data == VariableColumnNames.upper_bound
+            or header_data == VariableColumnNames.step
+            or header_data == VariableColumnNames.test_value
         ):
             editor: QLineEdit
             text = editor.text()
@@ -233,47 +260,67 @@ class VariableTableViewDelegate(QStyledItemDelegate):
             # check valid input or not
             if header_data == VariableColumnNames.step:
                 # if step, allow empty input
-                if text.removeprefix(' ') == '':
+                if text.removeprefix(" ") == "":
                     new_expression = None
 
                 # if step, positive only
                 else:
-                    ret_msg, a_msg, new_expression = self.check_valid(text, header_data, model, index)
-                    if not can_continue(ret_msg, parent=self.parent(), additional_message=text):
+                    ret_msg, a_msg, new_expression = self.check_valid(
+                        text, header_data, model, index
+                    )
+                    if not can_continue(
+                        ret_msg, parent=self.parent(), additional_message=text
+                    ):
                         return
 
                     assert new_expression is not None
                     if new_expression.value <= 0:
                         ret_msg = ReturnMsg.Error.step_must_be_positive
-                        can_continue(ret_msg, parent=self.parent(), additional_message=','.join((text, a_msg)))
+                        can_continue(
+                            ret_msg,
+                            parent=self.parent(),
+                            additional_message=",".join((text, a_msg)),
+                        )
                         return
 
             else:
-                ret_msg, a_msg, new_expression = self.check_valid(text, header_data, model, index)
-                if not can_continue(ret_msg, parent=self.parent(), additional_message=','.join((text, a_msg))):
+                ret_msg, a_msg, new_expression = self.check_valid(
+                    text, header_data, model, index
+                )
+                if not can_continue(
+                    ret_msg,
+                    parent=self.parent(),
+                    additional_message=",".join((text, a_msg)),
+                ):
                     return
 
             # if init or lb or ub, check bounds
             if (
-                    header_data == VariableColumnNames.initial_value
-                    or header_data == VariableColumnNames.lower_bound
-                    or header_data == VariableColumnNames.upper_bound
+                header_data == VariableColumnNames.initial_value
+                or header_data == VariableColumnNames.lower_bound
+                or header_data == VariableColumnNames.upper_bound
             ):
-                ret_msg, a_msg = self.check_bounds(new_expression, header_data, model, index)
-                if not can_continue(ret_msg, parent=self.parent(), additional_message=a_msg):
+                ret_msg, a_msg = self.check_bounds(
+                    new_expression, header_data, model, index
+                )
+                if not can_continue(
+                    ret_msg, parent=self.parent(), additional_message=a_msg
+                ):
                     return
 
             # if test, evaluate other expressions
-            if (
-                    header_data == VariableColumnNames.test_value
-            ):
+            if header_data == VariableColumnNames.test_value:
                 name = self.get_name(VariableColumnNames.name, model, index)
-                ret_msg, a_msg = get_var_model(None).update_test_value_expressions({name: new_expression})
-                if not can_continue(ret_msg, parent=self.parent(), additional_message=a_msg):
+                ret_msg, a_msg = get_var_model(None).update_test_value_expressions(
+                    {name: new_expression}
+                )
+                if not can_continue(
+                    ret_msg, parent=self.parent(), additional_message=a_msg
+                ):
                     return
 
             # if OK, update model
-            display = new_expression.expr if new_expression is not None else ''
+            display = new_expression.expr if new_expression is not None else ""
             model.setData(index, display, Qt.ItemDataRole.DisplayRole)
             model.setData(index, new_expression, Qt.ItemDataRole.UserRole)
 
@@ -288,11 +335,10 @@ class VariableItemModel(StandardItemModelWithHeader):
     ColumnNames = VariableColumnNames
 
     column_name_display_map = {
-        CommonItemColumnName.use: 'パラメータ\nとして使用'
+        CommonItemColumnName.use: QCoreApplication.translate("pyfemtet_opt_gui.models.variables.var", "パラメータ\nとして使用")
     }
 
     def _set_dummy_data(self, _dummy_data: dict):
-
         rows = 1 + len(tuple(_dummy_data.values())[0])
         columns = len(self.ColumnNames)
         self.setRowCount(rows)
@@ -300,18 +346,20 @@ class VariableItemModel(StandardItemModelWithHeader):
 
         variable_values, ret_msg, additional_msg = eval_expressions(
             {
-                name: Expression(tst) for name, tst in zip(
+                name: Expression(tst)
+                for name, tst in zip(
                     _dummy_data[self.ColumnNames.name],
-                    _dummy_data[self.ColumnNames.test_value]
+                    _dummy_data[self.ColumnNames.test_value],
                 )
             }
         )
-        assert ret_msg == ReturnMsg.no_message, 'ダミーデータが計算不能'
+        assert ret_msg == ReturnMsg.no_message, QCoreApplication.translate(
+            "pyfemtet_opt_gui.models.variables.var", "ダミーデータが計算不能"
+        )
 
         iterable = self.get_row_iterable()
         for key, values in _dummy_data.items():
             for i, (r, value) in enumerate(zip(iterable, values)):
-
                 c = self.get_column_by_header_data(key)
                 item = QStandardItem()
 
@@ -332,10 +380,10 @@ class VariableItemModel(StandardItemModelWithHeader):
                 # self.ColumnNames.upper_bound
                 # self.ColumnNames.step
                 elif (
-                        key == self.ColumnNames.initial_value
-                        or key == self.ColumnNames.lower_bound
-                        or key == self.ColumnNames.upper_bound
-                        or key == self.ColumnNames.step
+                    key == self.ColumnNames.initial_value
+                    or key == self.ColumnNames.lower_bound
+                    or key == self.ColumnNames.upper_bound
+                    or key == self.ColumnNames.step
                 ):
                     if value is not None:
                         item.setText(revert(str(value)))
@@ -352,7 +400,12 @@ class VariableItemModel(StandardItemModelWithHeader):
                         item.setText(str(value))
 
                 else:
-                    raise Exception(f'ダミーデータが不正, {key}')
+                    raise Exception(
+                        QCoreApplication.translate(
+                            "pyfemtet_opt_gui.models.variables.var",
+                            "ダミーデータが不正, {key}",
+                        ).format(key=key)
+                    )
 
                 self.setItem(r, c, item)
 
@@ -380,20 +433,23 @@ class VariableItemModel(StandardItemModelWithHeader):
             self.setRowCount(rows)  # header row for treeview
 
             for r, (name, expression) in zip(range(1, rows), expressions.items()):
-
                 # ===== use =====
-                with nullcontext():  # editor で畳みやすくするためだけのコンテキストマネージャ
+                with (
+                    nullcontext()
+                ):  # editor で畳みやすくするためだけのコンテキストマネージャ
                     item = QStandardItem()
                     if expression.is_number():
                         # expression が float なら checkable
                         item.setCheckable(True)
                         if name in stashed_data.keys():
-                            self.set_data_from_stash(item, name, self.ColumnNames.use, stashed_data)
+                            self.set_data_from_stash(
+                                item, name, self.ColumnNames.use, stashed_data
+                            )
                         else:
                             item.setCheckState(Qt.CheckState.Checked)
                     else:
                         # disabled は行全体に適用するので flags() で定義
-                        item.setToolTip('式が文字式であるため選択できません。')
+                        item.setToolTip(self.tr("式が文字式であるため選択できません。"))
                     c = self.get_column_by_header_data(self.ColumnNames.use)
                     item.setEditable(False)
                     self.setItem(r, c, item)
@@ -415,7 +471,7 @@ class VariableItemModel(StandardItemModelWithHeader):
                     item.setText(revert(expression.expr))
                     item.setData(expression, Qt.ItemDataRole.UserRole)
                     if expression.is_expression():
-                        item.setToolTip('式が文字式であるため編集できません。')
+                        item.setToolTip(self.tr("式が文字式であるため編集できません。"))
                     self.setItem(r, c, item)
 
                 # ===== lb =====
@@ -423,20 +479,22 @@ class VariableItemModel(StandardItemModelWithHeader):
                     item = QStandardItem()
                     # 新しい変数の式が文字式ならとにかく空欄にする
                     if expression.is_expression():
-                        display_value = ''
+                        display_value = ""
                         item.setText(display_value)
 
                     # 新しい変数が数値であって、
                     else:
                         # 以前からある変数であって、
                         if name in stashed_data.keys():
-                            self.set_data_from_stash(item, name, self.ColumnNames.lower_bound, stashed_data)
+                            self.set_data_from_stash(
+                                item, name, self.ColumnNames.lower_bound, stashed_data
+                            )
                             # 以前は文字式であって空欄が入っていた場合
-                            if item.text() == '':
+                            if item.text() == "":
                                 # 上の set_data_from_stash を破棄して
                                 item = QStandardItem()
                                 # デフォルト値を計算して設定する
-                                tmp_expression = Expression('0.9 * ' + expression.expr)
+                                tmp_expression = Expression("0.9 * " + expression.expr)
                                 item.setData(tmp_expression, Qt.ItemDataRole.UserRole)
                                 display_value = tmp_expression.expr
                                 item.setText(display_value)
@@ -444,8 +502,12 @@ class VariableItemModel(StandardItemModelWithHeader):
                             else:
                                 # 上下限チェックを満たしていれば
                                 assert expression.is_number()
-                                stashed: Expression = item.data(Qt.ItemDataRole.UserRole)
-                                ret_msg, error_nums = check_bounds(expression.value, lb=stashed.value)
+                                stashed: Expression = item.data(
+                                    Qt.ItemDataRole.UserRole
+                                )
+                                ret_msg, error_nums = check_bounds(
+                                    expression.value, lb=stashed.value
+                                )
                                 if ret_msg == ReturnMsg.no_message:
                                     # stash_data をそのまま使う
                                     pass
@@ -460,14 +522,18 @@ class VariableItemModel(StandardItemModelWithHeader):
                                         additional_message=name,
                                     )
                                     # デフォルト値を計算して設定する
-                                    tmp_expression = Expression('0.9 * ' + expression.expr)
-                                    item.setData(tmp_expression, Qt.ItemDataRole.UserRole)
+                                    tmp_expression = Expression(
+                                        "0.9 * " + expression.expr
+                                    )
+                                    item.setData(
+                                        tmp_expression, Qt.ItemDataRole.UserRole
+                                    )
                                     display_value = tmp_expression.expr
                                     item.setText(display_value)
                         # 以前にはなかった変数であれば
                         else:
                             # デフォルト値を計算して設定する
-                            tmp_expression = Expression('0.9 * ' + expression.expr)
+                            tmp_expression = Expression("0.9 * " + expression.expr)
                             item.setData(tmp_expression, Qt.ItemDataRole.UserRole)
                             display_value = tmp_expression.expr
                             item.setText(display_value)
@@ -480,7 +546,7 @@ class VariableItemModel(StandardItemModelWithHeader):
                     item = QStandardItem()
                     # 新しい変数の式が文字式ならとにかく空欄にする
                     if expression.is_expression():
-                        display_value = ''
+                        display_value = ""
                         item.setText(display_value)
 
                     # 新しい変数が数値であって、
@@ -488,12 +554,14 @@ class VariableItemModel(StandardItemModelWithHeader):
                         # 以前からある変数であって、
                         if name in stashed_data.keys():
                             # 以前は文字式であって空欄が入っていた場合
-                            self.set_data_from_stash(item, name, self.ColumnNames.upper_bound, stashed_data)
-                            if item.text() == '':
+                            self.set_data_from_stash(
+                                item, name, self.ColumnNames.upper_bound, stashed_data
+                            )
+                            if item.text() == "":
                                 # 上の set_data_from_stash を破棄して
                                 item = QStandardItem()
                                 # デフォルト値を計算して設定する
-                                tmp_expression = Expression('1.1 * ' + expression.expr)
+                                tmp_expression = Expression("1.1 * " + expression.expr)
                                 item.setData(tmp_expression, Qt.ItemDataRole.UserRole)
                                 display_value = tmp_expression.expr
                                 item.setText(display_value)
@@ -501,8 +569,12 @@ class VariableItemModel(StandardItemModelWithHeader):
                             else:
                                 # 上下限チェックを満たしていれば
                                 assert expression.is_number()
-                                stashed: Expression = item.data(Qt.ItemDataRole.UserRole)
-                                ret_msg, error_nums = check_bounds(expression.value, ub=stashed.value)
+                                stashed: Expression = item.data(
+                                    Qt.ItemDataRole.UserRole
+                                )
+                                ret_msg, error_nums = check_bounds(
+                                    expression.value, ub=stashed.value
+                                )
                                 if ret_msg == ReturnMsg.no_message:
                                     # stash_data をそのまま使う
                                     pass
@@ -517,14 +589,18 @@ class VariableItemModel(StandardItemModelWithHeader):
                                         additional_message=name,
                                     )
                                     # デフォルト値を計算して設定する
-                                    tmp_expression = Expression('1.1 * ' + expression.expr)
-                                    item.setData(tmp_expression, Qt.ItemDataRole.UserRole)
+                                    tmp_expression = Expression(
+                                        "1.1 * " + expression.expr
+                                    )
+                                    item.setData(
+                                        tmp_expression, Qt.ItemDataRole.UserRole
+                                    )
                                     display_value = tmp_expression.expr
                                     item.setText(display_value)
                         # 以前にはなかった変数であれば
                         else:
                             # デフォルト値を計算して設定する
-                            tmp_expression = Expression('1.1 * ' + expression.expr)
+                            tmp_expression = Expression("1.1 * " + expression.expr)
                             item.setData(tmp_expression, Qt.ItemDataRole.UserRole)
                             display_value = tmp_expression.expr
                             item.setText(display_value)
@@ -543,14 +619,19 @@ class VariableItemModel(StandardItemModelWithHeader):
 
                     # 新しい変数が数値であって、
                     else:
-
                         # 以前からある変数であって、
                         if name in stashed_data.keys():
-
                             # 以前は文字式であった場合 (stashed_data の initial_value を調べる)
                             tmp_item = QStandardItem()
-                            self.set_data_from_stash(tmp_item, name, self.ColumnNames.initial_value, stashed_data)
-                            stashed_expression: Expression = tmp_item.data(Qt.ItemDataRole.UserRole)
+                            self.set_data_from_stash(
+                                tmp_item,
+                                name,
+                                self.ColumnNames.initial_value,
+                                stashed_data,
+                            )
+                            stashed_expression: Expression = tmp_item.data(
+                                Qt.ItemDataRole.UserRole
+                            )
                             if stashed_expression.is_expression():
                                 # デフォルト値を設定する
                                 tmp_expression = Expression(expression.expr)
@@ -560,7 +641,12 @@ class VariableItemModel(StandardItemModelWithHeader):
                             # 以前も数値であった場合
                             else:
                                 # stash_data を使う
-                                self.set_data_from_stash(item, name, self.ColumnNames.test_value, stashed_data)
+                                self.set_data_from_stash(
+                                    item,
+                                    name,
+                                    self.ColumnNames.test_value,
+                                    stashed_data,
+                                )
 
                         # 以前からない数値であれば
                         else:
@@ -578,34 +664,40 @@ class VariableItemModel(StandardItemModelWithHeader):
                     # 新しい変数の式が文字式ならとにかくデフォルト値を設定する
                     if expression.is_expression():
                         item.setData(None, Qt.ItemDataRole.UserRole)
-                        item.setText('')
+                        item.setText("")
 
                     # 新しい変数が数値であって、
                     else:
-
                         # 以前からある変数であって、
                         if name in stashed_data.keys():
-
                             # 以前は文字式であった場合 (stashed_data の initial_value を調べる)
                             tmp_item = QStandardItem()
-                            self.set_data_from_stash(tmp_item, name, self.ColumnNames.initial_value, stashed_data)
-                            stashed_expression: Expression = tmp_item.data(Qt.ItemDataRole.UserRole)
+                            self.set_data_from_stash(
+                                tmp_item,
+                                name,
+                                self.ColumnNames.initial_value,
+                                stashed_data,
+                            )
+                            stashed_expression: Expression = tmp_item.data(
+                                Qt.ItemDataRole.UserRole
+                            )
                             if stashed_expression.is_expression():
-
                                 # デフォルト値を設定する
                                 item.setData(None, Qt.ItemDataRole.UserRole)
-                                item.setText('')
+                                item.setText("")
 
                             # 以前も数値であった場合
                             else:
                                 # stash_data を使う
-                                self.set_data_from_stash(item, name, self.ColumnNames.step, stashed_data)
+                                self.set_data_from_stash(
+                                    item, name, self.ColumnNames.step, stashed_data
+                                )
 
                         # 以前からない数値であれば
                         else:
                             # デフォルト値を設定する
                             item.setData(None, Qt.ItemDataRole.UserRole)
-                            item.setText('')
+                            item.setText("")
 
                     c = self.get_column_by_header_data(self.ColumnNames.step)
                     self.setItem(r, c, item)
@@ -614,9 +706,11 @@ class VariableItemModel(StandardItemModelWithHeader):
                 with nullcontext():
                     item = QStandardItem()
                     if name in stashed_data.keys():
-                        self.set_data_from_stash(item, name, self.ColumnNames.note, stashed_data)
+                        self.set_data_from_stash(
+                            item, name, self.ColumnNames.note, stashed_data
+                        )
                     else:
-                        item.setText('')
+                        item.setText("")
                     c = self.get_column_by_header_data(self.ColumnNames.note)
                     self.setItem(r, c, item)
 
@@ -630,15 +724,19 @@ class VariableItemModel(StandardItemModelWithHeader):
 
         # ただし lb、ub、note は除く
         if (
-                c == self.get_column_by_header_data(self.ColumnNames.lower_bound)
-                or c == self.get_column_by_header_data(self.ColumnNames.upper_bound)
-                or c == self.get_column_by_header_data(self.ColumnNames.note)
+            c == self.get_column_by_header_data(self.ColumnNames.lower_bound)
+            or c == self.get_column_by_header_data(self.ColumnNames.upper_bound)
+            or c == self.get_column_by_header_data(self.ColumnNames.note)
         ):
             return super().flags(index)
 
         # initial が expression なら enabled (not editable)
-        c_initial_value = self.get_column_by_header_data(value=self.ColumnNames.initial_value)
-        expression: Expression = self.item(r, c_initial_value).data(Qt.ItemDataRole.UserRole)
+        c_initial_value = self.get_column_by_header_data(
+            value=self.ColumnNames.initial_value
+        )
+        expression: Expression = self.item(r, c_initial_value).data(
+            Qt.ItemDataRole.UserRole
+        )
         if expression is not None:
             if expression.is_expression():
                 return Qt.ItemFlag.ItemIsEnabled
@@ -646,7 +744,7 @@ class VariableItemModel(StandardItemModelWithHeader):
         return super().flags(index)
 
     def update_test_value_expressions(
-            self, partial_expressions: dict[str, Expression] = None
+        self, partial_expressions: dict[str, Expression] = None
     ) -> tuple[ReturnType, str | None]:
         # QLineEdit を使いたいので str を setText すること
 
@@ -661,48 +759,39 @@ class VariableItemModel(StandardItemModelWithHeader):
             return ret_msg, a_msg
 
         # 再計算結果を表示する
-        c_var_name = self.get_column_by_header_data(
-            self.ColumnNames.name
-        )
-        c_test_value = self.get_column_by_header_data(
-            self.ColumnNames.test_value
-        )
-        c_initial_value = self.get_column_by_header_data(
-            self.ColumnNames.initial_value
-        )
+        c_var_name = self.get_column_by_header_data(self.ColumnNames.name)
+        c_test_value = self.get_column_by_header_data(self.ColumnNames.test_value)
+        c_initial_value = self.get_column_by_header_data(self.ColumnNames.initial_value)
         for r in self.get_row_iterable():
-
             # 変数が expression でなければ無視
-            expression: Expression = self.item(r, c_initial_value).data(Qt.ItemDataRole.UserRole)
+            expression: Expression = self.item(r, c_initial_value).data(
+                Qt.ItemDataRole.UserRole
+            )
             if expression is not None:
                 if not expression.is_expression():
                     continue
 
             # 値を更新
             name = self.item(r, c_var_name).data(Qt.ItemDataRole.UserRole)
-            self.item(r, c_test_value).setData(str(evaluated_values[name]), Qt.ItemDataRole.DisplayRole)
+            self.item(r, c_test_value).setData(
+                str(evaluated_values[name]), Qt.ItemDataRole.DisplayRole
+            )
             # self.item(r, c_test_value).setData(expressions[name], Qt.ItemDataRole.UserRole)  # なくてもいいはず
 
         return ReturnMsg.no_message, None
 
     def apply_test_values(self):
-
         # test 列に登録されている変数を取得
-        c_var_name = self.get_column_by_header_data(
-            self.ColumnNames.name
-        )
-        c_test_value = self.get_column_by_header_data(
-            self.ColumnNames.test_value
-        )
-        c_initial_value = self.get_column_by_header_data(
-            self.ColumnNames.initial_value
-        )
+        c_var_name = self.get_column_by_header_data(self.ColumnNames.name)
+        c_test_value = self.get_column_by_header_data(self.ColumnNames.test_value)
+        c_initial_value = self.get_column_by_header_data(self.ColumnNames.initial_value)
 
         variables = dict()
         for r in self.get_row_iterable():
-
             # 変数が expression なら無視
-            expression: Expression = self.item(r, c_initial_value).data(Qt.ItemDataRole.UserRole)
+            expression: Expression = self.item(r, c_initial_value).data(
+                Qt.ItemDataRole.UserRole
+            )
             if expression is not None:
                 if expression.is_expression():
                     continue
@@ -710,9 +799,7 @@ class VariableItemModel(StandardItemModelWithHeader):
             # 変数名: 値 の dict を作成
             var_name = self.item(r, c_var_name).data(Qt.ItemDataRole.UserRole)
             value = self.item(r, c_test_value).text()
-            variables.update(
-                {var_name: value}
-            )
+            variables.update({var_name: value})
 
         # Femtet に転送
         return_msg, a_msg = fi.get().apply_variables(variables)
@@ -756,7 +843,6 @@ class VariableItemModel(StandardItemModelWithHeader):
         out_object = list()
 
         for r in self.get_row_iterable():
-
             # 必要な列の logicalIndex を取得
             hd = self.ColumnNames.use
             c = self.get_column_by_header_data(hd)
@@ -771,174 +857,167 @@ class VariableItemModel(StandardItemModelWithHeader):
             # 評価できない
             # add_expression(pass_to_fem=False)
             if not self.item(r, c).isCheckable():
-
-                command_object.update(
-                    {'command': 'femopt.add_expression'}
-                )
+                command_object.update({"command": "femopt.add_expression"})
 
                 # name
                 with nullcontext():
-                    item = self.item(r, self.get_column_by_header_data(self.ColumnNames.name))
+                    item = self.item(
+                        r, self.get_column_by_header_data(self.ColumnNames.name)
+                    )
                     args_object.update(
                         dict(name=f'"{item.data(Qt.ItemDataRole.DisplayRole)}"')
                     )
 
                 # fun
                 with nullcontext():
-                    item = self.item(r, self.get_column_by_header_data(self.ColumnNames.initial_value))
+                    item = self.item(
+                        r,
+                        self.get_column_by_header_data(self.ColumnNames.initial_value),
+                    )
                     expr: Expression = item.data(Qt.ItemDataRole.UserRole)
                     if expr.is_number():
-                        value = f'lambda: {expr.value}'
+                        value = f"lambda: {expr.value}"
                     else:
                         # 必要な変数名に含まれる 記号 を gui 仕様から pyfemtet 仕様に変換
                         args = [
-                            name
-                            .replace('__at__', AT)
-                            .replace('__dot__', DOT)
-                            .replace('__hyphen__', HYPHEN)
+                            name.replace("__at__", AT)
+                            .replace("__dot__", DOT)
+                            .replace("__hyphen__", HYPHEN)
                             for name in list(expr.dependencies)
                         ]
                         # lambda <args>: eval('<expr>', locals=...)
                         expression = (
-                            expr.expr
-                            .replace('__at__', AT)
-                            .replace('__dot__', DOT)
-                            .replace('__hyphen__', HYPHEN)
+                            expr.expr.replace("__at__", AT)
+                            .replace("__dot__", DOT)
+                            .replace("__hyphen__", HYPHEN)
                         )
                         value = (
-                            'lambda '
-                            + ', '.join(args)
-                            + ': '
-                            + f'eval('  # noqa
-                                  f'unicodedata.normalize("NFKC", "{expression}"), '
-                                  'dict('
-                                      f'**{{unicodedata.normalize("NFKC", k): v for k, v in locals().items()}}, '
-                                      f'**{{'
-                                          f'unicodedata.normalize("NFKC", k): v for k, v in get_femtet_builtins().items()'
-                                          f'if k not in {{unicodedata.normalize("NFKC", k_): v_ for k_, v_ in locals().items()}}'
-                                      f'}}'
-                                  f')'
-                              f')'
+                            "lambda " + ", ".join(args) + ": " + f"eval("  # noqa
+                            f'unicodedata.normalize("NFKC", "{expression}"), '
+                            "dict("
+                            f'**{{unicodedata.normalize("NFKC", k): v for k, v in locals().items()}}, '
+                            f"**{{"
+                            f'unicodedata.normalize("NFKC", k): v for k, v in get_femtet_builtins().items()'
+                            f'if k not in {{unicodedata.normalize("NFKC", k_): v_ for k_, v_ in locals().items()}}'
+                            f"}}"
+                            f")"
+                            f")"
                         )
-                    args_object.update(
-                        dict(fun=value)
-                    )
+                    args_object.update(dict(fun=value))
 
                 # pass_to_fem
                 with nullcontext():
-                    args_object.update(
-                        dict(pass_to_fem=False)
-                    )
+                    args_object.update(dict(pass_to_fem=False))
 
             # 数式でなくて Check されている場合: 通常の Parameter
             # add_parameter
             elif self.item(r, c).checkState() == Qt.CheckState.Checked:
-
-                command_object.update(
-                    {'command': 'femopt.add_parameter'}
-                )
+                command_object.update({"command": "femopt.add_parameter"})
 
                 args_object = dict()
 
                 # name
                 with nullcontext():
-                    item = self.item(r, self.get_column_by_header_data(self.ColumnNames.name))
+                    item = self.item(
+                        r, self.get_column_by_header_data(self.ColumnNames.name)
+                    )
                     args_object.update(
                         dict(name=f'"{item.data(Qt.ItemDataRole.DisplayRole)}"')
                     )
 
                 # initial_value
                 with nullcontext():
-                    item = self.item(r, self.get_column_by_header_data(self.ColumnNames.initial_value))
+                    item = self.item(
+                        r,
+                        self.get_column_by_header_data(self.ColumnNames.initial_value),
+                    )
                     expr: Expression = item.data(Qt.ItemDataRole.UserRole)
                     assert expr.is_number()
-                    args_object.update(
-                        dict(initial_value=expr.value)
-                    )
+                    args_object.update(dict(initial_value=expr.value))
 
                 # lower_bound
                 with nullcontext():
-                    item = self.item(r, self.get_column_by_header_data(self.ColumnNames.lower_bound))
+                    item = self.item(
+                        r, self.get_column_by_header_data(self.ColumnNames.lower_bound)
+                    )
                     expr: Expression = item.data(Qt.ItemDataRole.UserRole)
                     assert expr.is_number()
-                    args_object.update(
-                        dict(lower_bound=expr.value)
-                    )
+                    args_object.update(dict(lower_bound=expr.value))
 
                 # upper_bound
                 with nullcontext():
-                    item = self.item(r, self.get_column_by_header_data(self.ColumnNames.upper_bound))
+                    item = self.item(
+                        r, self.get_column_by_header_data(self.ColumnNames.upper_bound)
+                    )
                     expr: Expression = item.data(Qt.ItemDataRole.UserRole)
                     assert expr.is_number()
-                    args_object.update(
-                        dict(upper_bound=expr.value)
-                    )
+                    args_object.update(dict(upper_bound=expr.value))
 
                 # step
                 with nullcontext():
-                    item = self.item(r, self.get_column_by_header_data(self.ColumnNames.step))
+                    item = self.item(
+                        r, self.get_column_by_header_data(self.ColumnNames.step)
+                    )
                     if item is None:
                         expr: Expression | None = None
                     else:
                         expr: Expression | None = item.data(Qt.ItemDataRole.UserRole)
                     if expr is not None:
                         assert expr.is_number()
-                        args_object.update(
-                            dict(step=expr.value)
-                        )
+                        args_object.update(dict(step=expr.value))
 
                 # properties
                 with nullcontext():
                     # initial_value の Expression が unit を持つなら
                     # それを properties に追加
-                    item = self.item(r, self.get_column_by_header_data(self.ColumnNames.initial_value))
+                    item = self.item(
+                        r,
+                        self.get_column_by_header_data(self.ColumnNames.initial_value),
+                    )
                     expr: Expression = item.data(Qt.ItemDataRole.UserRole)
                     assert expr.is_number()
                     if expr.unit:
-                        args_object.update(
-                            dict(properties=f'dict(unit="{expr.unit}")')
-                        )
+                        args_object.update(dict(properties=f'dict(unit="{expr.unit}")'))
 
             # 数式でなくて Check されていない場合: Expression (pass_to_fem=True)
             # GUI 画面と Femtet の定義に万一差があっても
             # pass_to_fem が True なら上書きできる。
             # add_expression
             else:
-
-                command_object.update(
-                    {'command': 'femopt.add_expression'}
-                )
+                command_object.update({"command": "femopt.add_expression"})
 
                 # name
                 with nullcontext():
-                    item = self.item(r, self.get_column_by_header_data(self.ColumnNames.name))
+                    item = self.item(
+                        r, self.get_column_by_header_data(self.ColumnNames.name)
+                    )
                     args_object.update(
                         dict(name=f'"{item.data(Qt.ItemDataRole.DisplayRole)}"')
                     )
 
                 # fun
                 with nullcontext():
-                    item = self.item(r, self.get_column_by_header_data(self.ColumnNames.initial_value))
+                    item = self.item(
+                        r,
+                        self.get_column_by_header_data(self.ColumnNames.initial_value),
+                    )
                     expr: Expression = item.data(Qt.ItemDataRole.UserRole)
                     if expr.is_number():
-                        value = f'lambda: {expr.value}'
+                        value = f"lambda: {expr.value}"
                     else:
                         # 数式ではないのでここには来ないはず
                         assert False
-                    args_object.update(
-                        dict(fun=value)
-                    )
+                    args_object.update(dict(fun=value))
 
                 # pass_to_fem
                 with nullcontext():
-                    args_object.update(
-                        dict(pass_to_fem=True)
-                    )
+                    args_object.update(dict(pass_to_fem=True))
 
-            command_object.update({'args': args_object})
+            command_object.update({"args": args_object})
             out_object.append(command_object)
 
         import json
+
         return json.dumps(out_object)
 
     def output_expression_constraint_json(self) -> str:
@@ -956,10 +1035,8 @@ class VariableItemModel(StandardItemModelWithHeader):
         out_object = list()
 
         for r in self.get_row_iterable():
-
             # 必要な列の logicalIndex を取得
             with nullcontext():
-
                 hd = self.ColumnNames.name
                 c_name = self.get_column_by_header_data(hd)
 
@@ -1005,20 +1082,18 @@ class VariableItemModel(StandardItemModelWithHeader):
                     lower_bound=lb,
                     upper_bound=ub,
                     strict=True,
-                    args=['femopt.opt']
+                    args=["femopt.opt"],
                 )
             )
 
             command_object.update(
-                {
-                    'command': 'femopt.add_constraint',
-                    'args': args_object
-                }
+                {"command": "femopt.add_constraint", "args": args_object}
             )
 
             out_object.append(command_object)
 
         import json
+
         return json.dumps(out_object)
 
 
@@ -1030,13 +1105,11 @@ class VariableItemModelForTableView(StandardItemModelWithoutFirstRow):
 
 # 一覧 Problem ページに表示される StandardItemModelAsStandardItem 用 ItemModel
 class QVariableItemModelForProblem(ProxyModelWithForProblem):
-
     def filterAcceptsColumn(self, source_column: int, source_parent: QModelIndex):
         # test_value を非表示
         source_model: VariableItemModel = self.sourceModel()
         if source_column == get_column_by_header_data(
-                source_model,
-                VariableColumnNames.test_value
+            source_model, VariableColumnNames.test_value
         ):
             return False
 
@@ -1054,10 +1127,10 @@ class VariableWizardPage(TitledWizardPage):
     page_name = PageSubTitles.var
 
     def __init__(
-            self,
-            parent=None,
-            load_femtet_fun: callable = None,
-            _dummy_data=None,
+        self,
+        parent=None,
+        load_femtet_fun: callable = None,
+        _dummy_data=None,
     ):
         super().__init__(parent, _dummy_data)
         self.setup_ui()
@@ -1069,12 +1142,12 @@ class VariableWizardPage(TitledWizardPage):
         self.ui = Ui_WizardPage()
         self.ui.setupUi(self)
         self.ui.commandLinkButton.clicked.connect(
-            lambda *args: fi.get().open_help('ProjectCreation/VariableTree.htm')
+            lambda *args: fi.get().open_help("ProjectCreation/VariableTree.htm")
         )
 
     def setup_model(
-            self,
-            load_femtet_fun=None,
+        self,
+        load_femtet_fun=None,
     ):
         self.source_model = get_var_model(self, _dummy_data=self._dummy_data)
         self.proxy_model = VariableItemModelForTableView(self)
@@ -1084,8 +1157,8 @@ class VariableWizardPage(TitledWizardPage):
         # femtet 全体を load する関数
         self.ui.pushButton_load_prm.clicked.connect(
             (lambda *_: self.source_model.load_femtet())  # debug 用
-            if load_femtet_fun is None else
-            (lambda *_: load_femtet_fun())
+            if load_femtet_fun is None
+            else (lambda *_: load_femtet_fun())
         )
 
         # test value を Femtet に転送する
@@ -1097,7 +1170,6 @@ class VariableWizardPage(TitledWizardPage):
         # isComplete を更新する
         def filter_role(_1, _2, roles):
             if Qt.ItemDataRole.CheckStateRole in roles:  # or len(roles) == 0
-
                 # 警告を表示する（編集は受け入れる）
                 if self.source_model.is_nothing_checked():
                     ret_msg = ReturnMsg.Warn.no_params_selected

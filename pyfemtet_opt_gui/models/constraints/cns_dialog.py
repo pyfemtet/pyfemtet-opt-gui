@@ -184,7 +184,7 @@ class ConstraintEditorDialog(QDialog):
             label.setFont(font)
 
         except ExpressionParseError:
-            value = '計算エラー'
+            value = QCoreApplication.translate('pyfemtet_opt_gui.models.constraints.cns_dialog', '計算エラー')
 
             # set 赤字・太字
             palette = label.palette()
@@ -195,7 +195,7 @@ class ConstraintEditorDialog(QDialog):
             label.setFont(font)
 
         self.ui.label_calc_value.setText(
-            '現在の計算値: ' + str(value)
+            QCoreApplication.translate('pyfemtet_opt_gui.models.constraints.cns_dialog', '現在の計算値: ') + str(value)
         )
 
     def get_selected_variable(self) -> str | None:
@@ -320,7 +320,7 @@ class ConstraintEditorDialog(QDialog):
                     can_continue(
                         ReturnMsg.Error.duplicated_constraint_name,
                         parent=self.parent(),
-                        additional_message=f'拘束式名: {constraint.name}',
+                        additional_message = (QCoreApplication.translate('pyfemtet_opt_gui.models.constraints.cns_dialog', '拘束式名: {constraint_name}').format(constraint_name=constraint.name),)
                     )
                     return None
 

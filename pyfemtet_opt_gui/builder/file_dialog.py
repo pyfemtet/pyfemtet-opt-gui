@@ -20,7 +20,7 @@ class ScriptBuilderFileDialog(QFileDialog):
     def __init__(self, parent, f=Qt.WindowType.Dialog):
         super().__init__(parent, f)
         self.return_msg = ReturnMsg.no_message
-        self.setNameFilter("Python files (*.py)")
+        self.setNameFilter("Python files (*.py)")  # No need to translate
         self.setDefaultSuffix('.py')
         self.setFileMode(QFileDialog.FileMode.AnyFile)
         self.setAcceptMode(QFileDialog.AcceptMode.AcceptSave)

@@ -1,0 +1,77 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, pyfemtet
+# This file is distributed under the same license as the pyfemtet-opt-gui package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: pyfemtet-opt-gui \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-08 20:38+0900\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/introduction.rst:2
+msgid "はじめに"
+msgstr "Introduction"
+
+#: ../../source/introduction.rst:4
+msgid "pyfemtet-opt-gui は、Femtet の拡張機能として pyfemtet.opt ライブラリを用いた最適設計を支援する GUI ツールです。 また、Solidworks との連携機能も備えています。"
+msgstr "pyfemtet-opt-gui is a GUI tool that supports optimal design using the pyfemtet.opt library as an extension for Femtet. It also provides integration with Solidworks."
+
+#: ../../source/introduction.rst:7
+msgid "このドキュメントでは、インストール方法から基本的な使い方、Femtet最適化機能・Solidworks連携機能の詳細、サンプルやトラブルシューティングまでを解説します。"
+msgstr "This documentation covers installation, basic usage, details of Femtet optimization and Solidworks integration features, as well as samples and troubleshooting."
+
+#: ../../source/introduction.rst:11
+msgid "概要"
+msgstr "Overview"
+
+#: ../../source/introduction.rst:12
+msgid "pyfemtet-opt-gui は、pyfemtet.opt を用いた最適化プログラムを コーディングなしで GUI から作成・実行できる設計エンジニア向けの支援ツールです。"
+msgstr "pyfemtet-opt-gui is a support tool for design engineers that allows you to create and run optimization programs using pyfemtet.opt from a GUI without coding."
+
+#: ../../source/introduction.rst:15
+msgid "本ツールは、Femtet を用いた最適化だけでなく、 Solidworks との連携機能も備えています （ただし Solidworks 連携時は一部機能が制限されます）。"
+msgstr "This tool not only supports optimization using Femtet, but also provides integration with Solidworks (note that some features are limited when using Solidworks integration)."
+
+#: ../../source/introduction.rst:19
+msgid "Femtet最適化機能やSolidworks統合の詳細については、 詳細については、 `pyfemtet.opt の公式サイト <https://pyfemtet.readthedocs.io/ja/stable/>`_ もご参照ください。"
+msgstr "For more details on Femtet optimization and Solidworks integration features, please also refer to the `official pyfemtet.opt website <https://pyfemtet.readthedocs.io/en/stable/>`_."
+
+#: ../../source/introduction.rst:26
+msgid "開発背景"
+msgstr "Background"
+
+#: ../../source/introduction.rst:27
+msgid "設計現場から「コーディングせずに最適化を実施したい」という要望があり、 その補助ツールとして開発されました。"
+msgstr "This tool was developed in response to requests from the design field to perform optimization without coding."
+
+#: ../../source/introduction.rst:32
+msgid "サポート環境・注意事項"
+msgstr "Supported Environment & Notes"
+
+#: ../../source/introduction.rst:33
+msgid "サポートFemtetバージョン: 2023.1 以降"
+msgstr "Supported Femtet version: 2023.1 or later"
+
+#: ../../source/introduction.rst:34
+msgid "サポートpyfemtetバージョン: 1.2.0 以降"
+msgstr "Supported pyfemtet version: 1.2.0 or later"
+
+#: ../../source/introduction.rst:35
+msgid "Solidworks: 開発は2023で行われています。必須ソフトウェアではありません。"
+msgstr "Solidworks: Development is done with version 2023. It is not a required software."
+
+#: ../../source/introduction.rst:36
+msgid "本プログラムは Python スクリプトとして動作します。一般的なアプリケーションのようなインストール作業は不要です。"
+msgstr "This program runs as a Python script. No installation is required as with typical applications."
+

@@ -287,10 +287,16 @@ class ConfirmWizardPage(TitledWizardPage):
             if Version(pyfemtet.__version__) >= Version("0.8.5"):
                 button.clicked.disconnect(self.save_script)
                 button.clicked.connect(self.stop_optimization)
-                button.setText('現在の解析を最後にして最適化を停止する')
+                button.setText(QCoreApplication.translate(
+                    "pyfemtet_opt_gui.models.problem.problem",
+                    "現在の解析を最後にして最適化を停止する",
+                ))
 
             else:
-                button.setText('最適化の実行中はスクリプトを保存できません')
+                button.setText(QCoreApplication.translate(
+                    "pyfemtet_opt_gui.models.problem.problem",
+                    "最適化の実行中はスクリプトを保存できません",
+                ))
                 button.setDisabled(True)
 
         else:
@@ -305,6 +311,7 @@ class ConfirmWizardPage(TitledWizardPage):
                 # model.reset_history_path()  # このスレッドで reset してはいけないかも
 
             # 元に戻す
+            # note: accessibleName() is expected to be a translated/default name
             button.setText(button.accessibleName())
             button.setDisabled(False)
 
@@ -324,9 +331,12 @@ class ConfirmWizardPage(TitledWizardPage):
             # 再実行時、html のフォーマットが残留することが
             # あったので document を使って初期化
             doc = QTextDocument()
-            doc.setPlainText('開始しています。1 分程度お待ちください。\n'
-                             '最適化が始まるとプロセスモニターを起動します。\n'
-                             '最適化の確認・中断はプロセスモニターから行います。')
+            doc.setPlainText(QCoreApplication.translate(
+                "pyfemtet_opt_gui.models.problem.problem",
+                "開始しています。1 分程度お待ちください。\n"
+                "最適化が始まるとプロセスモニターを起動します。\n"
+                "最適化の確認・中断はプロセスモニターから行います。",
+            ))
             text_edit.setDocument(doc)
 
         elif state == 'history found':
@@ -335,14 +345,19 @@ class ConfirmWizardPage(TitledWizardPage):
             proxy_model = get_config_model_for_problem(self)
             data, ret_msg = proxy_model.get_monitor_host_info()
 
-            text = (f'\nブラウザで上の URL にアクセスすると'
-                    f'プロセスモニターを開くことができます。')
+            text = QCoreApplication.translate(
+                "pyfemtet_opt_gui.models.problem.problem",
+                "\nブラウザで上の URL にアクセスするとプロセスモニターを開くことができます。",
+            )
 
             if Version(pyfemtet.__version__) < Version('0.8.6'):
                 from pyfemtet.opt.visualization._process_monitor.application import ProcessMonitorApplication
                 port = ProcessMonitorApplication.DEFAULT_PORT
                 url = f'http://localhost:{port}'
-                text = text + '※ pyfemtet のバージョンが古いのでデフォルトのポート値を取得しています。\n'
+                text = text + QCoreApplication.translate(
+                    "pyfemtet_opt_gui.models.problem.problem",
+                    "※ pyfemtet のバージョンが古いのでデフォルトのポート値を取得しています。\n",
+                )
 
             else:
 
@@ -351,10 +366,16 @@ class ConfirmWizardPage(TitledWizardPage):
 
                 else:
                     url = f'http://localhost:8080'
-                    text = text + '※ ポート情報の取得に失敗したのでデフォルトのポート値を取得しています。\n'
+                    text = text + QCoreApplication.translate(
+                        "pyfemtet_opt_gui.models.problem.problem",
+                        "※ ポート情報の取得に失敗したのでデフォルトのポート値を取得しています。\n",
+                    )
 
-            text += (f'最適化が停止したらコンソール画面で「Enter」を押してください。\n'
-                     f'それまでの間はモニターを停止しないので分析作業を行うことができます。')
+            text += QCoreApplication.translate(
+                "pyfemtet_opt_gui.models.problem.problem",
+                "最適化が停止したらコンソール画面で「Enter」を押してください。\n"
+                "それまでの間はモニターを停止しないので分析作業を行うことができます。",
+            )
 
             text_edit.setText(text)
 

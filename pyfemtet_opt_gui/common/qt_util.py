@@ -77,7 +77,7 @@ class UntouchableProgressDialog(QProgressDialog):
             cancelButtonText: str,
             minimum: int,
             maximum: int,
-            parent=...,
+            parent,
     ) -> None:
         flags = (Qt.WindowType.CustomizeWindowHint
                  | Qt.WindowType.WindowTitleHint)

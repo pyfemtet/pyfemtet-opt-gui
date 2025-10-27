@@ -1,4 +1,5 @@
 import json
+from PySide6.QtCore import QCoreApplication
 import os
 import enum
 import re
@@ -225,9 +226,9 @@ def create_script(
         # 次にサロゲートモデル用スクリプトを作成する時に備えて
         # パスを設定する（作成しないなら単に使われない）
         if path is None:
-            training_history_path = '訓練データ.csv'
+            training_history_path = QCoreApplication.translate('pyfemtet_opt_gui.builder.main', '訓練データ.csv')
         else:
-            training_history_path = os.path.splitext(path)[0] + '_訓練データ.csv'
+            training_history_path = os.path.splitext(path)[0] + QCoreApplication.translate('pyfemtet_opt_gui.builder.main', '_訓練データ.csv')
 
     code = ''
     code += create_message()

@@ -1,0 +1,41 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2025, pyfemtet
+# This file is distributed under the same license as the pyfemtet-opt-gui package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: pyfemtet-opt-gui \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-10-08 20:25+0900\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: en\n"
+"Language-Team: en <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../source/samples_and_tutorials.rst:2
+msgid "サンプルとチュートリアル"
+msgstr ""
+
+#: ../../source/samples_and_tutorials.rst:4
+msgid "この章では、付属サンプルの解説や、よくある操作例・チュートリアルを紹介します。"
+msgstr ""
+
+#: ../../source/samples_and_tutorials.rst:6
+msgid "サンプルプロジェクトの内容"
+msgstr ""
+
+#: ../../source/samples_and_tutorials.rst:7
+msgid "操作例"
+msgstr ""
+
+#: ../../source/samples_and_tutorials.rst:8
+msgid "応用的な使い方"
+msgstr ""
+

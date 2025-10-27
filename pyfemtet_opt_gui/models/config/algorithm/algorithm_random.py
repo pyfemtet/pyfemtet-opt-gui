@@ -32,7 +32,7 @@ import enum
 # （アルゴリズムごとの）設定項目
 class RandomAlgorithmConfig(AbstractAlgorithmConfig):
     name = 'Random'
-    note = 'Optuna 実装に基づくランダムサンプリング'
+    note = QCoreApplication.translate('pyfemtet_opt_gui.models.config.algorithm.algorithm_random', 'Optuna 実装に基づくランダムサンプリング')
 
     class Items(enum.Enum):
         pass

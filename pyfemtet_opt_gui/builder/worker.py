@@ -6,6 +6,7 @@ from PySide6 import QtWidgets, QtCore, QtGui
 
 # noinspection PyUnresolvedReferences
 from PySide6.QtCore import *
+from PySide6.QtCore import QCoreApplication
 
 # noinspection PyUnresolvedReferences
 from PySide6.QtGui import *
@@ -50,8 +51,8 @@ class HistoryFinder(QThread):
             s = time()
             while not os.path.exists(history_path):
                 sleep(1)
-                print(f'立上げからの経過時間: {int(time()-s)} 秒')
-            print(f'最適化が開始されます。')
+                print(QCoreApplication.translate('pyfemtet_opt_gui.builder.worker', '立上げからの経過時間: {sec} 秒').format(sec=int(time()-s)))
+            print(QCoreApplication.translate('pyfemtet_opt_gui.builder.worker', '最適化が開始されます。'))
 
 
 class OptimizationWorker(QThread):
@@ -77,9 +78,9 @@ class OptimizationWorker(QThread):
 
             print()
             print('================================')
-            print(f'最適化プログラムを開始します。')
-            print(f'ターゲットファイル: {path}')
-            print(f'Femtet の自動制御を開始します。\nしばらくお待ちください。')
+            print(QCoreApplication.translate('pyfemtet_opt_gui.builder.worker', '最適化プログラムを開始します。'))
+            print(QCoreApplication.translate('pyfemtet_opt_gui.builder.worker', 'ターゲットファイル: {path}').format(path=path))
+            print(QCoreApplication.translate('pyfemtet_opt_gui.builder.worker', 'Femtet の自動制御を開始します。\nしばらくお待ちください。'))
             print()
 
             import os
@@ -102,12 +103,12 @@ class OptimizationWorker(QThread):
                 getattr(module, 'main')()
 
                 print('================================')
-                print('終了しました。')
+                print(QCoreApplication.translate('pyfemtet_opt_gui.builder.worker', '終了しました。'))
                 print('================================')
 
             except Exception as e:
                 print_exception(e)
                 print()
                 print('================================')
-                print('エラー終了しました。')
+                print(QCoreApplication.translate('pyfemtet_opt_gui.builder.worker', 'エラー終了しました。'))
                 print('================================')

@@ -102,9 +102,18 @@ def get_config_model_for_problem(parent, _dummy_data=None):
 # 設定項目のヘッダー
 class ConfigHeaderNames(enum.StrEnum):
     # use = CommonItemColumnName.use  # 不要、かつ Algorithm とも一貫して見やすい
-    name = '項目'
-    value = '設定値'
-    note = '説明'
+    name = QCoreApplication.translate(
+        "pyfemtet_opt_gui.models.config.config",
+        "項目",
+    )
+    value = QCoreApplication.translate(
+        "pyfemtet_opt_gui.models.config.config",
+        "設定値",
+    )
+    note = QCoreApplication.translate(
+        "pyfemtet_opt_gui.models.config.config",
+        "説明",
+    )
 
 
 # 設定項目のベース
@@ -118,7 +127,10 @@ class AbstractConfigItem:
 # 設定項目のうちアルゴリズムに関する項目
 # 複雑なので切り出し
 class Algorithm(AbstractConfigItem):
-    name = '最適化アルゴリズム'
+    name = QCoreApplication.translate(
+        "pyfemtet_opt_gui.models.config.config",
+        "最適化アルゴリズム",
+    )
     default_display = DEFAULT_ALGORITHM_CONFIG.name
     choices: dict[str, callable] = {
         # AbstractAlgorithmConfig.name: get_abstract_algorithm_config_model,  # for debug
@@ -134,45 +146,75 @@ class Algorithm(AbstractConfigItem):
 class ConfigItemClassEnum(enum.Enum):
     @enum.member
     class n_trials(AbstractConfigItem):
-        name = '解析実行回数'
+        name = QCoreApplication.translate(
+            "pyfemtet_opt_gui.models.config.config",
+            "解析実行回数",
+        )
         default_display = str(20)
         default_internal = 20
-        note = ('解析および結果取得の成功数がこの値になると最適化を終了します。\n'
-                '「なし」の場合、回数による終了条件を設けません。')
+        note = QCoreApplication.translate(
+            "pyfemtet_opt_gui.models.config.config",
+            "解析および結果取得の成功数がこの値になると最適化を終了します。\n"
+            "「なし」の場合、回数による終了条件を設けません。",
+        )
 
     @enum.member
     class timeout(AbstractConfigItem):
-        name = 'タイムアウト'
-        default_display = 'なし'
+        name = QCoreApplication.translate(
+            "pyfemtet_opt_gui.models.config.config",
+            "タイムアウト",
+        )
+        default_display = QCoreApplication.translate(
+            "pyfemtet_opt_gui.models.config.config",
+            "なし",
+        )
         default_internal = None
-        note = ('最適化が開始されてからこの値（秒）の時間を過ぎると\n'
-                'その時点で実行中の解析を最後に最適化を終了します。')
+        note = QCoreApplication.translate(
+            "pyfemtet_opt_gui.models.config.config",
+            "最適化が開始されてからこの値（秒）の時間を過ぎると\n"
+            "その時点で実行中の解析を最後に最適化を終了します。",
+        )
 
     @enum.member
     class history_path(AbstractConfigItem):
-        name = 'csv ファイル名'
+        name = QCoreApplication.translate(
+            "pyfemtet_opt_gui.models.config.config",
+            "csv ファイル名",
+        )
         default_display = ''
         default_internal = None  # 使わない
-        note = ('最適化結果を記録する csv のファイル名です。\n'
-                '空欄にすると日時に基づいてファイル名を決定します。\n'
-                '既存のファイルパスを指定すると、その csv ファイルの内容を\n'
-                '読み込んで続きから最適化を行います（アルゴリズムが対応し\n'
-                'ている場合）。このとき、設計変数、拘束式、目的関数は元の\n'
-                'csv ファイルを生成した最適化の設定と一致させてください。')
+        note = QCoreApplication.translate(
+            "pyfemtet_opt_gui.models.config.config",
+            "最適化結果を記録する csv のファイル名です。\n"
+            "空欄にすると日時に基づいてファイル名を決定します。\n"
+            "既存のファイルパスを指定すると、その csv ファイルの内容を\n"
+            "読み込んで続きから最適化を行います（アルゴリズムが対応し\n"
+            "ている場合）。このとき、設計変数、拘束式、目的関数は元の\n"
+            "csv ファイルを生成した最適化の設定と一致させてください。",
+        )
 
     @enum.member
     class n_parallel(AbstractConfigItem):
-        name = '並列最適化'
-        default_display = 'なし'
+        name = QCoreApplication.translate(
+            "pyfemtet_opt_gui.models.config.config",
+            "並列最適化",
+        )
+        default_display = QCoreApplication.translate(
+            "pyfemtet_opt_gui.models.config.config",
+            "なし",
+        )
         default_internal = 1
-        note = ('2 以上の値を指定した場合、その数の Femtet プロセスを用い\n'
-                '最適化のイテレーションを並列・高速化することができます。\n'
-                '「なし」または「1」を指定すると並列化しません。\n'
-                '※ 2 つ目以降の Femtet は自動起動します。\n'
-                '※ 自動起動した分に関しても通常起動と同様にライセンスを\n'
-                '　 使用します。\n'
-                '※ 1 回の解析を内部で並列計算する Femtet 全体設定の機能\n'
-                '　 とは別の機能です。')
+        note = QCoreApplication.translate(
+            "pyfemtet_opt_gui.models.config.config",
+            "2 以上の値を指定した場合、その数の Femtet プロセスを用い\n"
+            "最適化のイテレーションを並列・高速化することができます。\n"
+            "「なし」または「1」を指定すると並列化しません。\n"
+            "※ 2 つ目以降の Femtet は自動起動します。\n"
+            "※ 自動起動した分に関しても通常起動と同様にライセンスを\n"
+            "　 使用します。\n"
+            "※ 1 回の解析を内部で並列計算する Femtet 全体設定の機能\n"
+            "　 とは別の機能です。",
+        )
 
     @enum.member
     class algorithm(Algorithm):
@@ -180,24 +222,39 @@ class ConfigItemClassEnum(enum.Enum):
 
     @enum.member
     class seed(AbstractConfigItem):
-        name = 'シード値'
-        default_display = 'なし'
+        name = QCoreApplication.translate(
+            "pyfemtet_opt_gui.models.config.config",
+            "シード値",
+        )
+        default_display = QCoreApplication.translate(
+            "pyfemtet_opt_gui.models.config.config",
+            "なし",
+        )
         default_internal = None
-        note = ('ランダム要素のある最適化手法において、\n'
-                '毎回同じ結果が再現されるようにします。\n'
-                'ただし、解析の種類によってはこの値を\n'
-                '設定しても全く同じ結果にはならない場合が\n'
-                'あります。')
+        note = QCoreApplication.translate(
+            "pyfemtet_opt_gui.models.config.config",
+            "ランダム要素のある最適化手法において、\n"
+            "毎回同じ結果が再現されるようにします。\n"
+            "ただし、解析の種類によってはこの値を\n"
+            "設定しても全く同じ結果にはならない場合が\n"
+            "あります。",
+        )
 
     @enum.member
     class surrogate_model_name(AbstractConfigItem):
-        name = 'サロゲートモデル'
+        name = QCoreApplication.translate(
+            "pyfemtet_opt_gui.models.config.config",
+            "サロゲートモデル",
+        )
         default_display = SurrogateModelNames.no.value
         default_internal = SurrogateModelNames.no
         # default_display = SurrogateModelNames.PoFBoTorchInterface.value  # for test
         # default_internal = SurrogateModelNames.PoFBoTorchInterface
-        note = ('サロゲートモデルを作成するかどうか。\n'
-                '作成するならばそのモデルを何にするか。')
+        note = QCoreApplication.translate(
+            "pyfemtet_opt_gui.models.config.config",
+            "サロゲートモデルを作成するかどうか。\n"
+            "作成するならばそのモデルを何にするか。",
+        )
         choices: dict[str, str] = {s: s for s in SurrogateModelNames}
 
 
@@ -327,12 +384,12 @@ class QConfigTreeViewDelegate(QStyledItemDelegateWithCombobox):
 
                     # positive ではない
                     if value <= 0:
-                        display = 'なし'
+                        display = QCoreApplication.translate('pyfemtet_opt_gui.models.config.config', 'なし')
                         value = None
 
                 # positive int ではない
                 except ValueError:
-                    display = 'なし'
+                    display = QCoreApplication.translate('pyfemtet_opt_gui.models.config.config', 'なし')
                     value = None
 
                 model.setData(index, display, Qt.ItemDataRole.DisplayRole)
@@ -727,7 +784,7 @@ class ConfigItemModel(StandardItemModelWithHeader):
         # スクリプトに None が渡らないように
         # ここで自動作成する
         if history_path == '.csv':
-            history_path = datetime.datetime.now().strftime('最適化_%Y%m%d_%H%M%S.csv')
+            history_path = datetime.datetime.now().strftime(QCoreApplication.translate('pyfemtet_opt_gui.models.config.config', '最適化_%Y%m%d_%H%M%S.csv'))
 
         # GUI が history_path にアクセスできるよう
         # 自身に与えられるパスを持っておく

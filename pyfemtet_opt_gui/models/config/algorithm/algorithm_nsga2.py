@@ -33,20 +33,20 @@ import enum
 # （アルゴリズムごとの）設定項目
 class NSGAIIAlgorithmConfig(AbstractAlgorithmConfig):
     name = 'NSGA2'
-    note = 'Optuna 実装に基づく遺伝的アルゴリズム'
+    note = QCoreApplication.translate('pyfemtet_opt_gui.models.config.algorithm.algorithm_nsga2', 'Optuna 実装に基づく遺伝的アルゴリズム')
 
     class Items(enum.Enum):
         @enum.member
         class population_size(AbstractAlgorithmConfigItem):
-            name = '1 世代あたりの試行数'
+            name = QCoreApplication.translate('pyfemtet_opt_gui.models.config.algorithm.algorithm_nsga2', '1 世代あたりの試行数')
             default = 50
-            note = '3 以上の自然数が有効です。'
+            note = QCoreApplication.translate('pyfemtet_opt_gui.models.config.algorithm.algorithm_nsga2', '3 以上の自然数が有効です。')
 
         @enum.member
         class mutation_prob(AbstractAlgorithmConfigItem):
-            name = '試行ごとの変異確率'
-            default = '自動'
-            note = '0 から 1 までの数値が有効です。'
+            name = QCoreApplication.translate('pyfemtet_opt_gui.models.config.algorithm.algorithm_nsga2', '試行ごとの変異確率')
+            default = QCoreApplication.translate('pyfemtet_opt_gui.models.config.algorithm.algorithm_nsga2', '自動')
+            note = QCoreApplication.translate('pyfemtet_opt_gui.models.config.algorithm.algorithm_nsga2', '0 から 1 までの数値が有効です。')
 
 
 # （アルゴリズムごとの）設定値の入力ルール
