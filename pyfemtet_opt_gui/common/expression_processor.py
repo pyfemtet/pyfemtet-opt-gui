@@ -11,6 +11,7 @@ from pyfemtet_opt_gui.common.femtet_operator_support import *
 from pyfemtet_opt_gui.common.solidworks_function_support import *
 
 from pyfemtet_opt_gui.fem_interfaces import get_current_cad_name, CADIntegration
+from PySide6.QtCore import QCoreApplication
 
 
 __all__ = [
