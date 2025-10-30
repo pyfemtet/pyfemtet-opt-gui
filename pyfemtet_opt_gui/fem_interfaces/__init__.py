@@ -21,7 +21,7 @@ def get():
         assert False, f'Unknown current_cad: {current_cad}'
 
 
-def switch_cad(cad):
+def switch_cad(cad: CADIntegration):
     global current_cad
     current_cad = cad
 

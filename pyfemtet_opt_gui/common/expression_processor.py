@@ -9,8 +9,13 @@ from typing import Sequence, Any
 import unicodedata
 
 from pyfemtet_opt_gui.common.return_msg import ReturnMsg, ReturnType
-from pyfemtet_opt_gui.common.femtet_operator_support import *
-from pyfemtet_opt_gui.common.solidworks_function_support import *
+from pyfemtet_opt_gui.fem_interfaces.femtet_interface.femtet_expression_support import (
+    get_fem_builtins as get_femtet_builtins
+)
+from pyfemtet_opt_gui.fem_interfaces.solidworks_interface.solidworks_expression_support import (
+    get_fem_builtins as get_solidworks_builtins,
+    split_unit_solidworks
+)
 from pyfemtet_opt_gui.common.type_alias import *
 
 from pyfemtet_opt_gui.fem_interfaces import (
@@ -152,7 +157,7 @@ def get_dependency(expr_str: ConvertedExpressionStr) -> set[ConvertedVariableNam
     関数は無視する。"""
 
     # CAD ビルトイン関数名の小文字化したもの
-    cad_builtin_keys_lower = [key.lower() for key in get_cad_buitlins().keys()]
+    cad_builtin_keys_lower = [key.lower() for key in get_cad_builtins().keys()]
 
     try:
         # 式のASTを生成
@@ -198,13 +203,13 @@ def get_dependency(expr_str: ConvertedExpressionStr) -> set[ConvertedVariableNam
         raise ExpressionParseError(expr_str) from e
 
 
-def get_cad_buitlins():
+def get_cad_builtins():
     # TODO: FEM クラスに移動
     current_cad = get_current_cad_name()
     if current_cad == CADIntegration.solidworks:
         return get_solidworks_builtins()
     elif current_cad == CADIntegration.no:
-        return get_fem_builtins()
+        return get_femtet_builtins()
     else:
         assert False, f'Unknown CADIntegration: {current_cad}'
 
@@ -324,7 +329,7 @@ class Expression:
 
     def eval(self, locals_: dict[str, Any] = None):
         # locals の組立
-        l_ = {k.lower(): v for k, v in get_cad_buitlins().items()}
+        l_ = {k.lower(): v for k, v in get_cad_builtins().items()}
         if locals_ is not None:
             l_.update({k.lower(): v for k, v in locals_.items()})
 

@@ -3,6 +3,8 @@ import locale
 from PySide6.QtCore import QTranslator
 from PySide6.QtWidgets import QApplication
 
+from fem_interfaces import CADIntegration
+
 # Detect the locale before loading other modules
 if __name__ == '__main__':
     app = QApplication()
@@ -103,8 +105,20 @@ class Main(QWizard):
         self.addPage(self.config_page)
         self.addPage(self.problem_page)
 
-    def switch_cad(self, cad):
-        fi.switch_cad(cad)
+    def switch_cad(self, cad: str):
+        try:
+            cad_ = CADIntegration(cad)
+        except ValueError:
+            show_return_msg(
+                return_msg=ReturnMsg.Error.internal,
+                parent=self,
+                additional_message=self.tr(
+                    "CAD統合の選択肢の値が不正です。開発元にご連絡ください。"
+                ),
+                with_cancel_button=False,
+            )
+        else:
+            fi.switch_cad(cad_)
 
     def connect_femtet(self):
         """

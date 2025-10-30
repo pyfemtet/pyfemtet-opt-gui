@@ -21,7 +21,7 @@ from pyfemtet_opt_gui.common.return_msg import ReturnMsg, ReturnType
 from pyfemtet_opt_gui.common.expression_processor import Expression
 from pyfemtet_opt_gui.common.type_alias import *
 from pyfemtet_opt_gui.fem_interfaces.base_fem_interface import AbstractFEMInterface
-from pyfemtet_opt_gui.fem_interfaces.femtet_interface.femtet_operator_support import *
+from pyfemtet_opt_gui.fem_interfaces.femtet_interface.femtet_expression_support import *
 
 
 logger = get_logger('Femtet')

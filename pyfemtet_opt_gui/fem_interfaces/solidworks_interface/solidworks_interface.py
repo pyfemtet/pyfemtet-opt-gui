@@ -149,6 +149,10 @@ class SolidWorksInterfaceGUI(FemtetInterfaceGUI):
         dict[VariableName, Expression],
         ReturnType
     ]:
+        """
+        関係式の解析が現時点では完全にできないので純粋変数のみを抽出。
+        例えば、 "Param(@スケッチ1)" = ＜数値＞(＜単位＞) というものを対象にする。
+        """
         # check Connection
         ret = SolidWorksInterfaceGUI.get_sw_connection_state()
         if ret != ReturnMsg.no_message:
@@ -181,7 +185,6 @@ class SolidWorksInterfaceGUI(FemtetInterfaceGUI):
                 raw_var_names=raw_var_names
             )
 
-            # Solidworks の関係式のパースが完全には対応できていないので
             # 純粋変数のみを抽出
             if expr.is_number():
                 var_name = VariableName(

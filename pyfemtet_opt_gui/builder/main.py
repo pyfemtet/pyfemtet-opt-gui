@@ -228,12 +228,24 @@ def create_script(
         if path is None:
             training_history_path = QCoreApplication.translate('pyfemtet_opt_gui.builder.main', '訓練データ.csv')
         else:
-            training_history_path = os.path.splitext(path)[0] + QCoreApplication.translate('pyfemtet_opt_gui.builder.main', '_訓練データ.csv')
+            training_history_path = os.path.splitext(path)[
+                0
+            ] + QCoreApplication.translate(
+                "pyfemtet_opt_gui.builder.main", "_訓練データ.csv"
+            )
 
-    code = ''
+    code = ""
     code += create_message()
-    code += '\n\n'
-    code += create_header()
+    code += "\n\n"
+    if get_current_cad_name() == CADIntegration.no:
+        from pyfemtet_opt_gui.fem_interfaces.femtet_interface.femtet_expression_support import (
+            _get_myself_code_str,
+        )
+    elif get_current_cad_name() == CADIntegration.solidworks:
+        from pyfemtet_opt_gui.fem_interfaces.solidworks_interface.solidworks_expression_support import _get_myself_code_str
+    else:
+        assert False, f'{get_current_cad_name()} not in {[m.value for m in CADIntegration]}'
+    code += create_header(_get_myself_code_str)
     code += '\n\n'
     if len(create_cns_function_def()) > 0:
         code += create_cns_function_def()
