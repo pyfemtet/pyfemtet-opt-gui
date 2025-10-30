@@ -122,17 +122,22 @@
 <context>
     <name>Main</name>
     <message>
-        <location filename="__main__.py" line="173"/>
+        <location filename="__main__.py" line="117"/>
+        <source>CAD統合の選択肢の値が不正です。開発元にご連絡ください。</source>
+        <translation>The value of the CAD integration option is invalid. Please contact the developer.</translation>
+    </message>
+    <message>
+        <location filename="__main__.py" line="187"/>
         <source>ファイル情報を読み込んでいます...</source>
         <translation>Loading file information...</translation>
     </message>
     <message>
-        <location filename="__main__.py" line="183"/>
+        <location filename="__main__.py" line="197"/>
         <source>変数を読み込んでいます...</source>
         <translation>Loading variables...</translation>
     </message>
     <message>
-        <location filename="__main__.py" line="193"/>
+        <location filename="__main__.py" line="207"/>
         <source>解析設定を読み込んでいます...</source>
         <translation>Loading analysis settings...</translation>
     </message>
@@ -208,12 +213,12 @@ li.checked::marker { content: &quot;\2612&quot;; }
 <context>
     <name>VariableItemModel</name>
     <message>
-        <location filename="models/variables/var.py" line="452"/>
+        <location filename="models/variables/var.py" line="383"/>
         <source>式が文字式であるため選択できません。</source>
         <translation>Cannot select because the expression is symbolic.</translation>
     </message>
     <message>
-        <location filename="models/variables/var.py" line="474"/>
+        <location filename="models/variables/var.py" line="405"/>
         <source>式が文字式であるため編集できません。</source>
         <translation>Cannot edit because the expression is symbolic.</translation>
     </message>
@@ -489,7 +494,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
 <context>
     <name>pyfemtet_opt_gui.builder.builder</name>
     <message>
-        <location filename="builder/builder.py" line="31"/>
+        <location filename="builder/builder.py" line="29"/>
         <source>
 import unicodedata
 import pyfemtet
@@ -583,7 +588,7 @@ def main():
         <translation>training_data.csv</translation>
     </message>
     <message>
-        <location filename="builder/main.py" line="233"/>
+        <location filename="builder/main.py" line="237"/>
         <source>_訓練データ.csv</source>
         <translation>_training_data.csv</translation>
     </message>
@@ -631,7 +636,7 @@ Please wait.</translation>
 <context>
     <name>pyfemtet_opt_gui.common.expression_processor</name>
     <message>
-        <location filename="common/expression_processor.py" line="166"/>
+        <location filename="common/expression_processor.py" line="111"/>
         <source>式が入力されていません。</source>
         <translation>No expression has been entered.</translation>
     </message>
@@ -652,190 +657,190 @@ Please wait.</translation>
 <context>
     <name>pyfemtet_opt_gui.common.return_msg</name>
     <message>
-        <location filename="common/return_msg.py" line="36"/>
+        <location filename="common/return_msg.py" line="33"/>
         <source>中断信号を送信しました。現在の解析を最後に最適化を終了します。</source>
         <translation>Interrupt signal sent. Optimization will stop after the current analysis completes.</translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="43"/>
+        <location filename="common/return_msg.py" line="40"/>
         <source>サロゲートモデルを用いた最適化をする場合、まず Femtet を使って訓練データを作成し、次にサロゲートモデルが訓練データを参照して最適化を行います。
 OK を押すと訓練データ作成を開始し、それが終了すると自動的に最適化を開始します。</source>
         <translation>When using a surrogate model for optimization, first generate training data with Femtet; then the surrogate model will perform optimization using that training data. Press OK to start creating training data; optimization will automatically begin when that process completes.</translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="50"/>
+        <location filename="common/return_msg.py" line="47"/>
         <source>値と下限の関係が正しくなくなったため、下限を更新します。</source>
         <translation>The relationship between the value and the lower limit became invalid, so the lower limit will be updated.</translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="54"/>
+        <location filename="common/return_msg.py" line="51"/>
         <source>値と上限の関係が正しくなくなったため、上限を更新します。</source>
         <translation>The relationship between the value and the upper limit became invalid, so the upper limit will be updated.</translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="58"/>
+        <location filename="common/return_msg.py" line="55"/>
         <source>現在の初期値に基づいて計算される値と上下限の関係が正しくありません。最適化の初期値が拘束を満たさない場合、最適化が収束しないかエラーになる場合があります。続行しますか？</source>
         <translation>The relationship between the values computed from the current initial values and the bounds is invalid. If the optimization initial values do not satisfy the constraints, the optimization may fail to converge or may error. Do you want to continue?</translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="63"/>
+        <location filename="common/return_msg.py" line="60"/>
         <source>少なくともひとつの変数を選択してください。</source>
         <translation>Please select at least one variable.</translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="67"/>
+        <location filename="common/return_msg.py" line="64"/>
         <source>少なくともひとつの目的関数を選択してください。</source>
         <translation>Please select at least one objective function.</translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="72"/>
+        <location filename="common/return_msg.py" line="69"/>
         <source>最適化の終了条件が指定されていません。この場合、手動で最適化を停止するまで計算を続けます。よろしいですか？</source>
         <translation>No optimization termination condition has been specified. The optimization will continue until you stop it manually. Do you want to proceed?</translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="79"/>
+        <location filename="common/return_msg.py" line="76"/>
         <source>最適化実施時、対象の解析モデルからはパラメトリック解析のスイープテーブルが削除されます。
 必要な場合、femprj ファイルのコピーを保存してから実行してください。
 このまま進めてもよろしいですか？</source>
         <translation>When optimization is performed, the parametric analysis sweep table will be removed from the target analysis model. If necessary, save a copy of the femprj file before running. Do you want to continue?</translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="84"/>
+        <location filename="common/return_msg.py" line="81"/>
         <source>最適化スクリプト作成・実行を終了しますか？</source>
         <translation>Do you want to exit script creation/execution?</translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="90"/>
+        <location filename="common/return_msg.py" line="87"/>
         <source>最適化の終了条件が指定されていません。この場合、訓練データの作成は手動停止まで継続し、その後さらにサロゲートモデルを用いた最適化が始まり、手動停止まで継続されます。このまま進めてもよろしいですか？</source>
         <translation>No optimization termination condition has been specified. In this case, training data generation will continue until manually stopped, after which surrogate-model-based optimization will begin and continue until manually stopped. Do you want to proceed?</translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="95"/>
+        <location filename="common/return_msg.py" line="92"/>
         <source>拘束式を削除してよろしいですか？この操作は取り消せません。: </source>
         <translation>Are you sure you want to delete the constraint? This operation cannot be undone: </translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="105"/>
+        <location filename="common/return_msg.py" line="102"/>
         <source>Femtet との接続がタイムアウトしました。</source>
         <translation>Connection to Femtet timed out.</translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="109"/>
+        <location filename="common/return_msg.py" line="106"/>
         <source>Femtet のプロセスがありません。</source>
         <translation>Femtet process not found.</translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="114"/>
+        <location filename="common/return_msg.py" line="111"/>
         <source>まだ Femtet と接続されていません。</source>
         <translation>Not connected to Femtet yet.</translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="119"/>
+        <location filename="common/return_msg.py" line="116"/>
         <source>Femtet にアクセスできません。</source>
         <translation>Cannot access Femtet.</translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="124"/>
+        <location filename="common/return_msg.py" line="121"/>
         <source>Femtet 本体または最後に実行された「マクロ機能の有効化」のバージョンが古いです。</source>
         <translation>The Femtet application or the last &quot;Enable macro features&quot; version is outdated.</translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="129"/>
+        <location filename="common/return_msg.py" line="126"/>
         <source>サンプルファイルのオープンに失敗しました</source>
         <translation>Failed to open sample file.</translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="134"/>
+        <location filename="common/return_msg.py" line="131"/>
         <source>Femtet マクロの実行に失敗しました。</source>
         <translation>Failed to execute Femtet macro.</translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="139"/>
+        <location filename="common/return_msg.py" line="136"/>
         <source>Femtet で開かれている解析モデルが上記のモデルと一致しません。Femtet で開かれているモデルを確認し、「Load」ボタンを押してください。</source>
         <translation>The analysis model opened in Femtet does not match the model shown above. Please check the model open in Femtet and press the &quot;Load&quot; button.</translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="144"/>
+        <location filename="common/return_msg.py" line="141"/>
         <source>femprj ファイルの保存に失敗しました。</source>
         <translation>Failed to save the femprj file.</translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="150"/>
+        <location filename="common/return_msg.py" line="147"/>
         <source>Femtet プロジェクトに CAD インポートコマンドが見つかりませんでした。まず Femtet で CAD インポートを行って解析条件設定を行ってください。</source>
         <translation>CAD import command was not found in the Femtet project. Please perform CAD import in Femtet and set the analysis conditions before proceeding.</translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="155"/>
+        <location filename="common/return_msg.py" line="152"/>
         <source>文字式の認識に失敗しました。</source>
         <translation>Failed to recognize symbolic expression.</translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="159"/>
+        <location filename="common/return_msg.py" line="156"/>
         <source>数値または数式の認識に失敗しました。</source>
         <translation>Failed to recognize numeric value or mathematical expression.</translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="164"/>
+        <location filename="common/return_msg.py" line="161"/>
         <source>数値が入力されていません。計算式を設定したい場合、「拘束式の設定」ページで設定してください。</source>
         <translation>No numeric value has been entered. If you want to set a calculation formula, please configure it on the &quot;Constraint settings&quot; page.</translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="169"/>
+        <location filename="common/return_msg.py" line="166"/>
         <source>数値を入力してください。</source>
         <translation>Please enter a numeric value.</translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="174"/>
+        <location filename="common/return_msg.py" line="171"/>
         <source>次の変数が不明な変数を参照しています</source>
         <translation>The following variables reference unknown variables</translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="179"/>
+        <location filename="common/return_msg.py" line="176"/>
         <source>式が計算できないか、計算結果に実数以外の数が含まれています</source>
         <translation>The expression cannot be evaluated or the result contains non-real numbers.</translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="184"/>
+        <location filename="common/return_msg.py" line="181"/>
         <source>上下限の大小関係が正しくありません。</source>
         <translation>The ordering between lower and upper limits is invalid.</translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="189"/>
+        <location filename="common/return_msg.py" line="186"/>
         <source>値と上限の大小関係が正しくありません。</source>
         <translation>The relationship between the value and the upper limit is invalid.</translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="194"/>
+        <location filename="common/return_msg.py" line="191"/>
         <source>値と下限の大小関係が正しくありません。</source>
         <translation>The relationship between the value and the lower limit is invalid.</translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="199"/>
+        <location filename="common/return_msg.py" line="196"/>
         <source>上下限のいずれかを設定してください。</source>
         <translation>Please set at least one bound (upper or lower).</translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="204"/>
+        <location filename="common/return_msg.py" line="201"/>
         <source>step は正の数でなければなりません。</source>
         <translation>Step must be a positive number.</translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="210"/>
+        <location filename="common/return_msg.py" line="207"/>
         <source>この変更によって、別の式にエラーが発生します。</source>
         <translation>This change will cause an error in another expression.</translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="214"/>
+        <location filename="common/return_msg.py" line="211"/>
         <source>拘束式名が既存のものと重複しています。別の名前を指定してください。</source>
         <translation>The constraint name duplicates an existing one. Please choose a different name.</translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="219"/>
+        <location filename="common/return_msg.py" line="216"/>
         <source>存在しないフォルダのファイルパスが指定されました。</source>
         <translation>A file path was specified in a non-existent folder.</translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="224"/>
+        <location filename="common/return_msg.py" line="221"/>
         <source>ファイル名は以下の条件を満たしてください。
 - 半角英数字又は _ 以外を含まない
 - 数字で始まらない</source>
@@ -844,91 +849,91 @@ OK を押すと訓練データ作成を開始し、それが終了すると自�
 - Must not begin with a digit</translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="229"/>
+        <location filename="common/return_msg.py" line="226"/>
         <source>ファイルパスに使用できない文字が含まれています。</source>
         <translation>The file path contains invalid characters.</translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="234"/>
+        <location filename="common/return_msg.py" line="231"/>
         <source>記録 csv ファイルが見つかりません。まだ最適化が始まっていない可能性があります。お手数ですが、最適化が始まってから中断を行ってください。</source>
         <translation>Record CSV file not found. Optimization may not have started yet. Please interrupt after optimization has begun.</translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="240"/>
+        <location filename="common/return_msg.py" line="237"/>
         <source>記録 csv にプロセスモニターのポート情報が見つかりません。pyfemtet のバージョンが古い可能性があります。
 最適化を中断する場合は、ブラウザでプロセスモニターにアクセス（既定は「http://localhost:8080」）して中断ボタンを押してください。</source>
         <translation>Process monitor port information was not found in the record CSV. The pyfemtet version may be outdated. To interrupt optimization, access the process monitor in a browser (default: http://localhost:8080) and press the interrupt button.</translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="248"/>
+        <location filename="common/return_msg.py" line="245"/>
         <source>最適化終了信号を送信しましたが、エラーが発生しました。最適化が始まっていないか可能性があります。
 最適化が始まっていない場合は、お手数ですが最適化が始まってから中断を行ってください。
 最適化が始まっているのにこのエラーが表示される場合は、ブラウザでプロセスモニターにアクセス（既定は「http://localhost:8080」）して中断ボタンを押してください。</source>
         <translation>Sent optimization termination signal but an error occurred. Optimization may not have started. If it has not started, please interrupt after it begins. If optimization has started but this error appears, access the process monitor in a browser (default: http://localhost:8080) and press the interrupt button.</translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="254"/>
+        <location filename="common/return_msg.py" line="251"/>
         <source>プロセスモニターのポートが見つかりませんでした。最適化が開始されていないか、ポート情報が間違っている可能性があります。
 最適化を中断する場合は、ブラウザでプロセスモニターにアクセス（既定は「http://localhost:8080」）して中断ボタンを押してください。</source>
         <translation>Process monitor port not found. Optimization may not have started, or the port information may be incorrect. To interrupt optimization, access the process monitor in a browser (default: http://localhost:8080) and press the interrupt button.</translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="259"/>
+        <location filename="common/return_msg.py" line="256"/>
         <source>最適化の実行中は終了できません。先に最適化を終了してください。</source>
         <translation>Cannot exit while optimization is running. Please stop the optimization first.</translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="264"/>
+        <location filename="common/return_msg.py" line="261"/>
         <source>何も選択されていません。</source>
         <translation>Nothing is selected.</translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="270"/>
+        <location filename="common/return_msg.py" line="267"/>
         <source>拘束式が見つかりませんでした。: </source>
         <translation>Constraint not found: </translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="275"/>
+        <location filename="common/return_msg.py" line="272"/>
         <source>Solidworks のプロセスがありません。</source>
         <translation>Solidworks process not found.</translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="280"/>
+        <location filename="common/return_msg.py" line="277"/>
         <source>まだ Solidworks と接続されていません。</source>
         <translation>Not connected to Solidworks yet.</translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="285"/>
+        <location filename="common/return_msg.py" line="282"/>
         <source>Solidworks のプロセスと接続できていません。</source>
         <translation>Cannot connect to the Solidworks process.</translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="290"/>
+        <location filename="common/return_msg.py" line="287"/>
         <source>Solidworks のアクティブなモデルがありません。</source>
         <translation>There is no active Solidworks model.</translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="295"/>
+        <location filename="common/return_msg.py" line="292"/>
         <source>Solidworks のモデル再構築に失敗しました。</source>
         <translation>Failed to rebuild the Solidworks model.</translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="300"/>
+        <location filename="common/return_msg.py" line="297"/>
         <source>Solidworks モデルの .x_t ファイル保存がタイムアウトしました。</source>
         <translation>Saving the Solidworks model .x_t file timed out.</translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="305"/>
+        <location filename="common/return_msg.py" line="302"/>
         <source>Solidworks モデルに登録されていない変数が転送されました。Solidworks で意図しないモデルが開かれている可能性があります。</source>
         <translation>A variable not registered in the Solidworks model was transferred. An unintended model may be open in Solidworks.</translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="310"/>
+        <location filename="common/return_msg.py" line="307"/>
         <source>開かれている Solidworks モデルの .sldprt ファイルパスが見つかりません。</source>
         <translation>The .sldprt file path of the opened Solidworks model could not be found.</translation>
     </message>
     <message>
-        <location filename="common/return_msg.py" line="326"/>
+        <location filename="common/return_msg.py" line="323"/>
         <source>{prefix}{value_name}</source>
         <translation>{prefix}{value_name}</translation>
     </message>
@@ -993,37 +998,37 @@ OK を押すと訓練データ作成を開始し、それが終了すると自�
 <context>
     <name>pyfemtet_opt_gui.fem_interfaces.femtet_interface_gui</name>
     <message>
-        <location filename="fem_interfaces/femtet_interface_gui.py" line="69"/>
+        <location filename="fem_interfaces/femtet_interface/femtet_interface.py" line="118"/>
         <source>Femtet を起動しています...</source>
         <translation>Starting Femtet...</translation>
     </message>
     <message>
-        <location filename="fem_interfaces/femtet_interface_gui.py" line="86"/>
+        <location filename="fem_interfaces/femtet_interface/femtet_interface.py" line="135"/>
         <source>Femtet を起動しています。</source>
         <translation>Femtet is starting.</translation>
     </message>
     <message>
-        <location filename="fem_interfaces/femtet_interface_gui.py" line="240"/>
+        <location filename="fem_interfaces/femtet_interface/femtet_interface.py" line="305"/>
         <source>変数: {var_name}, 値: {value}</source>
         <translation>Variable: {var_name}, Value: {value}</translation>
     </message>
     <message>
-        <location filename="fem_interfaces/femtet_interface_gui.py" line="267"/>
+        <location filename="fem_interfaces/femtet_interface/femtet_interface.py" line="332"/>
         <source>マクロ名: `UpdateVariable` エラーメッセージ: {exception_msg}</source>
         <translation>Macro: `UpdateVariable` Error message: {exception_msg}</translation>
     </message>
     <message>
-        <location filename="fem_interfaces/femtet_interface_gui.py" line="299"/>
+        <location filename="fem_interfaces/femtet_interface/femtet_interface.py" line="425"/>
         <source>マクロ名: ReExecute, エラーメッセージ: {exception_msg}</source>
         <translation>Macro: ReExecute, Error message: {exception_msg}</translation>
     </message>
     <message>
-        <location filename="fem_interfaces/femtet_interface_gui.py" line="371"/>
+        <location filename="fem_interfaces/femtet_interface/femtet_interface.py" line="497"/>
         <source>解析プロジェクトが開かれていません</source>
         <translation>No analysis project is open.</translation>
     </message>
     <message>
-        <location filename="fem_interfaces/femtet_interface_gui.py" line="410"/>
+        <location filename="fem_interfaces/femtet_interface/femtet_interface.py" line="536"/>
         <source>Femtet のサンプルファイルを開いています...</source>
         <translation>Opening Femtet sample file...</translation>
     </message>
@@ -1031,27 +1036,27 @@ OK を押すと訓練データ作成を開始し、それが終了すると自�
 <context>
     <name>pyfemtet_opt_gui.fem_interfaces.solidworks_interface_gui</name>
     <message>
-        <location filename="fem_interfaces/solidworks_interface_gui.py" line="98"/>
+        <location filename="fem_interfaces/solidworks_interface/solidworks_interface.py" line="88"/>
         <source>Solidworks を起動しています...</source>
         <translation>Starting Solidworks...</translation>
     </message>
     <message>
-        <location filename="fem_interfaces/solidworks_interface_gui.py" line="115"/>
+        <location filename="fem_interfaces/solidworks_interface/solidworks_interface.py" line="105"/>
         <source>Solidworks を起動しています。</source>
         <translation>Solidworks is starting.</translation>
     </message>
     <message>
-        <location filename="fem_interfaces/solidworks_interface_gui.py" line="293"/>
+        <location filename="fem_interfaces/solidworks_interface/solidworks_interface.py" line="309"/>
         <source>.sldprt ファイルが開かれていません</source>
         <translation>No .sldprt file is open.</translation>
     </message>
     <message>
-        <location filename="fem_interfaces/solidworks_interface_gui.py" line="333"/>
+        <location filename="fem_interfaces/solidworks_interface/solidworks_interface.py" line="349"/>
         <source>Femtet のサンプルファイルを開いています...</source>
         <translation>Opening Femtet sample file...</translation>
     </message>
     <message>
-        <location filename="fem_interfaces/solidworks_interface_gui.py" line="357"/>
+        <location filename="fem_interfaces/solidworks_interface/solidworks_interface.py" line="373"/>
         <source>Solidworks のサンプルファイルを開いています...</source>
         <translation>Opening Solidworks sample file...</translation>
     </message>
@@ -1340,17 +1345,17 @@ csv ファイルを生成した最適化の設定と一致させてください�
 <context>
     <name>pyfemtet_opt_gui.models.constraints.cns_dialog</name>
     <message>
-        <location filename="models/constraints/cns_dialog.py" line="190"/>
+        <location filename="models/constraints/cns_dialog.py" line="197"/>
         <source>計算エラー</source>
         <translation>Calculation error</translation>
     </message>
     <message>
-        <location filename="models/constraints/cns_dialog.py" line="198"/>
+        <location filename="models/constraints/cns_dialog.py" line="205"/>
         <source>現在の計算値: </source>
         <translation>Current computed value: </translation>
     </message>
     <message>
-        <location filename="models/constraints/cns_dialog.py" line="323"/>
+        <location filename="models/constraints/cns_dialog.py" line="334"/>
         <source>拘束式名: {constraint_name}</source>
         <translation>Constraint name: {constraint_name}</translation>
     </message>
@@ -1383,7 +1388,8 @@ csv ファイルを生成した最適化の設定と一致させてください�
         <translation>Memo</translation>
     </message>
     <message>
-        <location filename="models/constraints/model.py" line="281"/>
+        <location filename="models/constraints/model.py" line="289"/>
+        <location filename="models/constraints/model.py" line="307"/>
         <source>なし</source>
         <translation>No</translation>
     </message>
@@ -1464,12 +1470,12 @@ csv ファイルを生成した最適化の設定と一致させてください�
 <context>
     <name>pyfemtet_opt_gui.models.variables.var</name>
     <message>
-        <location filename="models/variables/var.py" line="70"/>
+        <location filename="models/variables/var.py" line="68"/>
         <source>変数名</source>
         <translation>Variable name</translation>
     </message>
     <message>
-        <location filename="models/variables/var.py" line="74"/>
+        <location filename="models/variables/var.py" line="72"/>
         <source>初期値 または
 文字式</source>
         <oldsource>初期値 または
@@ -1477,22 +1483,22 @@ csv ファイルを生成した最適化の設定と一致させてください�
         <translation>Initial value or symbolic expression</translation>
     </message>
     <message>
-        <location filename="models/variables/var.py" line="78"/>
+        <location filename="models/variables/var.py" line="76"/>
         <source>下限</source>
         <translation>Lower limit</translation>
     </message>
     <message>
-        <location filename="models/variables/var.py" line="82"/>
+        <location filename="models/variables/var.py" line="80"/>
         <source>上限</source>
         <translation>Upper limit</translation>
     </message>
     <message>
-        <location filename="models/variables/var.py" line="86"/>
+        <location filename="models/variables/var.py" line="84"/>
         <source>ステップ</source>
         <translation>Step</translation>
     </message>
     <message>
-        <location filename="models/variables/var.py" line="90"/>
+        <location filename="models/variables/var.py" line="88"/>
         <source>テスト値 または
 文字式の計算結果</source>
         <oldsource>テスト値 または
@@ -1500,26 +1506,24 @@ csv ファイルを生成した最適化の設定と一致させてください�
         <translation>Test value or result of symbolic expression</translation>
     </message>
     <message>
-        <location filename="models/variables/var.py" line="97"/>
+        <location filename="models/variables/var.py" line="95"/>
         <source>メモ欄</source>
         <translation>Memo</translation>
     </message>
     <message>
-        <location filename="models/variables/var.py" line="341"/>
+        <location filename="models/variables/var.py" line="342"/>
         <source>パラメータ
 として使用</source>
         <translation>Use as
  a parameter</translation>
     </message>
     <message>
-        <location filename="models/variables/var.py" line="360"/>
         <source>ダミーデータが計算不能</source>
-        <translation>Dummy data cannot be calculated</translation>
+        <translation type="vanished">Dummy data cannot be calculated</translation>
     </message>
     <message>
-        <location filename="models/variables/var.py" line="407"/>
         <source>ダミーデータが不正, {key}</source>
-        <translation>Invalid dummy data, {key}</translation>
+        <translation type="vanished">Invalid dummy data, {key}</translation>
     </message>
 </context>
 <context>

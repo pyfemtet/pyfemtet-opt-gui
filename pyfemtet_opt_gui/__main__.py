@@ -3,8 +3,6 @@ import locale
 from PySide6.QtCore import QTranslator
 from PySide6.QtWidgets import QApplication
 
-from pyfemtet_opt_gui.fem_interfaces import CADIntegration
-
 # Detect the locale before loading other modules
 if __name__ == '__main__':
     app = QApplication()
@@ -52,7 +50,7 @@ from pyfemtet_opt_gui.models.problem.problem import ConfirmWizardPage
 from pyfemtet_opt_gui.common.return_msg import *
 from pyfemtet_opt_gui.common.qt_util import *
 from pyfemtet_opt_gui.fem_interfaces.connection_worker import *
-
+from pyfemtet_opt_gui.fem_interfaces import CADIntegration
 import pyfemtet_opt_gui.fem_interfaces as fi
 
 # Necessary to import early timing.
