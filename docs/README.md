@@ -6,12 +6,12 @@ uv run sphinx-build -b gettext .\source .\build\gettext
 uv run sphinx-intl update -p .\build\gettext --language=en --line-width=-1
 
 
-### Build .mo and rebuild docs
+### Build .mo and rebuild docs (EN)
 
 uv run sphinx-intl build --language en
 uv run sphinx-build -b html .\source .\build\html -D language=en
 
 
-### Rebuild docs
+### Rebuild docs (JP)
 
 uv run sphinx-build -b html .\source .\build\html

@@ -22,7 +22,7 @@ msgstr ""
 
 #: ../../source/index.rst:13
 msgid "目次"
-msgstr ""
+msgstr "Index"
 
 #: ../../source/index.rst:8
 msgid "pyfemtet-opt-gui documentation"
@@ -30,5 +30,5 @@ msgstr ""
 
 #: ../../source/index.rst:10
 msgid "pyfemtet-opt-gui のドキュメントです。"
-msgstr "The documentation of pyfemtet-opt-gui. **Note that the application is Japanese only**."
+msgstr "The documentation of pyfemtet-opt-gui."
 
