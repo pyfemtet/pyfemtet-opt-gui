@@ -17,7 +17,7 @@ from pyfemtet_opt_gui.common.qt_util import *
 from pyfemtet_opt_gui.common.expression_processor import *
 from pyfemtet_opt_gui.common.pyfemtet_model_bases import *
 from pyfemtet_opt_gui.common.return_msg import *
-from pyfemtet_opt_gui.common.symbol_support import convert
+from pyfemtet_opt_gui.common.type_alias import *
 from pyfemtet_opt_gui.models.variables.var import VariableItemModel, get_var_model  # noqa
 
 import enum
@@ -75,21 +75,21 @@ _default_dummy_data = {
 class Constraint:
 
     def __init__(self, var_model: 'VariableItemModel'):
-        self.use: bool = None
-        self.name: str = None
-        self.expression: str = None
-        self.expression_show: str = None
+        self.use: bool = None  # noqa
+        self.name: str = None  # noqa
+        self.expression: str = None  # noqa
+        self.expression_show: str = None  # noqa
         self.lb: float | None = None
         self.ub: float | None = None
         self.var_model: 'VariableItemModel' = var_model
 
     def finalize_check(self) -> tuple[ReturnType, str]:
-
+        expressions = self.var_model.get_current_variables()
         return check_expr_str_and_bounds(
             self.expression,
             self.lb,
             self.ub,
-            self.var_model.get_current_variables(),
+            expressions,
         )
 
 
@@ -215,6 +215,8 @@ class ConstraintModel(StandardItemModelWithHeader):
                 self.setItem(r, c, QStandardItem(constraint.name))
 
         # 名前をキーにして処理すべき行を探索
+        var_model = get_var_model(parent=self.parent())
+        variables = var_model.get_current_variables()
         for r in self.get_row_iterable():
 
             # 一致する名前を探して constraint を parse
@@ -262,7 +264,10 @@ class ConstraintModel(StandardItemModelWithHeader):
                     item.setEditable(False)  # 編集不可
                     item.setText(constraint.expression_show)
                     item.setData(
-                        Expression(constraint.expression),
+                        Expression(
+                            constraint.expression,
+                            [n.raw for n in variables.keys()]
+                        ),
                         Qt.ItemDataRole.UserRole
                     )  # Expression に変換したものを UserRole に保管、finalize で Expression に変換できることは確定している
                     self.setItem(r, c, item)
@@ -274,8 +279,11 @@ class ConstraintModel(StandardItemModelWithHeader):
                     item = QStandardItem()
                     item.setEditable(False)  # 編集不可
                     if constraint.lb is not None:
-                        expr = Expression(constraint.lb)
-                        item.setText(expr.expr)
+                        expr = Expression(
+                            constraint.lb,
+                            [n.raw for n in variables.keys()]
+                        )
+                        item.setText(expr.expr_display)
                         item.setData(expr, Qt.ItemDataRole.UserRole)
                     else:
                         item.setText(QCoreApplication.translate('pyfemtet_opt_gui.models.constraints.model', 'なし'))
@@ -289,8 +297,11 @@ class ConstraintModel(StandardItemModelWithHeader):
                     item = QStandardItem()
                     item.setEditable(False)  # 編集不可
                     if constraint.ub is not None:
-                        expr = Expression(constraint.ub)
-                        item.setText(expr.expr)
+                        expr = Expression(
+                            constraint.ub,
+                            [n.raw for n in variables.keys()],
+                        )
+                        item.setText(expr.expr_display)
                         item.setData(expr, Qt.ItemDataRole.UserRole)
                     else:
                         item.setText(QCoreApplication.translate('pyfemtet_opt_gui.models.constraints.model', 'なし'))
@@ -317,7 +328,7 @@ class ConstraintModel(StandardItemModelWithHeader):
                 continue
 
             # 該当する場合 Constraint オブジェクトを作成
-            out = Constraint(var_model=None)
+            out = Constraint(var_model=get_var_model(self.parent))
             out.name = name
 
             # use
@@ -332,7 +343,7 @@ class ConstraintModel(StandardItemModelWithHeader):
                 _h = self.ColumnNames.expr
                 c = self.get_column_by_header_data(_h)
                 item = self.item(r, c)
-                out.expression = convert(item.text())
+                out.expression = item.text()
                 out.expression_show = item.text()
 
             # lb
@@ -344,7 +355,7 @@ class ConstraintModel(StandardItemModelWithHeader):
                 if data is not None:
                     data: Expression
                     assert data.is_number()
-                    data = data.value
+                    data: float = data.value
                 out.lb = data
 
             # ub
@@ -356,7 +367,7 @@ class ConstraintModel(StandardItemModelWithHeader):
                 if data is not None:
                     data: Expression
                     assert data.is_number()
-                    data = data.value
+                    data: float = data.value
                 out.ub = data
 
             return out
@@ -389,6 +400,10 @@ class ConstraintModel(StandardItemModelWithHeader):
         out_funcdef = []
         out = []
 
+        var_model = get_var_model(self.parent())
+        variables = var_model.get_current_variables()
+        raw_var_names = [n.raw for n in variables.keys()]
+
         fun_name_counter = 0
 
         for constraint in constraints:
@@ -398,7 +413,7 @@ class ConstraintModel(StandardItemModelWithHeader):
 
             # 式と使う変数名を取得
             expr_str = constraint.expression.replace('\n', '')
-            expr = Expression(expr_str)
+            expr = Expression(expr_str, raw_var_names)
 
             # def constraint_0 を定義
             fun_name = f'constraint_{fun_name_counter}'
@@ -412,15 +427,15 @@ class ConstraintModel(StandardItemModelWithHeader):
 
                     # locals を使いたいので eval を返す
                     ret=f'eval('  # noqa
-                            f'unicodedata.normalize("NFKC", "{expr._converted_expr_str}"), '  # __at__ が使われている
+                            f'unicodedata.normalize("NFKC", "{expr.norm_expr_str}"), '  # __at__ が使われている
                             'dict('
                                 f'**{{unicodedata.normalize("NFKC", k): v for k, v in locals().items()}}, '
                                 f'**{{'
-                                    f'unicodedata.normalize("NFKC", k): v for k, v in get_femtet_builtins(var).items()'
+                                    f'unicodedata.normalize("NFKC", k): v for k, v in get_fem_builtins(var).items()'
                                     f'if k not in {{unicodedata.normalize("NFKC", k_): v_ for k_, v_ in locals().items()}}'
                                 f'}}'
                             f')'
-                        f')',  # get_femtet_builtins で @ は __at__ に変換される
+                        f')',  # get_fem_builtins で @ は __at__ に変換される
                 )
 
                 # def の中身を作成

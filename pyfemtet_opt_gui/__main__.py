@@ -140,7 +140,7 @@ class Main(QWizard):
 
                 # スレッドで接続に成功していても
                 # 一度は メインスレッドで接続しなければならない
-                fi.get().get_femtet()
+                fi.get().get_fem()
 
                 # load_femtet を行う
                 # 時間がかかるが Model の更新は
@@ -205,4 +205,4 @@ if __name__ == '__main__':
     page_obj.show()
     print('pyfemtet-opt-gui successfully launched!')
 
-    sys.exit(app.exec())
+    sys.exit(app.exec())  # noqa

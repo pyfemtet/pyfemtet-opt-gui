@@ -33,7 +33,7 @@ _dummy_data = {
 def fem():
     # Femtet 起動
     fem_gui = fi.get()
-    fem_gui.get_femtet()
+    fem_gui.get_fem()
     assert fem_gui.get_connection_state() == ReturnMsg.no_message
     assert fem_gui._load_femprj(get_test_femprj_path()) is True
 

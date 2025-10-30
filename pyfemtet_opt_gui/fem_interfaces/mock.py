@@ -1,7 +1,7 @@
 from pyfemtet_opt_gui.common.return_msg import ReturnMsg
 
 __all__ = [
-    'get_femtet',
+    'get_fem',
     'get_connection_state',
     'get_obj_names',
     'get_variables',
@@ -17,7 +17,7 @@ class FemtetMock:
         return 1
 
 
-def get_femtet():
+def get_fem():
     return FemtetMock()
 
 

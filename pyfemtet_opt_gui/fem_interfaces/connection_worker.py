@@ -79,7 +79,7 @@ class ConnectionWorker(QThreadWithReturnMsg):
 
             # Femtet との接続を開始する
             # Femtet の接続ができるのを待つ
-            _, ret_msg = fi.get().get_femtet(self.progress)
+            _, ret_msg = fi.get().get_fem(self.progress)
 
             if ret_msg != ReturnMsg.no_message:
                 self.update_connection_state_label(ConnectionMessage.no_connection)

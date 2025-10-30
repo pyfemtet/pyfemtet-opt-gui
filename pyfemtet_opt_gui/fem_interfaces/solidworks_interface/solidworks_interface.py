@@ -6,7 +6,7 @@ from time import sleep, time
 from pythoncom import com_error
 from win32com.client import Dispatch, CDispatch
 # noinspection PyUnresolvedReferences
-from pythoncom import CoInitialize, CoUninitialize
+from pythoncom import CoInitialize
 
 # noinspection PyUnresolvedReferences
 from PySide6.QtWidgets import *
@@ -16,9 +16,9 @@ from pyfemtet._util.solidworks_variable import SolidworksVariableManager
 
 import pyfemtet_opt_gui
 from pyfemtet_opt_gui.common.expression_processor import Expression
-from pyfemtet_opt_gui.common.symbol_support import convert, revert
+from pyfemtet_opt_gui.common.type_alias import *
 from pyfemtet_opt_gui.common.return_msg import *
-from pyfemtet_opt_gui.fem_interfaces.femtet_interface_gui import (
+from pyfemtet_opt_gui.fem_interfaces.femtet_interface.femtet_interface import (
     _search_process,
     FemtetInterfaceGUI,
     logger
@@ -45,36 +45,25 @@ def launch_solidworks() -> bool:
     return True
 
 
-def get_name_from_equation(equation: str):
+def get_name_from_equation(equation: str) -> RawVariableName | None:
     pattern = r'^\s*"(.+?)"\s*$'  # " で囲まれた中身
     matched = re.match(pattern, equation.split('=')[0])
     if matched:
-        return convert(matched.group(1))
+        return matched.group(1)
     else:
         return None
 
 
-def get_expression_from_equation(equation: str):
+def get_expression_from_equation(
+        equation: str,
+        raw_var_names: list[RawVariableName],
+) -> Expression:
     assert '=' in equation
     expression: str = equation.removeprefix(equation.split('=')[0] + '=')  # 最初の = 以降を取得
 
-    # # 1) 式全体が "..." だけの場合
-    # whole_match = re.match(r'^\s*"(.+?)"\s*$', expression)  # " で囲まれた中身
-    # if whole_match:
-    #     inner = whole_match.group(1)
-    #     converted_expression = f'"{convert(inner)}"'
-
-    # 2) 部分的に "..." が含まれる場合：すべての "..." を convert して置換
-    def repl(m: re.Match) -> str:
-        inner = m.group(1)
-        return f'"{convert(inner)}"'
-
-    # 非貪欲で " 内だけを拾う
-    converted_expression = re.sub(r'"(.+?)"', repl, expression)
-
     # " を消す
-    converted_expression = converted_expression.replace('"', '')
-    expr: Expression = Expression(converted_expression)
+    converted_expression = expression.replace('"', '')
+    expr: Expression = Expression(converted_expression, raw_var_names)
     return expr
 
 
@@ -82,9 +71,9 @@ class SolidWorksInterfaceGUI(FemtetInterfaceGUI):
 
     # ===== process & object handling =====
     @classmethod
-    def get_femtet(cls, progress: QProgressDialog | None = None) -> tuple[CDispatch | None, ReturnType]:
+    def get_fem(cls, progress: QProgressDialog | None = None) -> tuple[CDispatch | None, ReturnType]:
         cls.get_sw(progress)
-        return FemtetInterfaceGUI.get_femtet(progress)
+        return FemtetInterfaceGUI.get_fem(progress)
 
     @classmethod
     def get_sw(cls, progress: QProgressDialog | None = None) -> tuple[CDispatch | None, ReturnType]:
@@ -145,8 +134,7 @@ class SolidWorksInterfaceGUI(FemtetInterfaceGUI):
 
         # メソッドへのアクセスを試みる
         try:
-            # noinspection PyUnusedLocal
-            visible = _sw.Visible
+            _visible = _sw.Visible
 
         # Dispatch オブジェクトは存在するが
         # メソッドにアクセスできない場合
@@ -157,8 +145,10 @@ class SolidWorksInterfaceGUI(FemtetInterfaceGUI):
 
     # ===== Parameter =====
     @classmethod
-    def get_variables(cls) -> tuple[dict[str, Expression], ReturnType]:
-
+    def get_variables(cls) -> tuple[
+        dict[VariableName, Expression],
+        ReturnType
+    ]:
         # check Connection
         ret = SolidWorksInterfaceGUI.get_sw_connection_state()
         if ret != ReturnMsg.no_message:
@@ -171,26 +161,45 @@ class SolidWorksInterfaceGUI(FemtetInterfaceGUI):
 
         # Get equations
         mgr = SolidworksVariableManager()
-        equations: set[str] = mgr.get_equations_recourse(
+        equations: list[str] = mgr.get_equations_recourse(
             swModel=swModel,
             global_variables_only=False,
         )
 
-        # Parse equations
-        out = dict()
+        # Get variable names
+        raw_var_names = []
         for eq in equations:
-            logger.debug(f'===== {eq} =====')
             name = get_name_from_equation(eq)
-            expr: Expression = get_expression_from_equation(eq)
+            if name is not None:
+                raw_var_names.append(name)
 
+        # Parse equations
+        out: dict[VariableName, Expression] = dict()
+        for name, eq in zip(raw_var_names, equations):
+            expr: Expression = get_expression_from_equation(
+                equation=eq,
+                raw_var_names=raw_var_names
+            )
+
+            # Solidworks の関係式のパースが完全には対応できていないので
+            # 純粋変数のみを抽出
             if expr.is_number():
-                out.update({name: expr})
-            # out.update({name: expr})
+                var_name = VariableName(
+                    raw=name,
+                    converted=cls.normalize_var_name(name),
+                )
+                out.update({var_name: expr})
 
         return out, ReturnMsg.no_message
 
     @classmethod
-    def apply_variables(cls, variables: dict[str, float | str]) -> tuple[ReturnType, str | None]:
+    def apply_variables(
+            cls,
+            variables: dict[
+                RawVariableName,
+                float | RawExpressionStr
+            ]
+    ) -> tuple[ReturnType, str | None]:
 
         # check Connection
         ret = SolidWorksInterfaceGUI.get_sw_connection_state()
@@ -203,15 +212,12 @@ class SolidWorksInterfaceGUI(FemtetInterfaceGUI):
             ret_msg = ReturnMsg.Error.sw_no_active_doc
             return ret_msg, ''
 
-        # Construct SWVariables:
-        x = {revert(name): revert(str(expression)) for name, expression in variables.items()}
-
         # Update variables
         mgr = SolidworksVariableManager(logger)
-        mgr.update_global_variables_recourse(swModel=swModel, x=x)
+        mgr.update_global_variables_recourse(swModel=swModel, x=variables)
 
         # Check the variables updated
-        remaining_variables = (set(x.keys()) - mgr.updated_objects)
+        remaining_variables = (set(variables.keys()) - mgr.updated_objects)
         if len(remaining_variables) > 0:
             return ReturnMsg.Error.sw_remaining_variable, ','.join(remaining_variables)
 
@@ -379,7 +385,7 @@ class SolidWorksInterfaceGUI(FemtetInterfaceGUI):
 
 
 if __name__ == '__main__':
-    __Femtet, __ret_msg = SolidWorksInterfaceGUI.get_femtet()
+    __Femtet, __ret_msg = SolidWorksInterfaceGUI.get_fem()
     print(__ret_msg)
     print(__Femtet)
 

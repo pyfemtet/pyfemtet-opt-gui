@@ -289,9 +289,9 @@ class AnalysisModelWizardPage(TitledWizardPage):
 
 if __name__ == '__main__':
     # _WITH_DUMMY = True  # comment out to prevent debug
-    # from pyfemtet_opt_gui.femtet.mock import get_femtet, get_obj_names  # comment out to prevent debug
+    # from pyfemtet_opt_gui.femtet.mock import get_fem, get_obj_names  # comment out to prevent debug
 
-    # fi.get().get_femtet()
+    # fi.get().get_fem()
 
     app = QApplication()
     app.setStyle('fusion')

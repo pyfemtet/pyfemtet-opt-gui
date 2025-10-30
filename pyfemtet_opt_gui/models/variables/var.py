@@ -10,13 +10,11 @@ from PySide6.QtCore import *
 # noinspection PyUnresolvedReferences
 from PySide6.QtGui import *
 
-# noinspection PyUnresolvedReferences
-from PySide6 import QtWidgets, QtCore, QtGui
-
 import enum
 import sys
 from contextlib import nullcontext
 from traceback import print_exception
+from typing import Callable
 
 from pyfemtet._util.symbol_support_for_param_name import AT, HYPHEN, DOT
 
@@ -27,7 +25,7 @@ from pyfemtet_opt_gui.common.pyfemtet_model_bases import *
 from pyfemtet_opt_gui.common.return_msg import *
 from pyfemtet_opt_gui.common.expression_processor import *
 from pyfemtet_opt_gui.common.titles import *
-from pyfemtet_opt_gui.common.symbol_support import convert, revert
+from pyfemtet_opt_gui.common.type_alias import *
 import pyfemtet_opt_gui.fem_interfaces as fi
 
 # ===== model =====
@@ -110,11 +108,11 @@ _default_dummy_data = {
 # 個別ページに表示される TableView の Delegate
 class VariableTableViewDelegate(QStyledItemDelegate):
     @staticmethod
-    def get_name(header_data_, model, index):
+    def get_name(header_data_, model, index) -> VariableName:
         # get name of initial_value
         c_ = get_column_by_header_data(model, header_data_)
         index_ = model.index(index.row(), c_)
-        name: str = model.data(index_, Qt.ItemDataRole.DisplayRole)
+        name: VariableName = model.data(index_, Qt.ItemDataRole.UserRole)
         return name
 
     @staticmethod
@@ -159,11 +157,12 @@ class VariableTableViewDelegate(QStyledItemDelegate):
         if lb is None and ub is None:
             return ReturnMsg.no_message, None
 
+        expressions = get_var_model(None).get_current_variables()
         return check_expr_str_and_bounds(
-            init.expr,
+            init.expr_display,
             lb.value if lb is not None else None,
             ub.value if ub is not None else None,
-            get_var_model(None).get_current_variables(),
+            expressions,
         )
 
     def check_valid(
@@ -187,8 +186,10 @@ class VariableTableViewDelegate(QStyledItemDelegate):
                     return ReturnMsg.no_message, "", new_expression
 
         # text をチェックする
+        var_model = get_var_model(parent=None)
         try:
-            new_expression: Expression = Expression(text)
+            raw_var_names = [n.raw for n in var_model.get_current_variables().keys()]
+            new_expression: Expression = Expression(text, raw_var_names=raw_var_names)
 
         # Not a valid expression
         except Exception as e:
@@ -271,7 +272,7 @@ class VariableTableViewDelegate(QStyledItemDelegate):
                     if not can_continue(
                         ret_msg, parent=self.parent(), additional_message=text
                     ):
-                        return
+                        return None
 
                     assert new_expression is not None
                     if new_expression.value <= 0:
@@ -281,7 +282,7 @@ class VariableTableViewDelegate(QStyledItemDelegate):
                             parent=self.parent(),
                             additional_message=",".join((text, a_msg)),
                         )
-                        return
+                        return None
 
             else:
                 ret_msg, a_msg, new_expression = self.check_valid(
@@ -292,7 +293,7 @@ class VariableTableViewDelegate(QStyledItemDelegate):
                     parent=self.parent(),
                     additional_message=",".join((text, a_msg)),
                 ):
-                    return
+                    return None
 
             # if init or lb or ub, check bounds
             if (
@@ -306,7 +307,7 @@ class VariableTableViewDelegate(QStyledItemDelegate):
                 if not can_continue(
                     ret_msg, parent=self.parent(), additional_message=a_msg
                 ):
-                    return
+                    return None
 
             # if test, evaluate other expressions
             if header_data == VariableColumnNames.test_value:
@@ -317,14 +318,14 @@ class VariableTableViewDelegate(QStyledItemDelegate):
                 if not can_continue(
                     ret_msg, parent=self.parent(), additional_message=a_msg
                 ):
-                    return
+                    return None
 
             # if OK, update model
-            display = new_expression.expr if new_expression is not None else ""
+            display = new_expression.expr_display if new_expression is not None else ""
             model.setData(index, display, Qt.ItemDataRole.DisplayRole)
             model.setData(index, new_expression, Qt.ItemDataRole.UserRole)
 
-            return
+            return None
 
         return super().setModelData(editor, model, index)
 
@@ -338,81 +339,10 @@ class VariableItemModel(StandardItemModelWithHeader):
         CommonItemColumnName.use: QCoreApplication.translate("pyfemtet_opt_gui.models.variables.var", "パラメータ\nとして使用")
     }
 
-    def _set_dummy_data(self, _dummy_data: dict):
-        rows = 1 + len(tuple(_dummy_data.values())[0])
-        columns = len(self.ColumnNames)
-        self.setRowCount(rows)
-        self.setColumnCount(columns)
-
-        variable_values, ret_msg, additional_msg = eval_expressions(
-            {
-                name: Expression(tst)
-                for name, tst in zip(
-                    _dummy_data[self.ColumnNames.name],
-                    _dummy_data[self.ColumnNames.test_value],
-                )
-            }
-        )
-        assert ret_msg == ReturnMsg.no_message, QCoreApplication.translate(
-            "pyfemtet_opt_gui.models.variables.var", "ダミーデータが計算不能"
-        )
-
-        iterable = self.get_row_iterable()
-        for key, values in _dummy_data.items():
-            for i, (r, value) in enumerate(zip(iterable, values)):
-                c = self.get_column_by_header_data(key)
-                item = QStandardItem()
-
-                # self.ColumnNames.use
-                if key == self.ColumnNames.use:
-                    item.setCheckable(True)
-                    item.setCheckState(Qt.CheckState.Checked)
-                    item.setEditable(False)
-
-                # self.ColumnNames.name
-                elif key == self.ColumnNames.name:
-                    item.setText(revert(str(value)))
-                    item.setData(str(value), Qt.ItemDataRole.UserRole)
-                    item.setEditable(False)
-
-                # self.ColumnNames.initial_value
-                # self.ColumnNames.lower_bound
-                # self.ColumnNames.upper_bound
-                # self.ColumnNames.step
-                elif (
-                    key == self.ColumnNames.initial_value
-                    or key == self.ColumnNames.lower_bound
-                    or key == self.ColumnNames.upper_bound
-                    or key == self.ColumnNames.step
-                ):
-                    if value is not None:
-                        item.setText(revert(str(value)))
-                        item.setData(Expression(value), Qt.ItemDataRole.UserRole)
-
-                # self.ColumnNames.test_value
-                elif key == self.ColumnNames.test_value:
-                    name = _dummy_data[self.ColumnNames.name][i]
-                    item.setText(str(variable_values[name]))
-                    item.setData(Expression(value), Qt.ItemDataRole.UserRole)
-
-                elif key == self.ColumnNames.note:
-                    if value is not None:
-                        item.setText(str(value))
-
-                else:
-                    raise Exception(
-                        QCoreApplication.translate(
-                            "pyfemtet_opt_gui.models.variables.var",
-                            "ダミーデータが不正, {key}",
-                        ).format(key=key)
-                    )
-
-                self.setItem(r, c, item)
-
-    def load_femtet(self) -> ReturnMsg:
+    def load_femtet(self) -> ReturnType:
         # variables 取得
         expression: Expression
-        expressions: dict[str, Expression]
+        expressions: dict[VariableName, Expression]
         expressions, ret_msg = fi.get().get_variables()
         if not can_continue(ret_msg, self.parent()):
             return ret_msg
@@ -432,6 +362,7 @@ class VariableItemModel(StandardItemModelWithHeader):
         with EditModel(self):
             self.setRowCount(rows)  # header row for treeview
 
+            raw_var_names = [n.raw for n in expressions.keys()]
             for r, (name, expression) in zip(range(1, rows), expressions.items()):
                 # ===== use =====
                 with (
@@ -458,7 +389,7 @@ class VariableItemModel(StandardItemModelWithHeader):
                 with nullcontext():
                     c = self.get_column_by_header_data(self.ColumnNames.name)
                     item = QStandardItem()
-                    item.setText(revert(name))
+                    item.setText(name.raw)
                     item.setData(name, Qt.ItemDataRole.UserRole)
                     item.setEditable(False)
                     self.setItem(r, c, item)
@@ -468,7 +399,7 @@ class VariableItemModel(StandardItemModelWithHeader):
                     # これは Femtet の値を優先して stash から更新しない
                     c = self.get_column_by_header_data(self.ColumnNames.initial_value)
                     item = QStandardItem()
-                    item.setText(revert(expression.expr))
+                    item.setText(expression.expr_display)
                     item.setData(expression, Qt.ItemDataRole.UserRole)
                     if expression.is_expression():
                         item.setToolTip(self.tr("式が文字式であるため編集できません。"))
@@ -494,9 +425,12 @@ class VariableItemModel(StandardItemModelWithHeader):
                                 # 上の set_data_from_stash を破棄して
                                 item = QStandardItem()
                                 # デフォルト値を計算して設定する
-                                tmp_expression = Expression("0.9 * " + expression.expr)
+                                tmp_expression = Expression(
+                                    "0.9 * " + expression.expr_display,
+                                    raw_var_names
+                                )
                                 item.setData(tmp_expression, Qt.ItemDataRole.UserRole)
-                                display_value = tmp_expression.expr
+                                display_value = tmp_expression.expr_display
                                 item.setText(display_value)
                             # 以前から何か数値が入っていた場合
                             else:
@@ -523,19 +457,23 @@ class VariableItemModel(StandardItemModelWithHeader):
                                     )
                                     # デフォルト値を計算して設定する
                                     tmp_expression = Expression(
-                                        "0.9 * " + expression.expr
+                                        "0.9 * " + expression.expr_display,
+                                        raw_var_names
                                     )
                                     item.setData(
                                         tmp_expression, Qt.ItemDataRole.UserRole
                                     )
-                                    display_value = tmp_expression.expr
+                                    display_value = tmp_expression.expr_display
                                     item.setText(display_value)
                         # 以前にはなかった変数であれば
                         else:
                             # デフォルト値を計算して設定する
-                            tmp_expression = Expression("0.9 * " + expression.expr)
+                            tmp_expression = Expression(
+                                "0.9 * " + expression.expr_display,
+                                raw_var_names,
+                            )
                             item.setData(tmp_expression, Qt.ItemDataRole.UserRole)
-                            display_value = tmp_expression.expr
+                            display_value = tmp_expression.expr_display
                             item.setText(display_value)
 
                     c = self.get_column_by_header_data(self.ColumnNames.lower_bound)
@@ -561,9 +499,12 @@ class VariableItemModel(StandardItemModelWithHeader):
                                 # 上の set_data_from_stash を破棄して
                                 item = QStandardItem()
                                 # デフォルト値を計算して設定する
-                                tmp_expression = Expression("1.1 * " + expression.expr)
+                                tmp_expression = Expression(
+                                    "1.1 * " + expression.expr_display,
+                                    raw_var_names,
+                                )
                                 item.setData(tmp_expression, Qt.ItemDataRole.UserRole)
-                                display_value = tmp_expression.expr
+                                display_value = tmp_expression.expr_display
                                 item.setText(display_value)
                             # 以前から何か数値が入っていた場合
                             else:
@@ -590,19 +531,23 @@ class VariableItemModel(StandardItemModelWithHeader):
                                     )
                                     # デフォルト値を計算して設定する
                                     tmp_expression = Expression(
-                                        "1.1 * " + expression.expr
+                                        "1.1 * " + expression.expr_display,
+                                        raw_var_names,
                                     )
                                     item.setData(
                                         tmp_expression, Qt.ItemDataRole.UserRole
                                     )
-                                    display_value = tmp_expression.expr
+                                    display_value = tmp_expression.expr_display
                                     item.setText(display_value)
                         # 以前にはなかった変数であれば
                         else:
                             # デフォルト値を計算して設定する
-                            tmp_expression = Expression("1.1 * " + expression.expr)
+                            tmp_expression = Expression(
+                                "1.1 * " + expression.expr_display,
+                                raw_var_names
+                            )
                             item.setData(tmp_expression, Qt.ItemDataRole.UserRole)
-                            display_value = tmp_expression.expr
+                            display_value = tmp_expression.expr_display
                             item.setText(display_value)
 
                     c = self.get_column_by_header_data(self.ColumnNames.upper_bound)
@@ -613,7 +558,10 @@ class VariableItemModel(StandardItemModelWithHeader):
                     item = QStandardItem()
                     # 新しい変数の式が文字式ならとにかくデフォルト値を設定する
                     if expression.is_expression():
-                        tmp_expression = Expression(expression.expr)
+                        tmp_expression = Expression(
+                            expression.expr_display,
+                            raw_var_names
+                        )
                         item.setData(tmp_expression, Qt.ItemDataRole.UserRole)
                         item.setText(str(variable_values[name]))
 
@@ -634,7 +582,7 @@ class VariableItemModel(StandardItemModelWithHeader):
                             )
                             if stashed_expression.is_expression():
                                 # デフォルト値を設定する
-                                tmp_expression = Expression(expression.expr)
+                                tmp_expression = Expression(expression.expr_display, raw_var_names)
                                 item.setData(tmp_expression, Qt.ItemDataRole.UserRole)
                                 item.setText(str(variable_values[name]))
 
@@ -651,7 +599,7 @@ class VariableItemModel(StandardItemModelWithHeader):
                         # 以前からない数値であれば
                         else:
                             # デフォルト値を設定する
-                            tmp_expression = Expression(expression.expr)
+                            tmp_expression = Expression(expression.expr_display, raw_var_names)
                             item.setData(tmp_expression, Qt.ItemDataRole.UserRole)
                             item.setText(str(variable_values[name]) + expression.unit)
 
@@ -744,7 +692,7 @@ class VariableItemModel(StandardItemModelWithHeader):
         return super().flags(index)
 
     def update_test_value_expressions(
-        self, partial_expressions: dict[str, Expression] = None
+        self, partial_expressions: dict[VariableName, Expression] = None
     ) -> tuple[ReturnType, str | None]:
         # QLineEdit を使いたいので str を setText すること
 
@@ -799,7 +747,7 @@ class VariableItemModel(StandardItemModelWithHeader):
             # 変数名: 値 の dict を作成
             var_name = self.item(r, c_var_name).data(Qt.ItemDataRole.UserRole)
             value = self.item(r, c_test_value).text()
-            variables.update({var_name: value})
+            variables.update({var_name.raw: value})
 
         # Femtet に転送
         return_msg, a_msg = fi.get().apply_variables(variables)
@@ -809,7 +757,7 @@ class VariableItemModel(StandardItemModelWithHeader):
             additional_message=a_msg,
         )
 
-    def get_current_variables(self, get_test_Value=False) -> dict[str, Expression]:
+    def get_current_variables(self, get_test_Value=False) -> dict[VariableName, Expression]:
         if self.with_first_row:
             iterable = range(1, self.rowCount())
         else:
@@ -841,7 +789,7 @@ class VariableItemModel(StandardItemModelWithHeader):
         """Use 列が Checked のものを json 形式にして出力"""
 
         out_object = list()
-
+        raw_var_names = [n.raw for n in self.get_current_variables().keys()]
         for r in self.get_row_iterable():
             # 必要な列の logicalIndex を取得
             hd = self.ColumnNames.use
@@ -878,26 +826,54 @@ class VariableItemModel(StandardItemModelWithHeader):
                     if expr.is_number():
                         value = f"lambda: {expr.value}"
                     else:
-                        # 必要な変数名に含まれる 記号 を gui 仕様から pyfemtet 仕様に変換
+                        # 必要な変数名に含まれる 記号 を
+                        # gui 仕様から pyfemtet 仕様に変換
                         args = [
                             name.replace("__at__", AT)
                             .replace("__dot__", DOT)
                             .replace("__hyphen__", HYPHEN)
-                            for name in list(expr.dependencies)
+                            for name in list(expr.norm_dependencies)
                         ]
                         # lambda <args>: eval('<expr>', locals=...)
-                        expression = (
-                            expr.expr.replace("__at__", AT)
-                            .replace("__dot__", DOT)
-                            .replace("__hyphen__", HYPHEN)
+
+                        # 登録されている式を pyfemtet で評価できるようにする
+                        #   "F_IF(d = 0, SampleVar@Part.1, 3)"
+                        #   => "f_if(d == 0, SampleVar_at_Part_dot_1, 3)"
+                        expr_str = expr.expr_display
+
+                        # 変数名以外の文字列は小文字にするために
+                        # 変数名を hash 値に置き換える
+                        hashed_var_names = [str(hash(var_name)) for var_name in raw_var_names]
+                        for var_name, hashed_var_name in zip(
+                            raw_var_names, hashed_var_names
+                        ):
+                            expr_str = expr_str.replace(var_name, hashed_var_name)
+                        expr_str = expr_str.lower()
+                        for var_name, hashed_var_name in zip(raw_var_names, hashed_var_names):
+                            expr_str = expr_str.replace(hashed_var_name, var_name)
+
+                        # builtins の local に対応するため
+                        # 変数名の記号を置き換える
+                        for var_name in raw_var_names:
+                            new_name = (
+                                var_name
+                                .replace('@', AT)
+                                .replace('.', DOT)
+                                .replace('-', HYPHEN)
+                            )
+                            expr_str.replace(var_name, new_name)
+
+                        expr_str = fi.get().normalize_expr_str(
+                            expr_str, []  # 変数は normalize しない
                         )
+
                         value = (
                             "lambda " + ", ".join(args) + ": " + f"eval("  # noqa
-                            f'unicodedata.normalize("NFKC", "{expression}"), '
+                            f'unicodedata.normalize("NFKC", "{expr_str}"), '
                             "dict("
                             f'**{{unicodedata.normalize("NFKC", k): v for k, v in locals().items()}}, '
                             f"**{{"
-                            f'unicodedata.normalize("NFKC", k): v for k, v in get_femtet_builtins().items()'
+                            f'unicodedata.normalize("NFKC", k): v for k, v in get_fem_builtins().items()'
                             f'if k not in {{unicodedata.normalize("NFKC", k_): v_ for k_, v_ in locals().items()}}'
                             f"}}"
                             f")"
@@ -1107,7 +1083,7 @@ class VariableItemModelForTableView(StandardItemModelWithoutFirstRow):
 class QVariableItemModelForProblem(ProxyModelWithForProblem):
     def filterAcceptsColumn(self, source_column: int, source_parent: QModelIndex):
         # test_value を非表示
-        source_model: VariableItemModel = self.sourceModel()
+        source_model: VariableItemModel = self.sourceModel()  # noqa
         if source_column == get_column_by_header_data(
             source_model, VariableColumnNames.test_value
         ):
@@ -1129,7 +1105,7 @@ class VariableWizardPage(TitledWizardPage):
     def __init__(
         self,
         parent=None,
-        load_femtet_fun: callable = None,
+        load_femtet_fun: Callable | None = None,
         _dummy_data=None,
     ):
         super().__init__(parent, _dummy_data)
@@ -1205,7 +1181,7 @@ def _debug():
     from tests import get_test_femprj_path
 
     fem_gui = fi.get()
-    fem_gui.get_femtet()
+    fem_gui.get_fem()
     assert fem_gui.get_connection_state() == ReturnMsg.no_message
     assert fem_gui._load_femprj(get_test_femprj_path()) is True
 

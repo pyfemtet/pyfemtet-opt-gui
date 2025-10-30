@@ -1,6 +1,7 @@
 import os
 import ctypes
 import webbrowser
+import ast
 
 import psutil
 from femtetutils import util
@@ -8,19 +9,20 @@ from win32com.client import Dispatch, CDispatch
 # noinspection PyUnresolvedReferences
 from pythoncom import com_error
 import win32process
-# noinspection PyUnresolvedReferences
-from pythoncom import CoInitialize, CoUninitialize
 
 # noinspection PyUnresolvedReferences
 from PySide6.QtWidgets import *
 
-from PySide6 import QtCore
 from PySide6.QtCore import QCoreApplication
 
 import pyfemtet_opt_gui
 from pyfemtet_opt_gui.logger import get_logger
 from pyfemtet_opt_gui.common.return_msg import ReturnMsg, ReturnType
 from pyfemtet_opt_gui.common.expression_processor import Expression
+from pyfemtet_opt_gui.common.type_alias import *
+from pyfemtet_opt_gui.fem_interfaces.base_fem_interface import AbstractFEMInterface
+from pyfemtet_opt_gui.fem_interfaces.femtet_interface.femtet_operator_support import *
+
 
 logger = get_logger('Femtet')
 
@@ -49,17 +51,64 @@ def _search_process(process_name):
 
     # psutil が失敗する場合はプロセス存在の
     # エラーチェックをあきらめる
-    except Exception:
+    except Exception:  # noqa
         is_running = True
 
     return is_running
 
 
-class FemtetInterfaceGUI:
+# 比較演算子に対応する関数名
+COMPARE_OP_TO_FUNC_NAME: dict[type, str] = {
+    ast.Eq: _femtet_equal.__name__,
+    ast.NotEq: _femtet_not_equal.__name__,
+    ast.Lt: _femtet_less_than.__name__,
+    ast.LtE: _femtet_less_than_equal.__name__,
+    ast.Gt: _femtet_greater_than.__name__,
+    ast.GtE: _femtet_greater_than_equal.__name__,
+    ast.And: _femtet_operator_and.__name__,
+    ast.Or: _femtet_operator_or.__name__,
+}
+
+
+# Femtet の比較演算子に合わせるための
+# 文字列中の比較演算を関数に変換するための
+# transformer
+class CompareTransformer(ast.NodeTransformer):
+
+    def visit_BoolOp(self, node: ast.BoolOp):
+        op_type = type(node.op)
+        if op_type in COMPARE_OP_TO_FUNC_NAME:
+            func_name = COMPARE_OP_TO_FUNC_NAME[op_type]
+            node = ast.Call(
+                func=ast.Name(id=func_name, ctx=ast.Load()),
+                args=node.values,
+                keywords=[]
+            )
+
+        return self.generic_visit(node)
+
+    def visit_Compare(self, node: ast.Compare):
+        if len(node.ops) == 1 and len(node.comparators) == 1:
+            op_type = type(node.ops[0])
+
+            # 変換対象かどうか
+            if op_type in COMPARE_OP_TO_FUNC_NAME:
+                func_name = COMPARE_OP_TO_FUNC_NAME[op_type]
+
+                node = ast.Call(
+                    func=ast.Name(id=func_name, ctx=ast.Load()),
+                    args=[node.left, node.comparators[0]],
+                    keywords=[]
+                )
+
+        return self.generic_visit(node)
+
+
+class FemtetInterfaceGUI(AbstractFEMInterface):
 
     # ===== Femtet process & object handling =====
     @classmethod
-    def get_femtet(cls, progress: QProgressDialog | None = None) -> tuple[CDispatch | None, ReturnType]:
+    def get_fem(cls, progress: QProgressDialog | None = None) -> tuple[CDispatch | None, ReturnType]:
         global _Femtet
 
         if progress is not None:
@@ -120,7 +169,7 @@ class FemtetInterfaceGUI:
         # Dispatch オブジェクトは存在するが
         # メソッドにアクセスできない場合
         # (makepy できていない？)
-        except Exception:
+        except Exception:  # noqa
             return ReturnMsg.Error.femtet_access_error
 
         # メソッドにアクセスできるが
@@ -176,7 +225,10 @@ class FemtetInterfaceGUI:
 
     # ===== Parameter =====
     @classmethod
-    def get_variables(cls) -> tuple[dict[str, Expression], ReturnType]:
+    def get_variables(cls) -> tuple[
+        dict[VariableName, Expression],
+        ReturnType
+    ]:
         out = dict()
 
         # check Femtet Connection
@@ -210,14 +262,27 @@ class FemtetInterfaceGUI:
         for var_name in variable_names:
             expression: str = _Femtet.GetVariableExpression(var_name)
             try:
-                out[var_name] = Expression(expression)
-            except Exception:
+                norm_var_name = cls.normalize_var_name(var_name)
+                out[VariableName(
+                    raw=var_name,
+                    converted=norm_var_name
+                )] = Expression(
+                    expression,
+                    variable_names
+                )
+            except Exception:  # noqa
                 return {}, ReturnMsg.Error.cannot_recognize_as_an_expression
 
         return out, ReturnMsg.no_message
 
     @classmethod
-    def apply_variables(cls, variables: dict[str, float | str]) -> tuple[ReturnType, str | None]:
+    def apply_variables(
+            cls,
+            variables: dict[
+                RawVariableName,
+                float
+            ]
+    ) -> tuple[ReturnType, str | None]:
         # check Femtet Connection
         ret = FemtetInterfaceGUI.get_connection_state()
         if ret != ReturnMsg.no_message:
@@ -275,6 +340,67 @@ class FemtetInterfaceGUI:
             # except から finally に来ていれば
             # すでに return_msg が入っている
             return return_msg, additional_msg
+
+    # ===== Expression Processing =====
+    @classmethod
+    def normalize_expr_str(
+            cls,
+            expr_str: RawExpressionStr,
+            names: list[RawVariableName],
+    ) -> ConvertedExpressionStr:
+
+        # 退避
+        expr_str = expr_str.replace("<=", "<$$")
+        expr_str = expr_str.replace('>=', '>$$')
+        expr_str = expr_str.replace('==', '$$$$')
+
+        # 変換
+        expr_str = expr_str.replace('=', '==')
+        expr_str = expr_str.replace('<>', '!=')
+        expr_str = expr_str.replace('^', '**')
+
+        # 元に戻す
+        expr_str = expr_str.replace('<$$', '<=')
+        expr_str = expr_str.replace('>$$', '>=')
+        expr_str = expr_str.replace('$$$$', '==')
+
+        # 特定の演算子を関数に変換
+        tree = ast.parse(expr_str, mode="eval")
+        transformer = CompareTransformer()
+        new_tree = transformer.visit(tree)
+        ast.fix_missing_locations(new_tree)
+        expr_str = ast.unparse(new_tree)
+
+        # 変数名を convert
+        out = expr_str
+        for name in names:
+            out.replace(name, cls.normalize_var_name(name))
+
+        return out
+
+    @classmethod
+    def normalize_var_name(
+        cls,
+        name: RawVariableName,
+    ) -> ConvertedVariableName:
+        return (
+            name
+            .replace('.', '__dot__')
+            .replace('@', '__at__')
+            .replace('-', '__hyphen__')
+        )
+
+    @classmethod
+    def unnormalize_var_name(
+            cls,
+            name: ConvertedVariableName,
+    ) -> RawVariableName:
+        return (
+            name
+            .replace('__dot__', '.')
+            .replace('__at__', '@')
+            .replace('__hyphen__', '-')
+        )
 
     # ===== Modeling =====
     @classmethod
@@ -337,14 +463,14 @@ class FemtetInterfaceGUI:
 
     # ===== femtet help homepage =====
     @classmethod
-    def _get_femtet_help_base(cls):
+    def _get_fem_help_base(cls):
         return 'https://www.muratasoftware.com/products/mainhelp/mainhelp2024_0/desktop/'
 
     @classmethod
     def _get_help_url(cls, partial_url):
         # partial_url = 'ParametricAnalysis/ParametricAnalysis.htm'
         # partial_url = 'ProjectCreation/VariableTree.htm'
-        return cls._get_femtet_help_base() + partial_url
+        return cls._get_fem_help_base() + partial_url
 
     @classmethod
     def open_help(cls, partial_url):
@@ -437,7 +563,7 @@ class FemtetInterfaceGUI:
 
 if __name__ == '__main__':
     # get Femtet
-    Femtet_, ret_msg = FemtetInterfaceGUI.get_femtet()
+    Femtet_, ret_msg = FemtetInterfaceGUI.get_fem()
     if ret_msg != ReturnMsg.no_message:
         print(ret_msg)
         print(FemtetInterfaceGUI.get_connection_state())

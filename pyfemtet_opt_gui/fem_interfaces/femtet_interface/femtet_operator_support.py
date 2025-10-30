@@ -93,18 +93,18 @@ def get_fem_builtins(d: dict = None) -> dict:
         d = {k.replace('@', '__at__'): v for k, v in d.items()}  # 出力スクリプト中で利用
 
     d.update({
-        'mean': lambda *args: float(mean(args)),
-        'max': lambda *args: float(max(args)),
-        'min': lambda *args: float(min(args)),
+        'Mean': lambda *args: float(mean(args)),
+        'Max': lambda *args: float(max(args)),
+        'Min': lambda *args: float(min(args)),
         'pi': pi,
-        'sin': sin,
-        'cos': cos,
-        'tan': tan,
-        'atn': arctan,
-        'log': log,
-        'sqr': sqrt,
-        'abs': abs,
-        'f_if': _femtet_f_if,
+        'Sin': sin,
+        'Cos': cos,
+        'Tan': tan,
+        'Atn': arctan,
+        'Log': log,
+        'Sqr': sqrt,
+        'Abs': abs,
+        'F_IF': _femtet_f_if,
     })
 
     d.update(FUNC_NAME_TO_FUNC)
@@ -177,4 +177,4 @@ def _get_myself_code_str():
 
 
 if __name__ == '__main__':
-    _get_myself_code_str()
+    print(_get_myself_code_str())

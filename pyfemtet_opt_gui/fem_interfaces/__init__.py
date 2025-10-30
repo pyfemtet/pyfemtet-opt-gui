@@ -31,5 +31,5 @@ def get_current_cad_name() -> CADIntegration:
 
 
 # 循環参照を避けるためここでインポート
-from pyfemtet_opt_gui.fem_interfaces.femtet_interface_gui import FemtetInterfaceGUI
-from pyfemtet_opt_gui.fem_interfaces.solidworks_interface_gui import SolidWorksInterfaceGUI
+from pyfemtet_opt_gui.fem_interfaces.femtet_interface import FemtetInterfaceGUI
+from pyfemtet_opt_gui.fem_interfaces.solidworks_interface import SolidWorksInterfaceGUI

@@ -1,9 +1,6 @@
 from __future__ import annotations
 
 # noinspection PyUnresolvedReferences
-from PySide6 import QtWidgets, QtCore, QtGui
-
-# noinspection PyUnresolvedReferences
 from PySide6.QtCore import *
 
 # noinspection PyUnresolvedReferences
@@ -382,7 +379,7 @@ ReturnType = ReturnMsg.Error | ReturnMsg.Warn | ReturnMsg.Info | ReturnMsg.no_me
 # OK かどうかを返す関数
 def show_return_msg(
         return_msg: ReturnType,
-        parent: QWidget,
+        parent: QWidget | QObject,
         with_cancel_button: bool = False,
         additional_message=None,
 ) -> bool:
@@ -429,7 +426,7 @@ def show_return_msg(
 # 内部処理を進めてよいかどうかを返す関数
 def can_continue(
         return_msg: ReturnType,
-        parent: QWidget,
+        parent: QWidget | QObject,
         with_cancel_button: bool | Literal['auto'] = 'auto',
         no_dialog_if_info=False,
         additional_message=None,

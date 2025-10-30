@@ -455,7 +455,7 @@ if __name__ == '__main__':
     from pyfemtet_opt_gui.models.constraints.cns import ConstraintWizardPage
     from pyfemtet_opt_gui.models.analysis_model.analysis_model import AnalysisModelWizardPage
 
-    fi.get().get_femtet()
+    fi.get().get_fem()
 
     app = QApplication()
     app.setStyle('fusion')

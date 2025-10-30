@@ -1,3 +1,5 @@
+from typing import Callable
+
 # noinspection PyUnresolvedReferences
 from PySide6.QtCore import *
 
@@ -10,15 +12,12 @@ from PySide6.QtCore import *
 # noinspection PyUnresolvedReferences
 from PySide6.QtGui import *
 
-# noinspection PyUnresolvedReferences
-from PySide6 import QtWidgets, QtCore, QtGui
-
 from pyfemtet_opt_gui.ui.ui_Dialog_cns_edit import Ui_Dialog
 
 from pyfemtet_opt_gui.common.qt_util import *
 from pyfemtet_opt_gui.common.return_msg import *
 from pyfemtet_opt_gui.common.expression_processor import *
-from pyfemtet_opt_gui.common.symbol_support import convert
+from pyfemtet_opt_gui.common.type_alias import *
 
 from pyfemtet_opt_gui.models.variables.var import get_var_model, VariableItemModelForTableView, VariableItemModel, VariableTableViewDelegate
 from pyfemtet_opt_gui.models.constraints.model import get_cns_model, ConstraintModel, Constraint
@@ -38,7 +37,7 @@ class ConstraintEditorDialog(QDialog):
             self,
             parent=None,
             f=Qt.WindowType.Dialog,
-            load_femtet_fun: callable = None,
+            load_femtet_fun: Callable = None,
             existing_constraint_name: str = None
     ):
         super().__init__(parent, f)
@@ -73,7 +72,8 @@ class ConstraintEditorDialog(QDialog):
         editor = self.ui.plainTextEdit_cnsFormula
         editor.textChanged.connect(
             lambda: self.update_evaluated_value(
-                editor.toPlainText().replace('@', '__at__')  # gui 内部で完結するので AT にはしなくてよい
+                editor.toPlainText(),
+                [n.raw for n in self.original_var_model.get_current_variables()]
             )
         )
 
@@ -90,7 +90,7 @@ class ConstraintEditorDialog(QDialog):
                 cns.expression_show
             )
 
-    def setup_signal(self, load_femtet_fun: callable):
+    def setup_signal(self, load_femtet_fun: Callable):
 
         # load femtet
         if load_femtet_fun is not None:
@@ -148,21 +148,28 @@ class ConstraintEditorDialog(QDialog):
             )
         )
         self.ui.pushButton_input_mean.clicked.connect(
-            lambda _: self.insert_text_to_expression(
-                'Mean(,)'
-            )
+            lambda _: self.insert_text_to_expression("Mean(,)")
         )
 
-    def update_evaluated_value(self, expression: str):
+    def update_evaluated_value(
+            self,
+            expression: RawExpressionStr,
+            raw_var_names: list[RawVariableName],
+    ):
 
         label = self.ui.label_calc_value
 
         try:
             # error check
-            expr = Expression(expression)
+            expr = Expression(expression, raw_var_names=raw_var_names)
 
             # eval
-            expr_key = 'this_is_a_current_expression_key'
+
+            tmp_expr_key_name = "this_is_a_current_expression_key"
+            expr_key = VariableName(
+                raw=tmp_expr_key_name,
+                converted=tmp_expr_key_name,
+            )
             expressions = self.original_var_model.get_current_variables()
             expressions.update(
                 {expr_key: expr}
@@ -292,8 +299,8 @@ class ConstraintEditorDialog(QDialog):
         with nullcontext():
             constraint: Constraint = Constraint(self.original_var_model)
             constraint.name = self.ui.lineEdit_name.text() if self.ui.lineEdit_name.text() != '' else self.constraints.get_unique_name()
-            constraint.name = convert(constraint.name)  # 念のため。
-            constraint.expression = convert(self.ui.plainTextEdit_cnsFormula.toPlainText())
+            constraint.name = constraint.name
+            constraint.expression = self.ui.plainTextEdit_cnsFormula.toPlainText()
             constraint.expression_show = self.ui.plainTextEdit_cnsFormula.toPlainText()
             constraint.lb = lb_value
             constraint.ub = ub_value
@@ -320,14 +327,18 @@ class ConstraintEditorDialog(QDialog):
                     can_continue(
                         ReturnMsg.Error.duplicated_constraint_name,
                         parent=self.parent(),
-                        additional_message = (QCoreApplication.translate('pyfemtet_opt_gui.models.constraints.cns_dialog', '拘束式名: {constraint_name}').format(constraint_name=constraint.name),)
+                        additional_message=(
+                            QCoreApplication.translate(
+                                'pyfemtet_opt_gui.models.constraints.cns_dialog',
+                                '拘束式名: {constraint_name}'
+                            ).format(constraint_name=constraint.name),
+                        )
                     )
                     return None
 
         # ConstraintModel モデルに書き戻す
         self.constraints.set_constraint(constraint, self.existing_constraint_name)
-
-        super().accept()
+        return super().accept()
 
     def _load_femtet_debug(self):
 

@@ -4,13 +4,20 @@ import sys
 import ast
 from traceback import print_exception
 from graphlib import TopologicalSorter
+from typing import Sequence, Any
+
 import unicodedata
 
 from pyfemtet_opt_gui.common.return_msg import ReturnMsg, ReturnType
 from pyfemtet_opt_gui.common.femtet_operator_support import *
 from pyfemtet_opt_gui.common.solidworks_function_support import *
+from pyfemtet_opt_gui.common.type_alias import *
 
-from pyfemtet_opt_gui.fem_interfaces import get_current_cad_name, CADIntegration
+from pyfemtet_opt_gui.fem_interfaces import (
+    get as get_fem_class,
+    get_current_cad_name,
+    CADIntegration
+)
 from PySide6.QtCore import QCoreApplication
 
 
@@ -27,87 +34,11 @@ class NotSupportedOperatorError(Exception):
     pass
 
 
-# 比較演算子に対応する関数名
-COMPARE_OP_TO_FUNC_NAME = {
-    ast.Eq: _femtet_equal.__name__,
-    ast.NotEq: _femtet_not_equal.__name__,
-    ast.Lt: _femtet_less_than.__name__,
-    ast.LtE: _femtet_less_than_equal.__name__,
-    ast.Gt: _femtet_greater_than.__name__,
-    ast.GtE: _femtet_greater_than_equal.__name__,
-    ast.And: _femtet_operator_and.__name__,
-    ast.Or: _femtet_operator_or.__name__,
-}
-
-
-# Femtet の比較演算子に合わせるための
-# 文字列中の比較演算を関数に変換するための
-# transformer
-class CompareTransformer(ast.NodeTransformer):
-
-    def visit_BoolOp(self, node: ast.BoolOp):
-        op_type = type(node.op)
-        if op_type in COMPARE_OP_TO_FUNC_NAME:
-            func_name = COMPARE_OP_TO_FUNC_NAME[op_type]
-            node = ast.Call(
-                func=ast.Name(id=func_name, ctx=ast.Load()),
-                args=node.values,
-                keywords=[]
-            )
-
-        return self.generic_visit(node)
-
-    def visit_Compare(self, node: ast.Compare):
-        if len(node.ops) == 1 and len(node.comparators) == 1:
-            op_type = type(node.ops[0])
-
-            # 変換対象かどうか
-            if op_type in COMPARE_OP_TO_FUNC_NAME:
-                func_name = COMPARE_OP_TO_FUNC_NAME[op_type]
-
-                node = ast.Call(
-                    func=ast.Name(id=func_name, ctx=ast.Load()),
-                    args=[node.left, node.comparators[0]],
-                    keywords=[]
-                )
-
-        return self.generic_visit(node)
-
-
-# Femtet 式を Python 書式・Femtet 演算に変換
-def convert_operator(expr_str: str) -> str:
-
-    # 退避
-    expr_str = expr_str.replace('<=', '<$$')
-    expr_str = expr_str.replace('>=', '>$$')
-    expr_str = expr_str.replace('==', '$$$$')
-
-    # 変換
-    expr_str = expr_str.replace('=', '==')
-    expr_str = expr_str.replace('<>', '!=')
-    expr_str = expr_str.replace('^', '**')
-
-    # 元に戻す
-    expr_str = expr_str.replace('<$$', '<=')
-    expr_str = expr_str.replace('>$$', '>=')
-    expr_str = expr_str.replace('$$$$', '==')
-
-    # Femtet ならば演算子を関数に変換
-    if get_current_cad_name() == CADIntegration.no:
-        tree = ast.parse(expr_str, mode='eval')
-        transformer = CompareTransformer()
-        new_tree = transformer.visit(tree)
-        ast.fix_missing_locations(new_tree)
-        expr_str = ast.unparse(new_tree)
-
-    return expr_str
-
-
 class ExpressionParseError(Exception):
     pass
 
 
-def check_bounds(value=None, lb=None, ub=None) -> tuple[ReturnMsg, str | None]:
+def check_bounds(value=None, lb=None, ub=None) -> tuple[ReturnType, str | None]:
     if value is None:
         if lb is None:
             return ReturnMsg.no_message, None
@@ -146,11 +77,13 @@ def check_bounds(value=None, lb=None, ub=None) -> tuple[ReturnMsg, str | None]:
 
 
 def check_expr_str_and_bounds(
-        expr_str: str | None,
+        expr_str: RawExpressionStr | None,
         lb: float | None,
         ub: float | None,
-        expressions: dict[str, Expression],
+        expressions: dict[VariableName, Expression],
 ) -> tuple[ReturnType, str]:
+
+    raw_var_names = [n.raw for n in expressions.keys()]
 
     # 両方とも指定されていなければエラー
     if lb is None and ub is None:
@@ -164,24 +97,33 @@ def check_expr_str_and_bounds(
 
     # expression が None ならエラー
     if expr_str is None:
-        return (ReturnMsg.Error.cannot_recognize_as_an_expression, QCoreApplication.translate('pyfemtet_opt_gui.common.expression_processor', '式が入力されていません。'))
+        return (
+            ReturnMsg.Error.cannot_recognize_as_an_expression,
+            QCoreApplication.translate(
+                'pyfemtet_opt_gui.common.expression_processor',
+                '式が入力されていません。'
+            )
+        )
 
     # expression が None でなくとも
     # Expression にできなければエラー
     try:
-        _expr = Expression(expr_str)
+        _expr = Expression(expr_str, raw_var_names=raw_var_names)
     except ExpressionParseError:
         return ReturnMsg.Error.cannot_recognize_as_an_expression, expr_str
 
     # Expression にできても値が
     # 計算できなければエラー
-    _expr_key = 'this_is_a_target_constraint_expression'
-    # expressions = var_model.get_current_variables()
+    _tmp_expr_key_name = 'this_is_a_target_constraint_expression'
+    _expr_key = VariableName(
+        raw=_tmp_expr_key_name,
+        converted=_tmp_expr_key_name,
+    )
     expressions.update(
         {_expr_key: _expr}
     )
     ret, ret_msg, a_msg = eval_expressions(expressions)
-    a_msg = a_msg.replace(_expr_key, expr_str)
+    a_msg = a_msg.replace(_tmp_expr_key_name, expr_str)
     if ret_msg != ReturnMsg.no_message:
         return ret_msg, a_msg
 
@@ -205,7 +147,7 @@ def check_expr_str_and_bounds(
     return ReturnMsg.no_message, ''
 
 
-def get_dependency(expr_str):
+def get_dependency(expr_str: ConvertedExpressionStr) -> set[ConvertedVariableName]:
     """大文字・小文字を維持したまま依存変数を取得する。
     関数は無視する。"""
 
@@ -257,18 +199,29 @@ def get_dependency(expr_str):
 
 
 def get_cad_buitlins():
+    # TODO: FEM クラスに移動
     current_cad = get_current_cad_name()
     if current_cad == CADIntegration.solidworks:
         return get_solidworks_builtins()
     elif current_cad == CADIntegration.no:
-        return get_femtet_builtins()
+        return get_fem_builtins()
     else:
         assert False, f'Unknown CADIntegration: {current_cad}'
 
 
 class Expression:
 
-    def __init__(self, expression: str | float):
+    expr_str: RawExpressionStr | float
+    raw_var_names: Sequence[RawVariableName] | None
+    unit: str
+    norm_expr_str: ConvertedExpressionStr
+    norm_dependencies: set[ConvertedVariableName]
+
+    def __init__(
+            self,
+            expr_str: RawExpressionStr | float,
+            raw_var_names: Sequence[RawVariableName],
+    ):
         """
         Example:
             e = Expression('1')
@@ -292,47 +245,46 @@ class Expression:
             e.value  # 1.0
 
         """
-        # ユーザー指定の何らかの入力
-        self._expr: str | float = expression
 
-        # 最低限の整形を行う
-        if isinstance(self._expr, str):
-            # Femtet, SW ではスペース削除可
-            self._expr = self._expr.strip()
+        # 元の変数名リストを保存
+        self.expr_str = expr_str
+        self.raw_var_names = raw_var_names
+
+        # 最低限の整形
+        self.norm_expr_str = str(self.expr_str).strip()
 
         # 単位があれば分離
-        if isinstance(self._expr, str):
-            if get_current_cad_name() == CADIntegration.solidworks:
-                value, unit = split_unit_solidworks(self._expr)
-                self._expr = value
-                self.unit = unit  # '', 'mm', ...
-            elif get_current_cad_name() == CADIntegration.no:
-                self.unit = ''
-            else:
-                assert False, f'Unknown CADIntegration: {get_current_cad_name()}'
-        else:
-            self.unit = ''
+        # TODO: FEM クラスに統合する
+        self.unit = ''
+        if get_current_cad_name() == CADIntegration.solidworks:
+            no_unit, unit = split_unit_solidworks(self.norm_expr_str)
+            self.norm_expr_str = no_unit
+            self.unit = unit  # '', 'mm', ...
 
-        # 書式を python 書式に変換
+        # 書式を python で評価できる形に変換
+        # FEM クラスに依存する正規化
         try:
-            self._converted_expr_str: str = convert_operator(str(self._expr))
+            self.norm_expr_str = get_fem_class().normalize_expr_str(
+                self.norm_expr_str,
+                raw_var_names
+            )
         except Exception as e:
             self.is_valid = False
             raise ExpressionParseError(str(e)) from e
 
-        # 変換できたら dependency を取得
+        # 正規化できたら dependency を取得
         try:
-            self.dependencies: set[str] = get_dependency(self._converted_expr_str)
+            self.norm_dependencies = get_dependency(self.norm_expr_str)
             self.is_valid = True
-
         except ExpressionParseError as e:
             self.is_valid = False
             raise e
 
-        # locals が適切ならば Python 式として評価できる文字列
+        # 適切な locals を与えれば Python 式として評価できる文字列
         # 大文字・小文字を区別しないが変更しては不具合が出る CAD のため
         # Python 評価時は小文字で統一
-        self.evalable_expr_str = self._converted_expr_str.lower()
+        self.norm_expr_str_ready_to_eval: ConvertedExpressionStr = \
+            self.norm_expr_str.lower()
 
     def _get_value_if_pure_number(self) -> float | None:
         # 1.0000 => True
@@ -341,19 +293,19 @@ class Expression:
         if self.unit != '':
             return None
         try:
-            value = float(str(self._expr).replace(',', '_'))
+            value = float(str(self.expr_str).replace(',', '_'))
             return value
         except ValueError:
             return None
 
     def is_number(self) -> bool:
-        return len(self.dependencies) == 0
+        return len(self.norm_dependencies) == 0
 
     def is_expression(self) -> bool:
         return not self.is_number()
 
     @property
-    def expr(self) -> str:
+    def expr_display(self) -> str:
         # 1.0000000e+0 などは 1 などにする
         # ただし 1.1 * 1.1 などは 1.21 にしない
         # self.is_number() は後者も True を返す
@@ -361,23 +313,25 @@ class Expression:
         if value is not None:
             return str(value)
         else:
-            return str(self._expr) + self.unit
+            return str(self.expr_str)
 
     @property
     def value(self) -> float:
         if self.is_number():
             return self.eval()
         else:
-            raise ValueError(f'Cannot convert expression {self.expr} to float.')
+            raise ValueError(f'Cannot convert expression {self.expr_display} to float.')
 
-    def eval(self, l: dict[str, ...] = None):
+    def eval(self, locals_: dict[str, Any] = None):
+        # locals の組立
         l_ = {k.lower(): v for k, v in get_cad_buitlins().items()}
-        if l is not None:
-            l_.update({k.lower(): v for k, v in l.items()})
-        # 半角が入っていてもいいように評価時のみ正規化する
+        if locals_ is not None:
+            l_.update({k.lower(): v for k, v in locals_.items()})
+
+        # 半角カナが入っていてもいいように評価時のみ正規化する
         return float(
             eval(
-                unicodedata.normalize('NFKC', self.evalable_expr_str),
+                unicodedata.normalize('NFKC', self.norm_expr_str_ready_to_eval),
                 {unicodedata.normalize('NFKC', key): value for key, value in l_.items()}
             )
         )
@@ -386,7 +340,7 @@ class Expression:
         return self.__str__()
 
     def __str__(self):
-        return f'{self.expr} ({str(self._expr)})'
+        return f'{self.expr_display} ({str(self.expr_str)})'
 
     def __float__(self):
         return self.value
@@ -395,63 +349,43 @@ class Expression:
         return int(float(self))
 
 
-def topological_sort(expressions: dict[str, Expression]) -> list[str]:
+def topological_sort(expressions: dict[VariableName, Expression]) -> list[ConvertedVariableName]:
     """
     Raises:
         CycleError
     """
-    dependencies = {name: expr.dependencies for name, expr in expressions.items()}
+    dependencies: dict[ConvertedVariableName, set[ConvertedVariableName]] = \
+        {name.converted: expr.norm_dependencies for name, expr in expressions.items()}
     ts = TopologicalSorter(dependencies)
     return list(ts.static_order())
 
 
-def eval_expressions(expressions: dict[str, Expression | float | str]) -> tuple[dict[str, float], ReturnType, str]:
+def eval_expressions(
+        expressions: dict[VariableName, Expression | float | RawExpressionStr]
+) -> tuple[dict[VariableName, float], ReturnType, str]:
 
     # 値渡しに変換
     expressions = expressions.copy()
 
+    # 戻り値を準備
     error_keys = []
 
-    # 型を統一
-    expression_: str | float | Expression
+    # value の型を Expression に統一
+    raw_var_names = [var_name.raw for var_name in expressions.keys()]
     for key, expression_ in expressions.items():
-        if not isinstance(expression_, Expression):
-            expressions[key] = Expression(expression_)
-
-    # Solidworks 対応:
-    #   param@Part1 のように、 @ を利用して
-    #   変数に suffix がついている場合はここで修正
-    fixed_expressions: dict[str, Expression] = dict()
-    for key, expression in expressions.items():
-        dependencies = expression.dependencies
-        expr_str = expression.expr
-        for dependency in dependencies:
-            # dependency を後ろから @ で区切っていき
-            # ほかの key と一致するならば
-            # それを採用
-            parts = dependency.split('__at__')
-            for i in range(len(parts))[::-1]:
-                # @ で区切った名前
-                temp_name = '__at__'.join(parts[:i+1])
-                # それが expressions の keys に一致すれば
-                if temp_name in expressions.keys():
-                    # expr_str に含まれる @ で区切る前の変数名を
-                    # @ で区切ったものにリネームして次の dependency へ
-                    expr_str = expr_str.replace(dependency, temp_name)
-                    break
-        # 変数名を修正した expr_str を用いて Expression を作り直す
-        fixed_expression = Expression(expr_str)
-        fixed_expressions.update(
-            {key: fixed_expression}
-        )
-    expressions = fixed_expressions
+        if isinstance(expression_, Expression):
+            pass
+        elif isinstance(expression_, float | RawExpressionStr):
+            expressions[key] = Expression(expression_, raw_var_names)
+        else:
+            assert False, f'Type of expression_ is invalid: {expression_}({type(expression_)}).'
 
     # 不明な変数を参照していればエラー
     expression: Expression
     for key, expression in expressions.items():
-        for var_name in expression.dependencies:
-            if var_name not in expressions:
-                error_keys.append(f"{key}: {var_name}")  # error!
+        for var_name in expression.norm_dependencies:
+            if var_name not in [n.converted for n in expressions.keys()]:
+                error_keys.append(f"{key.raw}: {var_name}")  # error!
 
     # エラーがあれば終了
     if len(error_keys) > 0:
@@ -461,27 +395,31 @@ def eval_expressions(expressions: dict[str, Expression | float | str]) -> tuple[
     evaluation_order = topological_sort(expressions)
 
     # ソート順に評価
-    evaluated_value = {}
-    for key in evaluation_order:
+    norm_var_name_to_var_name = {n.converted: n for n in expressions.keys()}
+    evaluated_locals: dict[ConvertedVariableName, float] = {}
+    out: dict[VariableName, float] = {}
+    for norm_var_name in evaluation_order:
 
         # 評価
+        key: VariableName = norm_var_name_to_var_name[norm_var_name]
         expression = expressions[key]
         try:
-            value = expression.eval(evaluated_value)
+            value = expression.eval(evaluated_locals)
         except Exception as e:
             print_exception(e)
             print(f'Failed to evaluate expression '
-                  f'{key}={expression.evalable_expr_str}',
+                  f'{key.raw}={expression.norm_expr_str_ready_to_eval}',
                   file=sys.stderr)
             # 評価に失敗（これ以降が計算できないのでここで終了）
-            error_keys.append(key)  # error!
+            error_keys.append(key.raw)  # error!
             break
 
         # 評価済み変数に追加
-        evaluated_value[key] = value
+        evaluated_locals[key.converted] = value
+        out[key] = value
 
     if error_keys:
         return {}, ReturnMsg.Error.evaluated_expression_not_float, f': {error_keys}'
 
     else:
-        return evaluated_value, ReturnMsg.no_message, ''
+        return out, ReturnMsg.no_message, ''
