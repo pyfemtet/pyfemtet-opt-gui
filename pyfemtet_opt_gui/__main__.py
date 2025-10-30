@@ -3,7 +3,7 @@ import locale
 from PySide6.QtCore import QTranslator
 from PySide6.QtWidgets import QApplication
 
-from fem_interfaces import CADIntegration
+from pyfemtet_opt_gui.fem_interfaces import CADIntegration
 
 # Detect the locale before loading other modules
 if __name__ == '__main__':

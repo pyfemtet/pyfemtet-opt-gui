@@ -255,7 +255,8 @@ if __name__ == '__main__':
 
     g_code = ''
 
-    g_code += create_header()
+    from pyfemtet_opt_gui.fem_interfaces.femtet_interface.femtet_expression_support import  _get_myself_code_str
+    g_code += create_header(_get_myself_code_str=_get_myself_code_str)
     g_code += '\n'
     g_code += '\n'
     g_code += create_main()

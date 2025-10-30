@@ -23,6 +23,7 @@ from pyfemtet_opt_gui.fem_interfaces.femtet_interface.femtet_interface import (
     FemtetInterfaceGUI,
     logger
 )
+from pyfemtet_opt_gui.fem_interfaces.solidworks_interface.solidworks_expression_support import split_unit_solidworks
 
 _sw: CDispatch | None = None
 
@@ -167,7 +168,7 @@ class SolidWorksInterfaceGUI(FemtetInterfaceGUI):
         mgr = SolidworksVariableManager()
         equations: list[str] = mgr.get_equations_recourse(
             swModel=swModel,
-            global_variables_only=False,
+            global_variables_only=True,
         )
 
         # Get variable names
@@ -180,16 +181,22 @@ class SolidWorksInterfaceGUI(FemtetInterfaceGUI):
         # Parse equations
         out: dict[VariableName, Expression] = dict()
         for name, eq in zip(raw_var_names, equations):
-            expr: Expression = get_expression_from_equation(
-                equation=eq,
-                raw_var_names=raw_var_names
-            )
-
             # 純粋変数のみを抽出
-            if expr.is_number():
+            right_side = '='.join(eq.split('=')[1:])
+            no_unit, unit = split_unit_solidworks(right_side)
+            
+            try:
+                float(no_unit)
+            except ValueError:
+                continue
+            else:
                 var_name = VariableName(
                     raw=name,
                     converted=cls.normalize_var_name(name),
+                )
+                expr = Expression(
+                    right_side,
+                    raw_var_names=raw_var_names,
                 )
                 out.update({var_name: expr})
 

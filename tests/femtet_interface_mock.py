@@ -5,7 +5,7 @@ from win32com.client import CDispatch
 from pythoncom import com_error
 
 from pyfemtet_opt_gui.common.return_msg import ReturnType, ReturnMsg
-from pyfemtet_opt_gui.fem_interfaces.femtet_interface_gui import FemtetInterfaceGUI
+from pyfemtet_opt_gui.fem_interfaces.femtet_interface.femtet_interface import FemtetInterfaceGUI
 
 from typing import TYPE_CHECKING
 
