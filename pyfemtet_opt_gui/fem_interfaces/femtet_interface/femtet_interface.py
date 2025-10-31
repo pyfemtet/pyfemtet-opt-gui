@@ -331,15 +331,13 @@ class FemtetInterfaceGUI(AbstractFEMInterface):
                 "マクロ名: `UpdateVariable` エラーメッセージ: {exception_msg}",
             ).format(exception_msg=exception_msg)
 
-        finally:
+        r_msg2, a_msg2 = cls._rebuild_model()
+        if r_msg2 != ReturnMsg.no_message:
+            return r_msg2, a_msg2
 
-            r_msg2, a_msg2 = cls._rebuild_model()
-            if r_msg2 != ReturnMsg.no_message:
-                return r_msg2, a_msg2
-
-            # except から finally に来ていれば
-            # すでに return_msg が入っている
-            return return_msg, additional_msg
+        # except から finally に来ていれば
+        # すでに return_msg が入っている
+        return return_msg, additional_msg
 
     # ===== Expression Processing =====
     @classmethod

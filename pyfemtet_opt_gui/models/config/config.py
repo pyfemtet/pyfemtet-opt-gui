@@ -394,7 +394,7 @@ class QConfigTreeViewDelegate(QStyledItemDelegateWithCombobox):
 
                 model.setData(index, display, Qt.ItemDataRole.DisplayRole)
                 model.setData(index, value, Qt.ItemDataRole.UserRole)
-                return
+                return None
 
             # surrogate model である
             elif vhd == ConfigItemClassEnum.surrogate_model_name.value.name:
@@ -412,7 +412,7 @@ class QConfigTreeViewDelegate(QStyledItemDelegateWithCombobox):
 
                 model.setData(index, display, Qt.ItemDataRole.DisplayRole)
                 model.setData(index, value, Qt.ItemDataRole.UserRole)
-                return
+                return None
 
             # history_path である
             elif vhd == ConfigItemClassEnum.history_path.value.name:
@@ -440,16 +440,17 @@ class QConfigTreeViewDelegate(QStyledItemDelegateWithCombobox):
                 except OSError:
                     ret_msg = ReturnMsg.Error.invalid_file_name
                     can_continue(ret_msg, self.parent())
-                    return
+                    return None
 
                 finally:
                     if text.endswith('.csv'):
                         text = text + '.csv'
                     model.setData(index, text, Qt.ItemDataRole.DisplayRole)
-                    return
+
+                return None
 
         # その他の場合
-        super().setModelData(editor, model, index)
+        return super().setModelData(editor, model, index)
 
 
 # 大元の ItemModel
