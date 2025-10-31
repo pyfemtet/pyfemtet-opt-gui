@@ -58,6 +58,19 @@ import pyfemtet_opt_gui.fem_interfaces as fi
 # noinspection PyUnresolvedReferences
 import torch
 
+# makepy
+import subprocess
+cmd = f"{sys.executable} -m win32com.client.makepy FemtetMacro"
+subprocess.run(cmd, shell=True)
+import win32com.client
+# importlib.reload(win32com.client)
+Dispatch = win32com.client.Dispatch
+Dispatch('FemtetMacro.Femtet')
+constants = win32com.client.constants
+if not hasattr(constants, "STATIC_C"):
+    raise ('makepy が実行されていません。Femtet の「マクロ機能の有効化」を実施したのち、'
+           f'{cmd} を実行してから再度 pyfemtet-opt-gui を実行してください。')
+
 
 class Main(QWizard):
     ui: Ui_Main
