@@ -785,7 +785,10 @@ class VariableItemModel(StandardItemModelWithHeader):
         # Checked がひとつもない
         return all([ch != Qt.CheckState.Checked for ch in check_list])
 
-    def output_json(self) -> str:
+    def output_json(
+            self,
+            pass_to_fem_of_no_check_no_check=True,
+    ) -> str:
         """Use 列が Checked のものを json 形式にして出力"""
 
         out_object = list()
@@ -958,6 +961,7 @@ class VariableItemModel(StandardItemModelWithHeader):
             # 数式でなくて Check されていない場合: Expression (pass_to_fem=True)
             # GUI 画面と Femtet の定義に万一差があっても
             # pass_to_fem が True なら上書きできる。
+            # ただし、サロゲートモデルを実施する場合は False とする。
             # add_expression
             else:
                 command_object.update({"command": "femopt.add_expression"})
@@ -987,7 +991,7 @@ class VariableItemModel(StandardItemModelWithHeader):
 
                 # pass_to_fem
                 with nullcontext():
-                    args_object.update(dict(pass_to_fem=True))
+                    args_object.update(dict(pass_to_fem=pass_to_fem_of_no_check_no_check))
 
             command_object.update({"args": args_object})
             out_object.append(command_object)

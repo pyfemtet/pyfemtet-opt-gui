@@ -133,10 +133,17 @@ def create_opt_script(surrogate_code_state: SurrogateCodeState):
     return create_from_model(model)
 
 
-def create_var_script():
+def create_var_script(surrogate_code_state: SurrogateCodeState):
     model: VariableItemModel = get_var_model(None)
-    return create_from_model(model)
-
+    if surrogate_code_state == SurrogateCodeState.for_surrogate_training:
+        return create_from_model(
+            model,
+        )
+    else:
+        return create_from_model(
+            model,
+            kwargs={'pass_to_fem_of_no_check_no_check': False},
+        )
 
 def create_cns_script(surrogate_code_state):
     model: ConstraintModel = get_cns_model(None)
@@ -258,7 +265,7 @@ def create_script(
     code += '\n'
     code += create_femopt(surrogate_code_state)
     code += '\n'
-    code += create_var_script()
+    code += create_var_script(surrogate_code_state)
     code += '\n'
     code += create_cns_script(surrogate_code_state)
     code += '\n'
