@@ -142,7 +142,7 @@ def create_var_script(surrogate_code_state: SurrogateCodeState):
     else:
         return create_from_model(
             model,
-            kwargs={'pass_to_fem_of_no_check_no_check': False},
+            pass_to_fem_of_no_check_no_check=False,
         )
 
 def create_cns_script(surrogate_code_state):
