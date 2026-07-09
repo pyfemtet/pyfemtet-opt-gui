@@ -511,27 +511,19 @@ class ConfigItemModel(StandardItemModelWithHeader):
     # Vertical に recurse してくれない仕様のせいで
     # ConfigItemModel は完全な singleton ではないので
     # これはクラス変数にする
+    # ※ 全インスタンスで共有するクラス変数として扱うため、
+    #   getter/setter はインスタンス経由でも type(self) を介して
+    #   クラス変数を読み書きする（@classmethod と @property の
+    #   重ね掛けは Python 3.11 で非推奨、3.13 で廃止されたため使わない）
     _history_path: str = None
 
-    # noinspection PyNestedDecorators
-    @property
-    @classmethod
-    def history_path(cls) -> str:
-        return cls._history_path
-
-    @classmethod
-    @history_path.setter
-    def history_path(cls, value):
-        cls._history_path = value
-
-    # noinspection PyTypeChecker
     @property
     def history_path(self) -> str:
-        return type(self).history_path
+        return type(self)._history_path
 
     @history_path.setter
     def history_path(self, value):
-        type(self).history_path = value
+        type(self)._history_path = value
 
     def __init__(self, parent=None, _dummy_data=True, original_model: 'ConfigItemModel' = None):
         super().__init__(parent, _dummy_data)
