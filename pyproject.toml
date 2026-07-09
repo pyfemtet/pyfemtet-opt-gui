@@ -26,12 +26,16 @@ build-backend = "hatchling.build"
 
 [dependency-groups]
 dev = [
+    "pyfemtet",
     "pytest>=8.3.5",
     "pytest-qt>=4.4.0",
-    "sphinx==8.2.3",  # Should copy to docs/requirements.txt
-    "sphinx-intl==2.3.2",  # Should copy to docs/requirements.txt
-    "sphinx-rtd-theme==3.0.2",  # Should copy to docs/requirements.txt
+    "sphinx==8.2.3", # Should copy to docs/requirements.txt
+    "sphinx-intl==2.3.2", # Should copy to docs/requirements.txt
+    "sphinx-rtd-theme==3.0.2", # Should copy to docs/requirements.txt
 ]
 
 [tool.hatch.version]
 source = "uv-dynamic-versioning"
+
+[tool.uv.sources]
+pyfemtet = { path = "../pyfemtet", editable = true }

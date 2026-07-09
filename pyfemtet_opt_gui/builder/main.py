@@ -82,6 +82,15 @@ def create_fem_script(surrogate_code_state: SurrogateCodeState):
                 ret='fem',
             )
 
+            config_model: ConfigItemModel = get_config_model(None)
+            if config_model.output_skip_3d_model_update():
+                if Version(pyfemtet.__version__) < Version('1.9.4'):
+                    # 警告を出す
+                    ...
+                else:
+                    args_obj_reference: dict = cmd_obj['args']
+                    args_obj_reference.update({"skip_model_update": "True"})
+
         elif get_current_cad_name() == CADIntegration.solidworks:
 
             sldprt_path = related_paths[0]

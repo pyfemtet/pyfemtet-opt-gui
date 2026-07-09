@@ -257,6 +257,23 @@ class ConfigItemClassEnum(enum.Enum):
         )
         choices: dict[str, str] = {s: s for s in SurrogateModelNames}
 
+    @enum.member
+    class skip_updating_model(AbstractConfigItem):
+        name = QCoreApplication.translate(
+            "pyfemtet_opt_gui.models.config.config",
+            "3Dモデル更新をスキップ",
+        )
+        default_display = "No"
+        default_internal = False
+        note = QCoreApplication.translate(
+            "pyfemtet_opt_gui.models.config.config",
+            "履歴制限プロジェクトに対して最適化を行う場合は必須です。\n"
+            "境界条件・ボディ属性・材料定数などのみを更新する場合、\n"
+            "3Dモデルの更新をスキップすることで最適化が可能です。\n"
+            "※ Solidworks 連携時は使用できません。\n",
+            "※ pyfemtet 1.9.4 未満では使用できません。\n",
+        )
+        choices: dict[str, bool] = {"Yes": True, "No": False}
 
 # ===== Models =====
 
@@ -343,6 +360,18 @@ class QConfigTreeViewDelegate(QStyledItemDelegateWithCombobox):
             )
             return editor
 
+        # 「3Dモデル更新をスキップ」の「設定値」ならばコンボボックスを作成
+        # 対応する setModelData, sizeHint, paint は抽象クラスで定義済み
+        if self.is_combobox_target(index, 'SKIP_UPDATING_MODEL'):
+            editor = self.create_combobox(
+                parent,
+                index,
+                choices=list(
+                    ConfigItemClassEnum.skip_updating_model.value.choices.keys()),
+                default=ConfigItemClassEnum.skip_updating_model.value.default_display,
+            )
+            return editor
+
         # その他の場合
         return super().createEditor(parent, option, index)
 
@@ -409,6 +438,24 @@ class QConfigTreeViewDelegate(QStyledItemDelegateWithCombobox):
 
                 # 列挙体のメンバーに変換
                 value = SurrogateModelNames(display)
+
+                model.setData(index, display, Qt.ItemDataRole.DisplayRole)
+                model.setData(index, value, Qt.ItemDataRole.UserRole)
+                return None
+
+            # skip_updating_model である
+            elif vhd == ConfigItemClassEnum.skip_updating_model.value.name:
+
+                # 文字列をコンボボックスで取得する前提
+                assert isinstance(editor, QComboBox)
+
+                display = editor.currentText()
+
+                # choices の中にないとおかしい
+                assert display in ConfigItemClassEnum.skip_updating_model.value.choices.keys()
+
+                # bool に変換
+                value = ConfigItemClassEnum.skip_updating_model.value.choices[display]
 
                 model.setData(index, display, Qt.ItemDataRole.DisplayRole)
                 model.setData(index, value, Qt.ItemDataRole.UserRole)
@@ -929,6 +976,19 @@ class ConfigItemModel(StandardItemModelWithHeader):
 
         return json.dumps([out])
 
+    def output_skip_3d_model_update(self) -> bool:
+        # 「設定値」列の番号
+        c_value = self.get_column_by_header_data(self.ColumnNames.value)
+
+        # 行番号
+        cls = ConfigItemClassEnum.skip_updating_model.value
+        vhd = cls.name
+        r = self.get_row_by_header_data(vhd)
+
+        # 値
+        skip_updating_model = self.item(r, c_value).data(Qt.ItemDataRole.UserRole)
+        return skip_updating_model
+
     def reset_history_path(self):
         self.history_path = None
 
@@ -1088,6 +1148,10 @@ class ConfigWizardPage(TitledWizardPage):
                 'SURROGATE_MODEL': (
                     ConfigHeaderNames.value,
                     ConfigItemClassEnum.surrogate_model_name.value.name
+                ),
+                'SKIP_UPDATING_MODEL': (
+                    ConfigHeaderNames.value,
+                    ConfigItemClassEnum.skip_updating_model.value.name
                 ),
             }
         )

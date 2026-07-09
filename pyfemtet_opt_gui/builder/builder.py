@@ -144,11 +144,11 @@ def create_command_line(command_json, n=1):
                     else:
                         raise NotImplementedError
 
-                code += ind(n + 1) + f'{key}=(' + ', '.join(str_list) + ',)\n'
+                code += ind(n + 1) + f'{key}=(' + ', '.join(str_list) + ',),\n'
             elif isinstance(value, dict):
                 # key={k: v, k2: v2}
                 arr = [f'{k}: {v}' for k, v in value.items()]
-                code += ind(n + 1) + key + '={' + ', '.join(arr) + '}\n'
+                code += ind(n + 1) + key + '={' + ', '.join(arr) + '},\n'
             else:
                 code += ind(n + 1) + f'{key}={value},\n'
 
